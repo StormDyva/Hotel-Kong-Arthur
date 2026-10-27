@@ -5,10 +5,10 @@
   "description": "Booking-UI for Hotel Kong Arthur (HTML, CSS og vanilla JavaScript).",
   "scripts": {
     "start": "python3 -m http.server 5500",
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.js",
     "smoke": "node tests/browser-smoke.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
