@@ -10,9 +10,10 @@ Approved as working agreement – 2026-10-26. Status viser specifikationsdæknin
 | REST/JSON API | specify, plan | US-001–US-005 | T-007–T-009 | OpenAPI/API-tests | Dækket |
 | OpenAPI-kontrakt og Swagger UI | constitution, specify | US-012 | T-007 | validator, Swagger smoke | Dækket |
 | MySQL | constitution, specify, plan | US-005 | T-003–T-006 | migration/integration | Dækket |
-| Docker Compose | constitution, plan | US-012 | T-005 | compose config/smoke | Dækket |
+| Docker Compose | constitution, plan | US-012 | T-005-Docker | compose config/smoke | Dækket |
 | Live/opdaterbare data | specify, clarify | US-005 | T-009 | POST/PUT/DELETE → GET | Dækket |
 | CSV/XSLT seed/import | specify, clarify | US-010 | T-004 | import smoke/re-run | Dækket |
+| ITAKEA kundedata-import | specify, clarify | US-005, US-008, US-010 | T-005 | mapping/import/idempotency tests | Dækket |
 | Booking CRUD frontend | specify | US-001–US-004 | T-014 | browser smoke | Dækket |
 | Belægningsgrad | clarify, plan | US-006 | T-010–T-011 | formel/golden tests | Dækket |
 | Hotelindtjening | specify, plan | US-007 | T-011 | golden dataset | Dækket |

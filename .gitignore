@@ -1,0 +1,4 @@
+# Kundens rådata må kun ligge lokalt under import.
+data/raw/
+*.csv
+*.xlsx
