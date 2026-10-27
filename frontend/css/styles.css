@@ -684,7 +684,8 @@ select[aria-invalid="true"] {
   .booking-table td {
     display: grid;
     grid-template-columns: 110px 1fr;
-    gap: 8px;
+    gap: 2px 8px;
+    align-items: start;
     text-align: left !important;
     border-bottom: 1px solid var(--border);
   }
@@ -695,9 +696,21 @@ select[aria-invalid="true"] {
 
   .booking-table td::before {
     content: attr(data-label);
+    grid-column: 1;
+    grid-row: 1 / span 4;
     color: var(--text-muted);
     font-size: 0.8rem;
     font-weight: 600;
+  }
+
+  /* Alt indhold i cellen hører til værdikolonnen. */
+  .booking-table td > * {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .booking-table .actions .btn + .btn {
+    margin-left: 0;
   }
 
   .booking-table td.empty-row {

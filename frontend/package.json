@@ -1,0 +1,14 @@
+{
+  "name": "hotel-kong-arthur-frontend",
+  "private": true,
+  "type": "module",
+  "description": "Booking-UI for Hotel Kong Arthur (HTML, CSS og vanilla JavaScript).",
+  "scripts": {
+    "start": "python3 -m http.server 5500",
+    "test": "node --test tests/",
+    "smoke": "node tests/browser-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
