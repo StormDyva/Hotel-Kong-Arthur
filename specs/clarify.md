@@ -48,9 +48,9 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 
 ### C-007 – Prisberegning
 
-- **Beslutning:** Sæsonpriser på room_types er reference/prisliste. bookings.price_total er faktisk registreret pris og bruges til indtjening. Faktisk pris rekonstrueres ikke fra sæsonpris.
-- **Begrundelse:** Historiske og faktiske salgspriser kan afvige.
-- **Konsekvens:** Pris er obligatorisk ved booking-CRUD, valuta er DKK og price_total >= 0. Sæsonpris er ikke automatisk fakturaberegning i MVP.
+- **Beslutning:** Sæsonpriser ligger i room_type_prices og slås op pr. overnatningsnat. bookings.price_total er den gemte faktiske bookingpris, og booking_price_lines dokumenterer prisberegningen.
+- **Begrundelse:** Booking-flowet skal kunne beregne en reproducerbar pris ud fra værelsestype, dato/sæson og antal nætter, samtidig med at historiske priser bevares som snapshots.
+- **Konsekvens:** Ved oprettelse beregnes price_total som summen af prislinjer. Valuta er DKK, price_total >= 0, og frontend/API-klienten sender ikke den endelige pris som autoritativ værdi. Rabatter, morgenmad, skatter, weekendtillæg og dynamiske priser er uden for MVP.
 - **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
 
 ### C-008 – Helene Christine-filter
