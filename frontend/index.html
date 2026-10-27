@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Kong Arthur – Booking</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <div>
+          <p class="brand-name">Hotel Kong Arthur</p>
+          <p class="brand-sub">Reception · Booking</p>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Visning">
+        <button type="button" role="tab" id="tab-booking" aria-controls="view-booking" aria-selected="true">Ny booking</button>
+        <button type="button" role="tab" id="tab-reception" aria-controls="view-reception" aria-selected="false" tabindex="-1">Bookingoversigt</button>
+      </nav>
+    </div>
+  </header>
+
+  <p id="mode-banner" class="mode-banner" hidden>
+    Mock-tilstand: data kommer fra mock-data i browseren og nulstilles, når siden genindlæses.
+  </p>
+
+  <main class="container">
+    <section id="view-booking" class="view" role="tabpanel" aria-labelledby="tab-booking">
+      <h1 class="visually-hidden">Ny booking</h1>
+
+      <section id="search" class="card" aria-labelledby="search-title">
+        <h2 id="search-title"><span class="step">1</span> Søg ledige værelser</h2>
+        <form id="search-form" class="form-grid search-grid" novalidate>
+          <div class="field">
+            <label for="check_in">Check-in</label>
+            <input id="check_in" name="check_in" type="date" required aria-describedby="err-check_in">
+            <p id="err-check_in" class="field-error" data-error-for="check_in"></p>
+          </div>
+          <div class="field">
+            <label for="check_out">Check-out</label>
+            <input id="check_out" name="check_out" type="date" required aria-describedby="err-check_out">
+            <p id="err-check_out" class="field-error" data-error-for="check_out"></p>
+          </div>
+          <div class="field">
+            <label for="guests_count">Antal gæster</label>
+            <input id="guests_count" name="guests_count" type="number" min="1" max="4" step="1" value="2" required aria-describedby="err-guests_count">
+            <p id="err-guests_count" class="field-error" data-error-for="guests_count"></p>
+          </div>
+          <div class="field field-action">
+            <button type="submit" class="btn btn-primary">Søg værelser</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="rooms" class="card" aria-labelledby="rooms-title" hidden>
+        <h2 id="rooms-title"><span class="step">2</span> Ledige værelser</h2>
+        <p class="muted" data-rooms-summary></p>
+        <div class="room-grid" data-rooms-list aria-live="polite"></div>
+      </section>
+
+      <section id="guest" class="card" aria-labelledby="guest-title" hidden>
+        <h2 id="guest-title"><span class="step">3</span> Gæstens oplysninger</h2>
+        <div class="guest-layout">
+          <form id="guest-form" class="form-grid" novalidate>
+            <p class="alert alert-error" data-form-alert role="alert" hidden></p>
+            <div class="field">
+              <label for="guest-name">Fulde navn</label>
+              <input id="guest-name" name="name" type="text" autocomplete="name" required aria-describedby="err-guest-name">
+              <p id="err-guest-name" class="field-error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="guest-email">E-mail</label>
+              <input id="guest-email" name="email" type="email" autocomplete="email" required aria-describedby="err-guest-email">
+              <p id="err-guest-email" class="field-error" data-error-for="email"></p>
+            </div>
+            <div class="field">
+              <label for="guest-phone">Telefon</label>
+              <input id="guest-phone" name="phone" type="tel" autocomplete="tel" placeholder="+45 12 34 56 78" required aria-describedby="err-guest-phone">
+              <p id="err-guest-phone" class="field-error" data-error-for="phone"></p>
+            </div>
+            <div class="field">
+              <label for="guest-country">Land</label>
+              <select id="guest-country" name="country_code" autocomplete="country" required aria-describedby="err-guest-country"></select>
+              <p id="err-guest-country" class="field-error" data-error-for="country_code"></p>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" data-back>Vælg et andet værelse</button>
+              <button type="submit" class="btn btn-primary">Bekræft booking</button>
+            </div>
+          </form>
+          <aside class="stay-summary" aria-label="Opholdet">
+            <h3>Opholdet</h3>
+            <div data-stay-details></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="confirmation" class="card" aria-labelledby="confirmation-title" hidden>
+        <h2 id="confirmation-title"><span class="step">4</span> Bookingbekræftelse</h2>
+        <div data-confirmation></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" data-new-booking>Ny booking</button>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-reception" class="view" role="tabpanel" aria-labelledby="tab-reception" hidden>
+      <div class="card">
+        <div class="list-head">
+          <h1 class="list-title">Bookingoversigt</h1>
+          <p class="muted" data-bookings-count aria-live="polite"></p>
+        </div>
+        <form class="toolbar" data-filters role="search">
+          <div class="field">
+            <label for="filter-query">Søg</label>
+            <input id="filter-query" name="query" type="search" placeholder="Navn, e-mail, bookingnr. eller værelse">
+          </div>
+          <div class="field">
+            <label for="filter-status">Status</label>
+            <select id="filter-status" name="status">
+              <option value="">Alle</option>
+              <option value="confirmed">Bekræftede</option>
+              <option value="cancelled">Annullerede</option>
+            </select>
+          </div>
+          <div class="field field-action">
+            <button type="button" class="btn btn-secondary" data-refresh>Opdatér</button>
+          </div>
+        </form>
+        <p class="alert alert-error" data-list-alert role="alert" hidden></p>
+        <div class="table-wrap">
+          <table class="booking-table">
+            <thead>
+              <tr>
+                <th scope="col">Booking</th>
+                <th scope="col">Gæst</th>
+                <th scope="col">Værelse</th>
+                <th scope="col">Ophold</th>
+                <th scope="col" class="num">Pris</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="visually-hidden">Handlinger</span></th>
+              </tr>
+            </thead>
+            <tbody data-bookings-body></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="edit-dialog" class="dialog" aria-labelledby="edit-title">
+    <form novalidate>
+      <h2 id="edit-title" data-edit-title>Redigér booking</h2>
+      <p class="alert alert-error" data-form-alert role="alert" hidden></p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="edit-check_in">Check-in</label>
+          <input id="edit-check_in" name="check_in" type="date" required aria-describedby="err-edit-check_in">
+          <p id="err-edit-check_in" class="field-error" data-error-for="check_in"></p>
+        </div>
+        <div class="field">
+          <label for="edit-check_out">Check-out</label>
+          <input id="edit-check_out" name="check_out" type="date" required aria-describedby="err-edit-check_out">
+          <p id="err-edit-check_out" class="field-error" data-error-for="check_out"></p>
+        </div>
+        <div class="field">
+          <label for="edit-guests_count">Antal gæster</label>
+          <input id="edit-guests_count" name="guests_count" type="number" min="1" step="1" required aria-describedby="err-edit-guests_count">
+          <p id="err-edit-guests_count" class="field-error" data-error-for="guests_count"></p>
+        </div>
+        <div class="field">
+          <label for="edit-name">Fulde navn</label>
+          <input id="edit-name" name="name" type="text" required aria-describedby="err-edit-name">
+          <p id="err-edit-name" class="field-error" data-error-for="name"></p>
+        </div>
+        <div class="field">
+          <label for="edit-email">E-mail</label>
+          <input id="edit-email" name="email" type="email" required aria-describedby="err-edit-email">
+          <p id="err-edit-email" class="field-error" data-error-for="email"></p>
+        </div>
+        <div class="field">
+          <label for="edit-phone">Telefon</label>
+          <input id="edit-phone" name="phone" type="tel" required aria-describedby="err-edit-phone">
+          <p id="err-edit-phone" class="field-error" data-error-for="phone"></p>
+        </div>
+        <div class="field">
+          <label for="edit-country">Land</label>
+          <select id="edit-country" name="country_code" required aria-describedby="err-edit-country"></select>
+          <p id="err-edit-country" class="field-error" data-error-for="country_code"></p>
+        </div>
+      </div>
+      <p class="price-preview"><span class="muted-label">Ny pris:</span> <strong data-edit-price></strong></p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-close>Fortryd</button>
+        <button type="submit" class="btn btn-primary">Gem ændringer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="cancel-dialog" class="dialog dialog-small" aria-labelledby="cancel-title">
+    <h2 id="cancel-title">Annullér booking?</h2>
+    <p data-cancel-summary></p>
+    <p class="muted">Bookingen markeres som annulleret og bevares i historikken. Værelset bliver ledigt igen.</p>
+    <p class="alert alert-error" data-form-alert role="alert" hidden></p>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" data-close>Behold booking</button>
+      <button type="button" class="btn btn-danger" data-confirm-cancel>Annullér booking</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
