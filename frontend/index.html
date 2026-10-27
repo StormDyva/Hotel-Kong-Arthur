@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Kong Arthur – Booking</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <div>
+          <p class="brand-name">Hotel Kong Arthur</p>
+          <p class="brand-sub">Reception · Booking</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p id="mode-banner" class="mode-banner" hidden>
+    Mock-tilstand: data kommer fra mock-data i browseren og nulstilles, når siden genindlæses.
+  </p>
+
+  <main class="container">
+    <section id="view-booking" class="view" aria-labelledby="view-booking-title">
+      <h1 id="view-booking-title" class="visually-hidden">Ny booking</h1>
+
+      <section id="search" class="card" aria-labelledby="search-title">
+        <h2 id="search-title"><span class="step">1</span> Søg ledige værelser</h2>
+        <form id="search-form" class="form-grid search-grid" novalidate>
+          <div class="field">
+            <label for="check_in">Check-in</label>
+            <input id="check_in" name="check_in" type="date" required aria-describedby="err-check_in">
+            <p id="err-check_in" class="field-error" data-error-for="check_in"></p>
+          </div>
+          <div class="field">
+            <label for="check_out">Check-out</label>
+            <input id="check_out" name="check_out" type="date" required aria-describedby="err-check_out">
+            <p id="err-check_out" class="field-error" data-error-for="check_out"></p>
+          </div>
+          <div class="field">
+            <label for="guests_count">Antal gæster</label>
+            <input id="guests_count" name="guests_count" type="number" min="1" max="4" step="1" value="2" required aria-describedby="err-guests_count">
+            <p id="err-guests_count" class="field-error" data-error-for="guests_count"></p>
+          </div>
+          <div class="field field-action">
+            <button type="submit" class="btn btn-primary">Søg værelser</button>
+          </div>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
