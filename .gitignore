@@ -2,3 +2,6 @@
 data/raw/
 *.csv
 *.xlsx
+.env
+.env.*
+!.env.example

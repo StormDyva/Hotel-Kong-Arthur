@@ -1,0 +1,74 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hotel_kong_arthur}
+      MYSQL_USER: ${MYSQL_USER:-hotel_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me_locally}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_locally}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  db-init:
+    image: mysql:8.0
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hotel_kong_arthur}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_locally}
+    volumes:
+      - ./database/migrations:/migrations:ro
+      - ./database/seed:/seed:ro
+      - ./database/tests:/tests:ro
+      - ./database/scripts/apply-database.sh:/scripts/apply-database.sh:ro
+    command: ["/bin/sh", "/scripts/apply-database.sh"]
+
+  test-db:
+    profiles: ["test"]
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: hotel_kong_arthur_test
+      MYSQL_USER: hotel_test
+      MYSQL_PASSWORD: test_password
+      MYSQL_ROOT_PASSWORD: test_root_password
+    healthcheck:
+      test:
+        ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  test-runner:
+    profiles: ["test"]
+    image: mysql:8.0
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: test-db
+      MYSQL_DATABASE: hotel_kong_arthur_test
+      MYSQL_ROOT_PASSWORD: test_root_password
+      RUN_CHECKS: "1"
+    volumes:
+      - ./database/migrations:/migrations:ro
+      - ./database/seed:/seed:ro
+      - ./database/tests:/tests:ro
+      - ./database/scripts/apply-database.sh:/scripts/apply-database.sh:ro
+    command: ["/bin/sh", "/scripts/apply-database.sh"]
+
+volumes:
+  mysql_data:
