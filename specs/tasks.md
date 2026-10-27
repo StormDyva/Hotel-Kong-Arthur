@@ -44,7 +44,15 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: eksempeldata mappes til MySQL, import er reproducerbar, genkørsel/dubletter er dokumenteret, live-flow er adskilt.
 - Test: seed/import smoke test og kontrol af antal/relationsfejl.
 
-### T-005 – Docker Compose og miljø
+### T-005 – Import af kundedata fra ITAKEA/hoteldata
+
+- Stories: US-005, US-008, US-010.
+- Afhængighed: T-003 og T-004.
+- Område: database/migrations/, database/import/, database/tests/, docs/.
+- Accept: kundens filer profileres, mapping dokumenteres, importen er reproducerbar og idempotent, ufuldstændige rækker afvises, og bookingmodellen ændres ikke utilsigtet.
+- Test: ren MySQL, import to gange, relationstjek, afvisningsrapport og eksisterende booking-/prislinjetjek.
+
+### T-005-Docker – Docker Compose og miljø
 
 - Stories: US-005, US-012.
 - Afhængighed: T-003.
@@ -57,7 +65,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 ### T-006 – 3-lags FastAPI-struktur og health
 
 - Stories: US-012.
-- Afhængighed: T-003 og T-005.
+- Afhængighed: T-003 og T-005-Docker.
 - Område: backend/src/, backend/tests/.
 - Accept: API-, service- og repository-lag kan inspiceres; /health kontrollerer API/database.
 - Test: pytest health og laggrænse-review.
