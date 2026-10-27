@@ -2,119 +2,163 @@
 
 ## Status
 
-Draft implementation reference for T-003. The migration is the executable schema; this document explains domain meaning and invariants.
+Databasegrundlaget er udvidet i T-004 med migrationen
+`database/migrations/002_booking_database_foundation.sql`.
+`database/seed/001_booking_foundation_seed.sql` er et lille deterministisk
+udviklingsdatasæt. Det er ikke historiske hoteldata fra ITAKEA/hoteldata.
 
-## Global conventions
+## Globale konventioner
 
 - Database: MySQL 8+, InnoDB, utf8mb4.
-- Money: DECIMAL, currency DKK. Floating-point money is not allowed.
-- Calendar dates: ISO 8601 YYYY-MM-DD in Europe/Copenhagen.
-- Timestamps: stored by MySQL as UTC-compatible timestamps and converted for local display.
-- IDs: unsigned numeric surrogate keys.
-- Historical rows are retained. Booking cancellation is represented by status, not hard deletion.
+- Penge: `DECIMAL`, altid DKK i MVP. Floating point bruges ikke til penge.
+- Datoer: ISO 8601 (`YYYY-MM-DD`) i Europe/Copenhagen.
+- Check-in er inkluderet; check-out er eksklusiv og tæller ikke som overnatning.
+- Historiske rækker bevares. Annullering er soft-cancel via status.
 
-## Tables and relations
+## Booking- og prisflow
 
-### room_types
+En booking refererer til én hovedgæst og ét konkret værelse. Den endelige pris
+beregnes senere i service-laget som summen af én prislinje pr. overnatningsnat:
 
-One room type has many rooms. There are eight expected hotel categories in the project domain; the exact distribution of 214 rooms belongs in seed data.
+`price_total = SUM(booking_price_lines.line_total)`
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| name | VARCHAR(120) | Yes | Unique room type name |
-| capacity | TINYINT UNSIGNED | Yes | Maximum 1–4 guests |
-| base_price_low_season | DECIMAL(10,2) | Yes | Reference price per night |
-| base_price_mid_season | DECIMAL(10,2) | Yes | Reference price per night |
-| base_price_high_season | DECIMAL(10,2) | Yes | Reference price per night |
-| created_at, updated_at | TIMESTAMP | Yes | Audit timestamps |
+Prisen slås op via værelsets type, nattens sæson og `room_type_prices`.
+`bookings.price_total` og prislinjerne gemmes som snapshot, så en senere
+prisændring ikke ændrer historiske bookinger.
 
-Season prices are reference/list prices. They are not used to overwrite a booking’s actual price.
+## Tabeller og relationer
 
-### rooms
+### `room_types`
 
-Each room belongs to exactly one room type. A room can have many bookings over time but cannot have overlapping confirmed bookings.
+En værelsestype har mange konkrete værelser. De gamle
+`base_price_*_season`-kolonner fra migration 001 bevares af hensyn til
+bagudkompatibilitet, men den nye prismodel i `room_type_prices` er den
+autoritative model for nye bookinger.
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| room_number | VARCHAR(20) | Yes | Unique operational room number |
-| room_type_id | BIGINT UNSIGNED | Yes | Foreign key to room_types |
-| active | BOOLEAN | Yes | Whether room contributes to available capacity |
-| created_at, updated_at | TIMESTAMP | Yes | Audit timestamps |
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `id` | BIGINT UNSIGNED | Primærnøgle |
+| `name` | VARCHAR(120) | Unikt navn |
+| `description` | VARCHAR(500) | Valgfri beskrivelse |
+| `capacity` | TINYINT UNSIGNED | Maksimalt antal gæster, 1–4 |
+| `active` | BOOLEAN | Om typen må bruges til nye bookinger |
+| `base_price_low_season` etc. | DECIMAL(10,2) | Legacy/referencefelter fra migration 001 |
 
-### guests
+### `rooms`
 
-One guest record can have many bookings. Country code is the stable grouping key.
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `id` | BIGINT UNSIGNED | Primærnøgle |
+| `room_number` | VARCHAR(20) | Unikt fysisk værelsesnummer |
+| `room_type_id` | BIGINT UNSIGNED | Foreign key til `room_types` |
+| `status` | ENUM | `available`, `maintenance` eller `inactive` |
+| `active` | BOOLEAN | Om værelset indgår i kapacitet |
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| country_code | CHAR(2) | Yes | ISO-style country code |
-| country_name | VARCHAR(120) | Yes | Display name |
-| created_at, updated_at | TIMESTAMP | Yes | Audit timestamps |
+Værelser med status `maintenance` eller `inactive` må ikke vælges til nye
+bookinger. En senere API/service skal kontrollere både `active` og `status`.
 
-### bookings
+### `guests`
 
-Each booking references exactly one guest and one room. A booking is an overnight interval: check_in is inclusive and check_out is exclusive.
+En gæst kan have mange bookinger. Land bruges som stabil analysekategori.
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| guest_id | BIGINT UNSIGNED | Yes | Foreign key to guests |
-| room_id | BIGINT UNSIGNED | Yes | Foreign key to rooms |
-| check_in | DATE | Yes | First night boundary |
-| check_out | DATE | Yes | Departure boundary, not a night |
-| guests_count | TINYINT UNSIGNED | Yes | At least 1 and no more than room type capacity |
-| price_total | DECIMAL(12,2) | Yes | Actual recorded booking price |
-| currency | CHAR(3) | Yes | DKK only in MVP |
-| status | ENUM | Yes | confirmed or cancelled |
-| created_at, updated_at | TIMESTAMP | Yes | Audit timestamps |
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `id` | BIGINT UNSIGNED | Primærnøgle |
+| `first_name` | VARCHAR(120) | Fornavn; nullable for legacy-rækker |
+| `last_name` | VARCHAR(120) | Efternavn; nullable for legacy-rækker |
+| `email` | VARCHAR(254) | Kontaktmail; nullable |
+| `phone` | VARCHAR(40) | Telefonnummer; nullable |
+| `country_code` | CHAR(2) | ISO-lignende landekode |
+| `country_name` | VARCHAR(120) | Visningsnavn for land |
+| `created_at`, `updated_at` | TIMESTAMP | Auditfelter |
 
-Confirmed bookings participate in overlap checks and analysis. Cancelled bookings remain for history but participate in neither.
+Den gamle unikke constraint på land er fjernet, så flere gæster fra samme
+land kan gemmes. Email er ikke gjort unik, fordi et hotel kan have gentagne
+eller delte kontaktadresser.
 
-### bar_products
+### `seasons` og `season_periods`
 
-One product has many sales. Category is controlled so cocktail and coffee percentages are reproducible.
+`seasons` indeholder den logiske sæson og `season_periods` dens tilbagevendende
+kalenderintervaller. Den todelte lavsæson kan derfor have én pris med to
+kalenderperioder.
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| name | VARCHAR(160) | Yes | Unique product/drink name |
-| category | ENUM | Yes | cocktail, coffee or other |
-| price | DECIMAL(10,2) | Yes | Reference price |
-| active | BOOLEAN | Yes | Current catalogue flag |
-| created_at, updated_at | TIMESTAMP | Yes | Audit timestamps |
+Godkendt MVP-kalender:
 
-### bar_sales
+- `low`: 1/1–31/3 og 1/11–31/12
+- `mid`: 1/4–31/5 og 1/9–31/10
+- `high`: 1/6–31/8
 
-Each sale references exactly one product. unit_price is the actual price at sale time and is authoritative for revenue.
+### `room_type_prices`
 
-| Column | Type | Required | Meaning |
-|---|---|---:|---|
-| id | BIGINT UNSIGNED | Yes | Primary key |
-| product_id | BIGINT UNSIGNED | Yes | Foreign key to bar_products |
-| sold_at | TIMESTAMP | Yes | Sale time |
-| quantity | INT UNSIGNED | Yes | At least 1 |
-| unit_price | DECIMAL(10,2) | Yes | Actual sale price |
-| currency | CHAR(3) | Yes | DKK only in MVP |
-| employee_name | VARCHAR(160) | Yes | Used for Helene Christine filter |
-| created_at | TIMESTAMP | Yes | Import/audit timestamp |
+Én aktiv pris pr. værelsestype og sæson. `(room_type_id, season_id)` er unik.
 
-## Integrity rules
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `room_type_id` | BIGINT UNSIGNED | Foreign key til `room_types` |
+| `season_id` | BIGINT UNSIGNED | Foreign key til `seasons` |
+| `price_per_night` | DECIMAL(10,2) | Pris for én nat |
+| `currency` | CHAR(3) | DKK i MVP |
+| `active` | BOOLEAN | Om prisen kan bruges |
 
-1. check_out must be after check_in.
-2. guests_count must be at least 1 and no greater than the referenced room type capacity.
-3. Confirmed bookings for the same room overlap when new.check_in < existing.check_out and new.check_out > existing.check_in. The service/repository transaction must reject this; cancelled bookings are ignored.
-4. Active rooms determine available room nights.
-5. Prices and quantities cannot be negative; money is DKK.
-6. Foreign keys prevent deleting referenced room types, rooms, guests or products.
-7. The migration triggers enforce active-room and capacity checks. Overlap remains a transaction-level service rule because it spans booking rows.
+### `bookings`
 
-## Kvalitetstjek
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `id` | BIGINT UNSIGNED | Primærnøgle |
+| `guest_id` | BIGINT UNSIGNED | Hovedgæst |
+| `room_id` | BIGINT UNSIGNED | Konkret værelse |
+| `check_in` | DATE | Første nat, inkluderet |
+| `check_out` | DATE | Afrejsedag, eksklusiv |
+| `guests_count` | TINYINT UNSIGNED | Mindst 1, højst kapacitet |
+| `price_total` | DECIMAL(12,2) | Gemte faktiske bookingpris |
+| `currency` | CHAR(3) | DKK i MVP |
+| `status` | ENUM | `confirmed` eller `cancelled` |
+| `cancelled_at` | TIMESTAMP | Hvornår booking blev annulleret |
+| `created_at`, `updated_at` | TIMESTAMP | Auditfelter |
 
-- Er schemaet entydigt? Ja, felter, relationer, status, valuta og tidsregler er beskrevet.
-- Kan det implementeres? Ja, migrationen er vedlagt i database/migrations/001_initial_schema.sql.
-- Kan det testes? Ja, med migration, constraint, trigger og overlap-tests.
-- Er det dækket af user story/task? Ja, US-001–US-010 og T-003/T-004.
-- Er der afhængigheder? Seed-data og overlapservice kommer i senere tasks.
+### `booking_price_lines`
+
+Én række pr. overnatningsnat. `UNIQUE(booking_id, night_date)` forhindrer
+duplikerede prislinjer for samme bookingnat.
+
+| Kolonne | Type | Betydning |
+|---|---|---|
+| `booking_id` | BIGINT UNSIGNED | Foreign key til `bookings` |
+| `night_date` | DATE | Den konkrete overnatningsnat |
+| `season_id` | BIGINT UNSIGNED | Sæson brugt ved beregning |
+| `price_per_night` | DECIMAL(10,2) | Snapshot af natprisen |
+| `quantity` | TINYINT UNSIGNED | MVP er 1 pr. nat |
+| `line_total` | DECIMAL(12,2) | `price_per_night * quantity` |
+| `currency` | CHAR(3) | DKK i MVP |
+
+### `bar_products` og `bar_sales`
+
+Disse tabeller er genbrugt fra migration 001. `bar_sales.unit_price` er den
+faktiske historiske salgspris, mens `bar_products.price` er katalog/referencepris.
+`employee_name` bevares til Helene Christine-filteret og senere Tableau-KPI’er.
+
+## Integritetsregler
+
+1. Foreign keys beskytter relationerne mellem tabellerne.
+2. `check_out` skal være efter `check_in`.
+3. `guests_count` må ikke overstige værelsestypens kapacitet; migration 001’s
+   triggers håndhæver dette ved insert/update.
+4. Værelset skal være aktivt og have status `available` ved booking.
+5. Annullerede bookinger blokerer ikke værelset og tæller ikke i analyser.
+6. To bekræftede bookinger på samme værelse overlapper, når:
+
+   `new.check_in < existing.check_out AND new.check_out > existing.check_in`
+
+   MySQL `CHECK` kan ikke sammenligne rækker. Den senere bookingtransaktion
+   skal derfor låse værelsesrækken (`SELECT ... FOR UPDATE`) og kontrollere
+   overlap, før den skriver booking og prislinjer.
+7. Booking og alle prislinjer skal gemmes atomisk i én transaktion.
+8. `price_total` skal stemme med summen af `line_total`.
+9. Penge og mængder må ikke være negative; valuta er DKK i MVP.
+
+## Seed og kildedata
+
+Der findes ingen CSV/XSLT-kildedata i dette repository. Seed-filen er derfor
+et lille, deterministisk testdatasæt med otte værelsestyper, 16 værelser,
+fire gæster, tre sæsoner, sæsonpriser, bookinger samt barprodukter og salg.
+Den må ikke præsenteres som hotellets historiske produktionsdata.
