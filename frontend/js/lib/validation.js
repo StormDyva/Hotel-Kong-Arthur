@@ -54,3 +54,46 @@ export function validateStay(stay, { today, maxGuests = MAX_GUESTS_PER_ROOM } = 
 
   return result(errors);
 }
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_CHARS = /^\+?[\d\s()-]+$/;
+const COUNTRY_CODE = /^[A-Z]{2}$/;
+
+/**
+ * Validerer gæstens navn, e-mail, telefon og land (ISO 3166-1 alpha-2).
+ * @param {{name: string, email: string, phone: string, country_code: string}} guest
+ */
+export function validateGuest(guest) {
+  const { name, email, phone, country_code: countryCode } = guest ?? {};
+  const errors = {};
+
+  const trimmedName = String(name ?? '').trim();
+  if (!trimmedName) {
+    errors.name = 'Angiv gæstens fulde navn.';
+  } else if (trimmedName.length < 2 || trimmedName.length > 120) {
+    errors.name = 'Navnet skal være mellem 2 og 120 tegn.';
+  }
+
+  const trimmedEmail = String(email ?? '').trim();
+  if (!trimmedEmail) {
+    errors.email = 'Angiv gæstens e-mail.';
+  } else if (!EMAIL.test(trimmedEmail)) {
+    errors.email = 'E-mailen er ikke gyldig (fx navn@example.com).';
+  }
+
+  const trimmedPhone = String(phone ?? '').trim();
+  const digits = trimmedPhone.replace(/\D/g, '').length;
+  if (!trimmedPhone) {
+    errors.phone = 'Angiv gæstens telefonnummer.';
+  } else if (!PHONE_CHARS.test(trimmedPhone) || digits < 6 || digits > 15) {
+    errors.phone = 'Telefonnummeret skal have 6-15 cifre og må starte med +.';
+  }
+
+  if (isBlank(countryCode)) {
+    errors.country_code = 'Vælg gæstens land.';
+  } else if (!COUNTRY_CODE.test(String(countryCode).trim().toUpperCase())) {
+    errors.country_code = 'Landet skal angives som en landekode på to bogstaver.';
+  }
+
+  return result(errors);
+}

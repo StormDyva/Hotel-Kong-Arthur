@@ -305,3 +305,103 @@ select[aria-invalid="true"] {
 .toast[data-type="error"] {
   background: var(--danger);
 }
+
+/* Ledige værelser */
+
+.muted {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+}
+
+.room-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.room-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.room-number {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.room-facts {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.room-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.room-facts dt {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.room-facts dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.room-total {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.room-total dd {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.room-card .btn {
+  margin-top: auto;
+}
+
+.empty-state,
+.loading {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.alert {
+  grid-column: 1 / -1;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.925rem;
+}
+
+.alert-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
