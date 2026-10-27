@@ -57,6 +57,51 @@
         <p class="muted" data-rooms-summary></p>
         <div class="room-grid" data-rooms-list aria-live="polite"></div>
       </section>
+
+      <section id="guest" class="card" aria-labelledby="guest-title" hidden>
+        <h2 id="guest-title"><span class="step">3</span> Gæstens oplysninger</h2>
+        <div class="guest-layout">
+          <form id="guest-form" class="form-grid" novalidate>
+            <p class="alert alert-error" data-form-alert role="alert" hidden></p>
+            <div class="field">
+              <label for="guest-name">Fulde navn</label>
+              <input id="guest-name" name="name" type="text" autocomplete="name" required aria-describedby="err-guest-name">
+              <p id="err-guest-name" class="field-error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="guest-email">E-mail</label>
+              <input id="guest-email" name="email" type="email" autocomplete="email" required aria-describedby="err-guest-email">
+              <p id="err-guest-email" class="field-error" data-error-for="email"></p>
+            </div>
+            <div class="field">
+              <label for="guest-phone">Telefon</label>
+              <input id="guest-phone" name="phone" type="tel" autocomplete="tel" placeholder="+45 12 34 56 78" required aria-describedby="err-guest-phone">
+              <p id="err-guest-phone" class="field-error" data-error-for="phone"></p>
+            </div>
+            <div class="field">
+              <label for="guest-country">Land</label>
+              <select id="guest-country" name="country_code" autocomplete="country" required aria-describedby="err-guest-country"></select>
+              <p id="err-guest-country" class="field-error" data-error-for="country_code"></p>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" data-back>Vælg et andet værelse</button>
+              <button type="submit" class="btn btn-primary">Bekræft booking</button>
+            </div>
+          </form>
+          <aside class="stay-summary" aria-label="Opholdet">
+            <h3>Opholdet</h3>
+            <div data-stay-details></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="confirmation" class="card" aria-labelledby="confirmation-title" hidden>
+        <h2 id="confirmation-title"><span class="step">4</span> Bookingbekræftelse</h2>
+        <div data-confirmation></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" data-new-booking>Ny booking</button>
+        </div>
+      </section>
     </section>
   </main>
 

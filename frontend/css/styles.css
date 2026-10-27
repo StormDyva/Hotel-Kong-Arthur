@@ -405,3 +405,87 @@ select[aria-invalid="true"] {
   background: var(--success-bg);
   color: var(--success);
 }
+
+/* Gæsteformular og bekræftelse */
+
+.guest-layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.guest-layout .form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.guest-layout .alert,
+.form-actions {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.stay-summary {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.stay-summary h3 {
+  font-size: 1.05rem;
+}
+
+.summary-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.summary-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.summary-list dt {
+  color: var(--text-muted);
+}
+
+.summary-list dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.summary-total {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.summary-total dd {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+#confirmation .summary-list {
+  max-width: 520px;
+}
+
+@media (max-width: 760px) {
+  .guest-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .stay-summary {
+    order: -1;
+  }
+}
