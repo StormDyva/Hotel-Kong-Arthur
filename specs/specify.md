@@ -63,7 +63,7 @@ Alle responses er JSON. Fejl følger error, message og details. Analyse-endpoint
 | check_in | date | Påkrævet | Påkrævet | ISO 8601, lokal kalenderdato |
 | check_out | date | Påkrævet | Påkrævet | Efter check_in, eksklusiv overnatning |
 | guests_count | integer | Påkrævet | Påkrævet | Minimum 1, højst room_type.capacity |
-| price_total | decimal | Påkrævet | Påkrævet | DKK, mindst 0, faktisk bookingpris |
+| price_total | decimal | Beregnes af systemet | Beregnes af systemet | DKK, mindst 0, sum af prislinjer |
 | currency | string | Valgfrit | Valgfrit | Default DKK; andre valutaer afvises i MVP |
 | status | enum | Valgfrit | Påkrævet ved fuld PUT | confirmed eller cancelled; default confirmed ved POST |
 
@@ -89,10 +89,13 @@ PUT med samme gyldige payload giver samme resource-state. DELETE på allerede ca
 
 Hotellet har 214 værelser og 8 værelsestyper. Værelsestyper har kapacitet 1–4 personer og sæsonpriser. Præcise antal pr. type skal komme fra seed-data eller godkendt beslutning.
 
-- room_types: id, name, capacity, low/mid/high-season-priser.
+- room_types: id, name, description, capacity, active.
+- seasons/season_periods: sæsonnavn, aktive kalenderperioder og gentagelsesregler.
+- room_type_prices: room_type_id, season_id, price_per_night, currency, active.
 - rooms: id, room_number, room_type_id, active.
 - guests: id, country_code, country_name.
-- bookings: id, guest_id, room_id, check_in, check_out, guests_count, price_total, currency, status, created_at, updated_at.
+- bookings: id, guest_id, room_id, check_in, check_out, guests_count, price_total, currency, status, cancelled_at, created_at, updated_at.
+- booking_price_lines: booking_id, night_date, season_id, price_per_night, quantity, line_total, currency.
 - bar_products: id, name, category (cocktail, coffee eller anden godkendt kategori), price, active.
 - bar_sales: id, product_id, sold_at, quantity, unit_price, currency, employee_name.
 

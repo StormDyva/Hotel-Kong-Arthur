@@ -14,7 +14,7 @@ Presentation/API: routes, request/response schemas, HTTP, JSON og fejl. Service:
 
 ## Datamodel og relationer
 
-room_types 1-til-mange rooms; guests 1-til-mange bookings; rooms 1-til-mange bookings; bar_products 1-til-mange bar_sales. Booking har obligatoriske guest, room, check_in, check_out, guests_count, price_total, currency og status. Status er confirmed eller cancelled. Datoer er ISO 8601; timestamps lagres UTC. Valuta er DKK. guests_count må ikke overstige room_type.capacity.
+room_types 1-til-mange rooms og room_type_prices; seasons 1-til-mange season_periods og room_type_prices; guests 1-til-mange bookings; rooms 1-til-mange bookings; bookings 1-til-mange booking_price_lines; bar_products 1-til-mange bar_sales. Booking har obligatoriske guest, room, check_in, check_out, guests_count, price_total, currency og status. Status er confirmed eller cancelled. Datoer er ISO 8601; timestamps lagres UTC. Valuta er DKK. guests_count må ikke overstige room_type.capacity. price_total beregnes som summen af booking_price_lines og gemmes som historisk snapshot.
 
 ## API-kontrakt
 
