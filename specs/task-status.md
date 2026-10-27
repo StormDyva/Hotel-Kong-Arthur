@@ -42,28 +42,38 @@ https://github.com/StormDyva/Hotel-Kong-Arthur/pull/new/feature/T-003-database-s
 - Pull Request må merges til main efter godkendelse.
 - T-003 må først markeres endeligt færdig efter review og merge.
 
-## Næste task
+## Nuværende task
 
-T-004 – Seed-data og CSV/XSLT-import.
+T-004 – Booking-databasegrundlag og deterministisk seed er implementeret på
+branch `feature/T-004-booking-database-foundation` og afventer review.
 
-Målet er at kunne oprette en ren MySQL-database, køre schema og seed og få et reproducerbart datasæt til API og analyser.
+Målet er opfyldt for databasegrundlaget: en ren MySQL-database kan køre schema,
+seed og read-only kontroller og få et reproducerbart datasæt til booking-API og
+senere analyser.
+
+## Implementeret i T-004
+
+- Tilføjet migration 002 med gæsteoplysninger, room-status, seasons,
+  season_periods, room_type_prices, booking_price_lines og cancelled_at.
+- Opdateret bookingtriggers, så kun aktive værelser med status `available` og
+  aktive room types kan bruges, og kapacitetsreglen fortsat håndhæves.
+- Tilføjet deterministisk, genkørbar seed med otte room types, 16 rooms, fire
+  gæster, tre seasons/priser, fire bookings samt barprodukter og bar_sales.
+- Tilføjet read-only databasekontroller og opdateret data dictionary/specs.
 
 ## Plan for næste arbejdsdag
 
-1. Review og merge T-003.
-2. Opdatér lokal main fra origin.
-3. Opret branch feature/T-004-seed-import.
-4. Find og dokumentér CSV/XSLT-datakilder fra ITAKEA/hoteldata.
-5. Map data til de seks tabeller.
-6. Opret reproducerbare seed/import-filer.
-7. Test import mod en ren MySQL-container.
-8. Dokumentér genkørsel og håndtering af dubletter.
+1. Review og merge T-004 efter gruppens branch-strategi.
+2. Opret eller review T-005 – import af kundedata.
+3. Implementér FastAPI health endpoint og repository/service-lag.
+4. Implementér booking-flowets transaktionelle overlapkontrol.
+5. Implementér booking CRUD og endpoint for ledige værelser.
 
 Startkommandoer:
 
     /usr/bin/git switch main
     /usr/bin/git pull --rebase origin main
-    /usr/bin/git switch -c feature/T-004-seed-import
+    /usr/bin/git switch -c feature/T-005-docker-environment
 
 ## Arbejdsregler
 
