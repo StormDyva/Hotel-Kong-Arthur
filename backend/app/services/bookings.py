@@ -80,6 +80,16 @@ def save(repo, data, booking_id=None):
         old = repo.bookings(booking_id, lock=True)[0]
         if old['room_id'] != initial['room_id']:
             raise DomainError(409, 'BOOKING_CHANGED', 'Booking room changed concurrently; reload and retry')
+        if repo.review(booking_id):
+            old_name = ' '.join(filter(None, [old['first_name'], old['last_name']]))
+            changed = (old_name != data.guest.name.strip()
+                or old['country_code'] != data.guest.country_code
+                or old['room_id'] != data.room_id
+                or old['check_in'] != data.check_in or old['check_out'] != data.check_out
+                or old['guests_count'] != data.guests_count)
+            if changed:
+                raise DomainError(409, 'REVIEWED_BOOKING_IMMUTABLE',
+                    'Reviewed bookings only permit email and phone corrections')
         if old['status'] == 'cancelled':
             raise DomainError(409, 'CANCELLED', 'Cancelled bookings cannot be edited')
     if not room['active'] or not room['type_active'] or room['status'] != 'available':

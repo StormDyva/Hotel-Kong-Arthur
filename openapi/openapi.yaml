@@ -1631,7 +1631,8 @@ paths:
       - Analytics
       summary: Guests by country
       description: booking_guests counts party sizes once per matching booking; distinct_bookers
-        counts guest profiles. All party members are attributed to the booker country.
+        counts booking guest snapshots, not identified repeat visitors. All party
+        members are attributed to the booker country.
       operationId: analytics_guests_by_country_api_analytics_guests_by_country_get
       parameters:
       - name: from

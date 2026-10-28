@@ -57,8 +57,8 @@ nginx waits for the API health check. Swagger runs inside the API container.
 PUT uses a complete booking payload, preserves prices for an unchanged stay and
 recalculates them when dates change. DELETE returns 204 and soft-cancels the stay;
 repeating it is safe. Overlap returns 409, invalid input 422, missing booking 404.
-Shared guests follow the existing name/country identity assumption; editing contact
-information updates that shared guest. No authentication is provided in this local MVP.
+Bookings own separate guest snapshots; contact corrections cannot overwrite another
+booking. Names and countries are not person identifiers. No authentication is provided in this local MVP.
 
 ## Swagger og API-test
 
@@ -125,3 +125,9 @@ The required artifacts are [constitution](specs/constitution.md),
 [spec](specs/spec.md), [plan](specs/plan.md), and [tasks](specs/tasks.md).
 `specify.md` is a compatibility pointer to `spec.md`. See
 [the dated Converge report](specs/converge-2026-10-28.md) for test evidence and gaps.
+
+
+T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
+kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
+Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
+ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.

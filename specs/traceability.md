@@ -72,3 +72,8 @@ US-007 → services/revenue_rows.py → de to /analytics/revenue endpoints.
 Testbevis: test_revenue_rows.py kontrollerer 24 unikke kombinationer (også ved 0 og
 inaktiv historisk type), numeriske beløb, sæson-/periodeklip, dansk landelabel,
 annulleringer og ugyldige perioder. Ingen prisberegning flyttes til Tableau.
+
+T-023: Reviewfund 1–3 → migration 007, bookings.save, Repository.save_guest,
+importørens import_key og refresh.guest_rows → test_review_regressions.py.
+Samlet dashboard/refresh-accept er stadig udestående; eksporttest er ikke et
+færdigt Tableau-dashboardbevis.

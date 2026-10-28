@@ -8,6 +8,11 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 
+def guest_rows(data):
+    # Party size is attributed to the booking guest's country.
+    return [(x['label'], x['booking_guests']) for x in data['by_country']]
+
+
 def refresh(api, output, start, end):
     url = api.rstrip('/') + '/api/analytics/dashboard?' + urlencode({'from':start, 'to':end})
     with urlopen(url, timeout=30) as response:
@@ -18,7 +23,7 @@ def refresh(api, output, start, end):
         'summary': [(k, v) for k, v in s.items()],
         'rooms': [(x['label'],x['revenue']) for x in data['by_room_type']],
         'countries': [(x['label'],x['revenue']) for x in data['by_country']],
-        'guests': [(x['label'],x['bookings']) for x in data['by_country']],
+        'guests': guest_rows(data),
         'seasons': [(x['label'],x['revenue']) for x in data['by_season']],
         'room_seasons': [(x['label'],x['revenue']) for x in data['by_room_type_season']],
         'drinks': [(x['product'],x['revenue']) for x in data['bar_products']],

@@ -26,8 +26,9 @@ MySQL og Swagger startes med docker compose up --build.
   Samme payload er idempotent. Datoer, værelse og gæstekontakt kan ændres.
 - DELETE /api/bookings/{id} → 204. Soft-cancel, historik bevares; gentagelse er sikker.
 - Guest indeholder name, email, phone og country_code. Kontaktens navn opdeles på
-  første mellemrum til first_name/last_name. Navn/land er gæstens eksisterende
-  identitetsnøgle, så kontaktændringer deles mellem bookinger på samme gæst.
+  første mellemrum til first_name/last_name. Hver ny booking får et selvstændigt
+  gæstesnapshot. Kontaktrettelser opretter et nyt snapshot, så andre bookinger
+  ikke ændres. Uændret PUT genbruger det aktuelle snapshot.
 - Checkout er eksklusiv. Ophold varer 1–366 nætter, antal gæster 1–4 og højst rummets
   kapacitet. Kun aktive, disponible værelser og typer kan bookes.
 - Confirmed ophold må ikke overlappe. Involverede værelser låses i ID-rækkefølge
@@ -148,3 +149,17 @@ traceability.md. specify.md er en henvisning til denne kanoniske specifikation.
   opholdet på de historiske natpriser. Annullerede bookinger tæller ikke med.
 - Disse to specifikt ønskede URLs har ikke `/api`-præfiks. Eksisterende endpoints
   bevarer deres kontrakt. Tableau skal vise disse færdige beløb uden prisberegning.
+
+## T-023 — integritetsrettelser
+
+Navn/land identificerer aldrig automatisk samme person. API'et bruger separate
+gæstesnapshots pr. booking. distinct_bookers tæller profiler/snapshots, ikke sikkert
+identificerede tilbagevendende personer. Import-idempotens bygger på kildefilens
+SHA-256 og rækkenummer via guests.import_key. Tidligere sammenblandede oplysninger
+kan ikke rekonstrueres automatisk; eksisterende historik bevares.
+
+På bedømte bookinger er navn, land, værelse, datoer og gæsteantal låst (409 ved
+ændring). Kun email/telefonrettelser tillades; ratingen forbliver på samme ophold.
+Eksportens guests-datasæt bruger booking_guests. Hele selskabet henføres til
+bookinggæstens land, da øvrige nationaliteter ikke registreres. Samlet Tableau-
+dashboard og opdateringsdemonstration er fortsat uden endelig godkendelse.

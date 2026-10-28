@@ -46,3 +46,9 @@ land/type/sæson og medarbejderfiltre med eksplicitte definitioner i spec.md.
 Kundetilfredshed beregnes nu i service-laget fra 1–5-ratings i booking_reviews.
 Swagger UI assets serveres lokalt. Tableau bygges manuelt senere; det tidligere
 extract-flow er derfor ikke et afsluttet dashboard-acceptbevis for denne iteration.
+
+
+T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
+kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
+Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
+ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.

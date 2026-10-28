@@ -193,7 +193,7 @@ for path,model,summary,description in [
     ('revenue-by-country',list[Group],'Revenue by country','Country is the booking guest country.'),
     ('revenue-by-season',list[Group],'Revenue by season','Season is determined per occupied night.'),
     ('revenue-by-room-type-season',list[Group],'Revenue by room type and season','Cross-season stays are split by nightly snapshots.'),
-    ('guests-by-country',list[Group],'Guests by country','booking_guests counts party sizes once per matching booking; distinct_bookers counts guest profiles. All party members are attributed to the booker country.'),
+    ('guests-by-country',list[Group],'Guests by country','booking_guests counts party sizes once per matching booking; distinct_bookers counts booking guest snapshots, not identified repeat visitors. All party members are attributed to the booker country.'),
     ('top-performers',TopPerformers,'Most profitable room, type and country','Highest total revenue in the selected period. Empty groups return null.'),
     ('bar-sales',BarReport,'Bar revenue, drinks and category shares','Default employee is Helene Christine. Includes total_revenue, products and categories with percentage of total revenue. Hotel filters do not affect bar sales.'),
     ('customer-satisfaction',Satisfaction,'Guest ratings and response rate','Checkout cohort in [from,to). Only completed confirmed bookings qualify. Average is null without ratings; no synthetic scores.'),

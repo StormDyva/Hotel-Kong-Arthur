@@ -266,11 +266,12 @@ def main() -> int:
         batch_sql(guest_xlsx, len(guest_xlsx_rows), len(valid_guests), len(rejected_guests)),
     ]
 
+    guest_source_hash = hashlib.sha256(guest_xlsx.read_bytes()).hexdigest()
     for source_record_id, row in valid_guests:
         sql.extend(
             [
-                "INSERT INTO guests (first_name, last_name, country_code, country_name)",
-                f"VALUES ({sql_string(row['first_name'])}, {sql_string(row['family_name'])}, {sql_string(row['country_code'])}, {sql_string(row['country_name'])})",
+                "INSERT INTO guests (first_name, last_name, country_code, country_name, import_key)",
+                f"VALUES ({sql_string(row['first_name'])}, {sql_string(row['family_name'])}, {sql_string(row['country_code'])}, {sql_string(row['country_name'])}, {sql_string(hashlib.sha256((guest_source_hash + ':' + source_record_id).encode()).hexdigest())})",
                 "ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), country_name = VALUES(country_name);",
                 "SET @guest_id = LAST_INSERT_ID();",
                 "INSERT INTO customer_stay_records",

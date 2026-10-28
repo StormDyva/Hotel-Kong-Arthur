@@ -19,7 +19,7 @@ beside the workbook in `tableau/data/` and are ignored by Git.
 The dashboard contains total revenue, occupancy, ADR (the extra KPI), inventory,
 room-type revenue, country revenue, guest stays by country, room type by season,
 seasonal revenue, Helene Christine's drink revenue and cocktail/coffee revenue shares.
-Guest stays count bookings, not distinct individuals or all occupants' nationalities.
+Guest distribution uses booking_guests (party sizes), not booking counts. All party members are attributed to the booking guest country; other occupants’ nationalities are not recorded.
 Select marks for details and use Tableau's Keep Only / Exclude controls for filtering.
 
 ## Refresh after a booking
@@ -52,3 +52,8 @@ embedded, for portable review. It is a snapshot: rerun refresh and rebuild the
 package to update it. The final extract-backed version loaded without workbook
 errors in Tableau's logs; visual layout and interactive filtering still need review.
 The earlier XML and missing-extract versions were invalid and have been replaced.
+
+
+T-023: Eksportens guests-rækker tæller nu booking_guests. En booking med fire
+personer bidrager med fire. Det er ikke et bevis for et færdigt eller opdateret
+Tableau-dashboard; den samlede leverance afventer manuel dashboardverifikation.

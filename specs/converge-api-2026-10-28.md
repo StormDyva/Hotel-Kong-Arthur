@@ -61,3 +61,21 @@ services/revenue_rows.py. Samme periode-/annulleringsregler som den øvrige API.
 23 backend-/kontrakttests bestået, inklusive fem nye målrettede tests. Tests beviser
 24 kombinationer, ingen-data, historisk inaktiv type, landelabel, decimalpriser,
 sæsonskift, eksklusiv checkout, annullering og ugyldige perioder.
+
+## T-023 — dataintegritet efter review
+
+De tre reproducerede fund er rettet: nye bookings bruger separate gæstesnapshots;
+kontaktændringer kopierer frem for at overskrive en delt gæst; bedømte bookinger
+låser navn/land, datoer, værelse og gæsteantal, men tillader email/telefonrettelser.
+Import-idempotens bygger på kilde-ID, ikke navn. Eksporten tæller booking_guests.
+26 backend-/kontrakttests består, inklusive tre nye regressionstests. Import kørt
+to gange i testdatabasen med uændret gæsteantal efter anden kørsel; SQL-check består.
+API → CSV/Hyper-eksport er kørt i separat midlertidig mappe, og gæsterækkernes antal
+er afstemt med API'ets booking_guests. En booking med fire personer er særskilt testet.
+
+Dette er IKKE verifikation af det samlede Tableau-dashboard eller dets opdatering.
+Den samlede Tableau-godkendelse forbliver åben. Tidligere overskrevne kontaktdata
+kan ikke gendannes uden en autoritativ kilde; eksisterende rækker slettes ikke.
+distinct_bookers tæller gæstesnapshots/profiler og hævder ikke at deduplikere personer.
+Allerede fejltilskrevne bedømmelser kan heller ikke identificeres sikkert uden
+oprindelig gæste-/opholdshistorik; de kræver autoritativ kilde eller manuel kontrol.

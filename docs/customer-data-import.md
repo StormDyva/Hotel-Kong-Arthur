@@ -72,3 +72,10 @@ men medarbejder- og vagtfiltre kræver en senere dateret salgskilde.
 - Samme import kan køres igen uden nye gæster, staging-rækker eller produkter.
 - Gæste-XLSX’ens ekstra delvist tomme række afvises med årsag og gemmes som
   `row_status = rejected`.
+
+
+T-023 erstatter navnebaseret deduplikering: guests.import_key er SHA-256 af
+kildens filhash og source_record_id. Nøglen identificerer en importeret kilderække,
+ikke en person. Gentagen import bruger samme kilde-ID; bookinger bruger NULL-nøgle
+og separate gæstesnapshots. Allerede importerede legacy-rækker får ved første
+genimport nye eksplicitte gæsterelationer, hvorefter genimport er stabil.

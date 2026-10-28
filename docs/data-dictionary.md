@@ -188,3 +188,9 @@ Julehøjsæson er 20.–31. december; den tidligere lavsæson slutter 19. decemb
 
 Mysql-klienten bruger nu eksplicit utf8mb4. Migration 006 reparerer de kendte
 reference-labels, som tidligere var indlæst med forkert klienttegnsæt.
+
+
+T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
+kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
+Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
+ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.

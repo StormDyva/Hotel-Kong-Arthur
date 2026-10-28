@@ -222,3 +222,13 @@ Alle otte typer × tre sæsoner medtages, også ved 0. Ingen Tableau-beregninger
 Beløb returneres som JSON-tal i DKK. Filtre: year eller from/to, samme periodevalg
 som øvrige analyser. Annullerede bookinger udelades, checkout er eksklusiv.
 Test: 24 kombinationer, nulperiode, sæson-/periodegrænse, landegruppering og kontrakt.
+
+## T-023 — Gæstesnapshots, bedømmelsesintegritet og eksport
+
+Ret de reproducerede reviewfund. API-oprettelse får selvstændig gæsterække pr.
+booking; kontaktændringer bruger copy-on-write, uændret PUT genbruger samme række.
+Navn/land fjernes som unik identitet. Historisk import bruger eksplicit kilde-ID.
+Bedømt booking afviser ændring af navn/land, datoer, værelse eller selskabsstørrelse
+med 409; email/telefon må rettes. Tableau-guests bruger booking_guests.
+Accept: regressionstests mod MySQL, idempotent import og eksportdata med fire gæster.
+Tableau-dashboardets samlede opdateringsdemo er fortsat ikke godkendt.

@@ -97,8 +97,7 @@ class Repository:
 
     def save_guest(self, guest):
         return self.execute("""INSERT INTO guests(first_name,last_name,email,phone,country_code,country_name)
-            VALUES(:first,:last,:email,:phone,:country,:country)
-            ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), email=VALUES(email), phone=VALUES(phone)""", **guest).lastrowid
+            VALUES(:first,:last,:email,:phone,:country,:country)""", **guest).lastrowid
 
     def save_booking(self, values, booking_id=None, replace_lines=True):
         if booking_id is not None:
