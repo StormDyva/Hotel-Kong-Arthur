@@ -60,11 +60,18 @@ repeating it is safe. Overlap returns 409, invalid input 422, missing booking 40
 Shared guests follow the existing name/country identity assumption; editing contact
 information updates that shared guest. No authentication is provided in this local MVP.
 
+## Swagger og API-test
+
+Åbn http://localhost:8000/docs. Alle 25 operationer er samlet efter Bookings,
+Inventory, Analytics, Bar og Guest feedback. Vælg en operation, Try it out og Execute.
+Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
+[trin-for-trin API-test](docs/api-testing.md) for konkrete booking-, bar- og review-kald.
+
 ## Tableau
 
-See [tableau/README.md](tableau/README.md). The native workbook and refresh bridge
-consume the REST API, not a direct MySQL connection. Manual extract refresh is the
-MVP meaning of live; this is not continuous push into Tableau Public.
+Dashboardet bygges manuelt senere efter brugerens prioritering. API'et leverer
+JSON-analyser som datagrundlag. Eksisterende Tableau-artefakter fra den tidligere
+iteration er ikke ændret eller genvalideret som del af API-opgaven.
 
 ## API examples
 
@@ -81,8 +88,9 @@ FastAPI's served schema. All canonical resource URLs start with `/api`.
 
 ```sh
 uv venv backend/.venv
-uv pip install --python backend/.venv/bin/python -r backend/requirements.txt
+uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
 PYTHONPATH=backend MYSQL_PORT=3307 backend/.venv/bin/pytest -q backend/tests
+node backend/tests/swagger-smoke.mjs
 npm --prefix frontend test
 npm --prefix frontend run smoke
 docker compose --profile test run --rm test-runner
@@ -95,18 +103,20 @@ The browser smoke command uses explicit mock mode; real MySQL behavior is tested
 separately. Import verification needs the external customer files; see
 [docs/customer-data-import.md](docs/customer-data-import.md).
 
-## Scope and gaps
+## Datagrundlag og begrænsninger
 
-The seed is fictional demonstration data: 16 rooms and eight example room types,
-not the real hotel's 214-room inventory or exact room categories. Analytics use
-stored inventory, not a hardcoded capacity of 214. Historical customer records lack
-booking dates and employee-level bar timestamps, so they cannot be treated as live
-bookings or Helene's yearly sales. They remain in separate staging tables.
-Customer satisfaction has no source or agreed scale and remains unimplemented;
-C-009 documents that gap rather than implying full assignment compliance.
+Det syntetiske referenceinventar har 214 værelser, otte kategorier fra opgaven og
+428 kapacitetspladser. Typefordelingen og numrene er ikke hotellets faktiske.
+Referencekataloget har 20 cocktails og 10 kaffeprodukter. Eksisterende fire
+barsalg og historiske bookinger er fortsat tydeligt demodata.
 
-See `docs/swa-questions.md` for the ten architecture questions and
-`specs/converge-2026-10-28.md` for verified behavior and remaining requirements.
+Kundetilfredshed er implementeret med brugerens valgte 1–5-skala, gennemsnit og
+svarprocent. Ingen ratings seedes. Historiske kundefiler mangler datoer og
+medarbejderoplysninger og bruges derfor ikke som live bookinger eller Helene-salg.
+
+Ingen login/roller eller produktionshosting indgår i denne lokale prototype.
+Tableau bygges senere manuelt. Se den aktuelle
+[API Converge-rapport](specs/converge-api-2026-10-28.md).
 
 ## Spec-driven delivery
 

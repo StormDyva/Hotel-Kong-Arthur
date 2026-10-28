@@ -7,7 +7,7 @@ set -eu
 : "${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}"
 
 mysql_root() {
-    mysql --protocol=TCP \
+    mysql --default-character-set=utf8mb4 --protocol=TCP \
         --host="${MYSQL_HOST}" \
         --user=root \
         --password="${MYSQL_ROOT_PASSWORD}" \

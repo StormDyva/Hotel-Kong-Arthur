@@ -1,135 +1,133 @@
-# Specifikation
+# Funktionel specifikation — Hotel Kong Arthur API
 
-## Status
+Revision: 2026-10-28, T-020. Kilder: E26 Tværfaglig Opgave Hotel Kong Arthur og
+Tillægsspørgsmål_swa. Brugeren har prioriteret API og Swagger; Tableau-dashboard
+bygges manuelt senere. Kundetilfredshed 1–5 pr. booking er valgt af brugeren.
 
-Kravgrundlag fra 2026-10-26; integrationsrevision 2026-10-28 afventer gruppereview. Kilder: begge opgave-PDF’er i projektets hovedmappe og PROJECT_GUIDE.md. Implementering er ikke det samme som godkendt aflevering.
+## Principper og roller
 
-## Formål og roller
+Receptionisten opretter, læser, ændrer og annullerer bookinger. Hotellets egne
+klienter kan bruge samme REST/JSON-kontrakt som browserprototypen. Administratoren
+henter aktuelle hotel-, bar- og tilfredshedsanalyser fra MySQL via API'et.
 
-Systemet skal analysere og præsentere data fra Hotel Kong Arthurs drift for beslutningstagere. Receptionisten vedligeholder bookinger gennem browserfrontend og REST API. Hoteladministratoren ser hotel- og baranalyser. Beslutningstageren bruger et interaktivt Tableau-dashboard uden SQL.
+Backend har tre lag: HTTP/schemas i api, regler/beregninger i services og SQL i
+repositories. MySQL er runtime-datakilden. OpenAPI i openapi/openapi.yaml skal
+stemme med /openapi.json og kunne testes gennem Swagger på /docs. Applikationen,
+MySQL og Swagger startes med docker compose up --build.
 
-## Funktionelle krav
+## Booking
 
-### Booking og live-opdatering
+- POST /api/bookings → 201, Location-header og gemt resource.
+- GET /api/bookings/{id} → 200 eller 404.
+- GET /api/bookings → items, total, page, page_size, applied_filters.
+- Filtre: status, room_id, guest_id, from og to. Datoer vælger ophold, der overlapper
+  [from,to). page >= 1, page_size 1–100 (default 100).
+- PUT /api/bookings/{id} → 200. Hele request-modellen er påkrævet inklusive status.
+  Samme payload er idempotent. Datoer, værelse og gæstekontakt kan ændres.
+- DELETE /api/bookings/{id} → 204. Soft-cancel, historik bevares; gentagelse er sikker.
+- Guest indeholder name, email, phone og country_code. Kontaktens navn opdeles på
+  første mellemrum til first_name/last_name. Navn/land er gæstens eksisterende
+  identitetsnøgle, så kontaktændringer deles mellem bookinger på samme gæst.
+- Checkout er eksklusiv. Ophold varer 1–366 nætter, antal gæster 1–4 og højst rummets
+  kapacitet. Kun aktive, disponible værelser og typer kan bookes.
+- Confirmed ophold må ikke overlappe. Involverede værelser låses i ID-rækkefølge
+  før bookinglåsen; transaktionen indeholder overlapkontrol, booking og prislinjer.
+- Lavsæson: januar–marts og 1. november–19. december. Mellemsæson: april–maj og
+  september–oktober. Højsæson: juni–august og 20.–31. december (julegrænser er
+  projektets dokumenterede antagelse; PDF angiver kun juletid).
+- Prisen beregnes pr. nat efter sæson og gemmes som historiske prislinjer.
+  Klientens price_total accepteres som kompatibilitetsfelt, men bestemmer aldrig prisen.
+  Uændret værelse/datoer bevarer pris; ændret ophold genberegnes. Valuta er DKK.
+- Svar indeholder bl.a. guest_id, guest, room_id/number/type/capacity, datoer, antal,
+  price_total, gennemsnitlig price_per_night, status og UTC-timestamps.
 
-- Frontend skal kunne oprette, se, redigere og annullere bookinger.
-- API’et skal kunne modtage POST, PUT og DELETE-bookingændringer og gemme dem i MySQL.
-- Ændringer skal valideres og være synlige ved næste API-request eller Tableau-refresh.
-- CSV/XSLT fra ITAKEA/hoteldata er historisk eksempeldata til seed/import, ikke primær live-opdateringsmekanisme.
+## Inventar og barsalg
 
-### Hotelanalyse
+GET /api/rooms viser inventaret, evt. filtreret på room_type_id.
+GET /api/rooms/availability kræver check_in, check_out og guests_count.
+GET /api/room-types viser kategorier og kapacitet.
 
-Systemet skal vise gæster pr. land, samlet og årlig indtjening, indtjening pr. værelsestype, sæson og land, mest indbringende værelsestype og land, belægningsgrad samt mindst ét ekstra nøgletal. Ekstra nøgletal er ADR: indtjening divideret med solgte værelsesnætter i perioden.
+Referenceinventaret er syntetisk: 214 værelser, 428 kapacitetspladser og opgavens
+otte kategorier (Standard enkelt, Grand lit, Standard dobbelt, Superior dobbelt,
+Junior suite, Spa executive, Suite og LOFT suite). Typefordeling og værelse-ID'er
+påstår ikke at være hotellets faktiske. Priser følger opgavens intervaller.
 
-### Cocktailbar
+GET /api/bar-products viser aktive produkter og priser. Referencekataloget indeholder
+20 cocktails og 10 kaffeprodukter; det er demodata, ikke hotellets faktiske menu.
+POST /api/bar-sales → 201 registrerer product_id, sold_at med tidszone, positivt
+quantity, employee_name og evt. faktisk unit_price >= 0. Udeladt unit_price bruger
+produktprisen som snapshot. sold_at skal passe i MySQL TIMESTAMP-intervallet
+1970-01-01T00:00:01Z til 2038-01-19T03:14:07Z; øvrige afvises med 422. Salg lagres UTC; ingen syntetiske salg opfindes.
 
-Systemet skal vise Helene Christines samlede salg for året, omsætning pr. drink/produkt og procentfordeling mellem cocktails og kaffe for Helene Christine. Helene Christine håndteres som employee_name-filter, indtil andet er godkendt.
+## Analyser
 
-### Tableau
+Alle nedenstående GET-endpoints har selvstændige schemas og beskrivelser i Swagger:
 
-Dashboardet skal være interaktivt og vise hotel- og bar-KPI’er med relevante periode-, land-, værelsestype-, sæson- og medarbejderfiltre. KPI-definitioner og refresh-procedure skal dokumenteres.
+| Endpoint under /api/analytics/ | Resultat |
+|---|---|
+| occupancy | solgte/tilgængelige nætter, procent, ADR |
+| revenue | samlet/årlig hotelindtjening |
+| revenue-by-room | omsætning pr. fysisk værelse |
+| revenue-by-room-type | omsætning pr. kategori |
+| revenue-by-country | omsætning pr. bookinggæstens land |
+| revenue-by-season | omsætning pr. sæson |
+| revenue-by-room-type-season | krydstabel kategori × sæson |
+| guests-by-country | selskabsstørrelser, unikke bookinggæster og gæstenætter |
+| top-performers | mest indbringende værelse, type og land |
+| bar-sales | medarbejdertotal, salg pr. drink og kategoriandele |
+| customer-satisfaction | gennemsnit, svarprocent og ratingfordeling |
+| dashboard | samlet JSON til senere dashboardarbejde |
 
-### Kundetilfredshed
+Filtre: enten year (1900–9998) eller from/to; de må ikke kombineres. Default er
+[2026-01-01,2027-01-01). Perioden er 1–3660 dage. Land (country_code), type
+(room_type_id) og season (low/mid/high) filtrerer hoteldata. employee_name filtrerer
+baren og er default Helene Christine. Hotel-filtre påvirker ikke barsalg, som ingen
+bookingrelation har; dette fremgår af hotel_filters_apply_to_bar=false.
 
-PDF’en nævner kundetilfredshed blandt mulige nøgletal, men specificerer ikke data, skala, beregning eller visualisering. MVP’en implementerer derfor ikke kundetilfredshed uden godkendt datakilde og definition. Hvis beslutningen ændres, aktiveres de ekstra story/task-spor i Clarify og Tasks.
+- Indtjening = sum af faktiske prislinjer i perioden for ikke-annullerede bookinger.
+  Tværsæson-/årsophold fordeles nøjagtigt efter natlige snapshots.
+- Belægning = solgte nætter / (aktive værelser i valgt type × valgte sæsonnætter) × 100.
+  Landefilter ændrer kun tælleren. Inventarets aktuelle aktive status bruges, da der
+  ikke findes historiske inventar-snapshots. Over 100 % giver datakvalitets-warning.
+- ADR = indtjening / solgte nætter; dette er projektets ekstra nøgletal.
+- Gæster pr. land: booking_guests tæller selskabet én gang pr. matchende booking;
+  distinct_bookers tæller gæsteprofiler; guest_nights tæller antal × opholdsnætter.
+  Hele selskabets land antages at være bookinggæstens land, fordi øvrige nationaliteter
+  ikke er registreret.
+- Top-resultater sorteres på omsætning faldende, label stigende ved lighed.
+- Baromsætning = quantity × unit_price. Kategoriandele er omsætning / samlet valgt
+  medarbejders omsætning × 100, inklusive evt. øvrige kategorier i nævneren.
+- Datoafgrænset barsalg bruger Europe/Copenhagen kalenderdage konverteret til UTC.
+- Standardsvar indeholder period, applied_filters, generated_at, currency, data,
+  warnings og hotel_filters_apply_to_bar. Dashboard beholder også sin samlede form.
+- Ingen data giver tomme grupper/null topresultater og warnings. Nævner 0 giver
+  procent/ADR 0. Penge og Decimal-værdier serialiseres som JSON-strenge for præcision.
 
-## API-overflade
+## Kundetilfredshed
 
-| Metode | Endpoint | Formål |
-|---|---|---|
-| GET | /health | API- og databasehealth |
-| GET | /api/bookings | Paginering og filtreret bookingliste |
-| GET | /api/bookings/{id} | Hent én booking |
-| POST | /api/bookings | Opret booking, HTTP 201 |
-| PUT | /api/bookings/{id} | Fuld idempotent opdatering |
-| DELETE | /api/bookings/{id} | Soft-cancel booking, HTTP 200 eller 204 efter OpenAPI |
-| GET | /api/room-types | Hent værelsestyper og kapacitet |
-| GET | /api/analytics/occupancy | Belægningsgrad for periode |
-| GET | /api/analytics/revenue | Samlet indtjening |
-| GET | /api/analytics/revenue-by-room-type | Indtjening pr. værelsestype og sæson |
-| GET | /api/analytics/revenue-by-country | Indtjening pr. land |
-| GET | /api/analytics/bar-sales | Helene-filter, produktsalg og kategoriandele |
+PUT /api/bookings/{id}/review med rating heltal 1–5 opretter/erstatter én bedømmelse.
+GET på samme URL henter bedømmelsen eller 404. Kun confirmed bookinger med checkout
+senest i dag (Europe/Copenhagen) kan bedømmes; øvrige giver 409.
 
-Alle responses er JSON. Fejl følger error, message og details. Dashboard-endpointet understøtter from, to og employee_name. Bookinglisten understøtter page, page_size (default/maksimum 100) og status. Yderligere land-, værelses-, gæste- og datofiltre er fortsat krav til næste iteration; de er ikke implementeret endnu.
+Analysekohorten er afsluttede confirmed bookinger med checkout i [from,to).
+Svarprocent = antal med rating / antal i kohorten × 100. average_rating er gennemsnit
+af indsendte ratings, null uden ratings. Fordelingen viser antal for hver score 1–5.
+Land/type filtrerer kohorten; sæson vælger bookinger med mindst én nat i sæsonen.
+Ingen kundetilfredshedstal indlæses som opdigtede demoresultater.
 
-## Request- og response-schemas
+## Fejl, live data og accept
 
-### BookingCreate og BookingUpdate
+Fejl har error, message og details. Ugyldige input giver 422, ukendt resource 404,
+overlap/ikke-tilladt operation 409, databasefejl 503 og uventet fejl 500. SQL og
+serverdetaljer udleveres ikke. Request-/response-validering dokumenteres i OpenAPI.
+Transaktionen committes før svaret sendes. Senere GET/analyse læser aktuelle MySQL-data.
 
-| Felt | Type | Create | Update | Regel |
-|---|---|---|---|---|
-| guest | object | Påkrævet | Påkrævet | name, email, phone, country_code; kontaktoplysninger valideres |
-| room_id | integer | Påkrævet | Påkrævet | Eksisterende aktivt room |
-| check_in | date | Påkrævet | Påkrævet | ISO 8601, lokal kalenderdato |
-| check_out | date | Påkrævet | Påkrævet | Efter check_in, eksklusiv overnatning |
-| guests_count | integer | Påkrævet | Påkrævet | Minimum 1, højst room_type.capacity |
-| price_total | decimal | Beregnes af systemet | Beregnes af systemet | DKK, mindst 0, sum af prislinjer |
-| currency | string | Valgfrit | Valgfrit | Default DKK; andre valutaer afvises i MVP |
-| status | enum | Valgfrit | Påkrævet ved fuld PUT | confirmed; annullering sker via DELETE |
+Acceptbevis: MySQL-integrationstests, samtidighedstest, grænse-/formeltests,
+OpenAPI 3.1-validering, kontraktlighed, Compose-smoke og Swagger Try it out i browser.
+Tableau-rendering er uden for denne API-task.
 
-BookingResponse indeholder desuden id, room_number, room_type, capacity, guest og price_per_night. Det nøjagtige schema findes i OpenAPI. En booking må ikke referere til slettet/inaktivt room. POST returnerer 201; PUT returnerer 200; GET returnerer 200 eller 404; DELETE returnerer 200 med cancelled resource eller 204 efter den godkendte OpenAPI-kontrakt.
+## Artefakter
 
-### BookingListResponse
-
-Liste-responsen indeholder items, page, page_size og total. items er BookingResponse-objekter. page er mindst 1, page_size er 1–100, og default page_size skal dokumenteres i OpenAPI.
-
-### ErrorResponse
-
-Fejl har formen error (stabil kode), message (læselig forklaring) og details (liste med felt/kode/årsag). Forventede statuskoder er 400/422 ved inputfejl, 404 ved ukendt resource, 409 ved overlap eller konflikt, 503 ved utilgængelig database og 500 kun ved uventet fejl.
-
-### AnalyticsResponse
-
-Analyse-responser indeholder period, applied_filters, generated_at, data og warnings. data indeholder de relevante grupperinger og totaler. Ingen data returneres som tom data med forklarende metadata; division med nul returnerer 0 og warning.
-
-### Idempotens og opdateringsregler
-
-PUT med samme gyldige payload giver samme resource-state. DELETE på allerede cancelled booking giver samme state uden ny historikrække. POST er ikke idempotent uden en senere godkendt idempotency-key; dubletbeskyttelse håndteres af validering og eventuelle klientnøgler skal beskrives i OpenAPI.
-
-## Datamodel på domæneniveau
-
-Hotellet har 214 værelser og 8 værelsestyper. Værelsestyper har kapacitet 1–4 personer og sæsonpriser. Præcise antal pr. type skal komme fra seed-data eller godkendt beslutning.
-
-- room_types: id, name, description, capacity, active.
-- seasons/season_periods: sæsonnavn, aktive kalenderperioder og gentagelsesregler.
-- room_type_prices: room_type_id, season_id, price_per_night, currency, active.
-- rooms: id, room_number, room_type_id, active.
-- guests: id, country_code, country_name.
-- bookings: id, guest_id, room_id, check_in, check_out, guests_count, price_total, currency, status, cancelled_at, created_at, updated_at.
-- booking_price_lines: booking_id, night_date, season_id, price_per_night, quantity, line_total, currency.
-- bar_products: id, name, category (cocktail, coffee eller anden godkendt kategori), price, active.
-- bar_sales: id, product_id, sold_at, quantity, unit_price, currency, employee_name.
-
-Relationer er: én room_type har mange rooms; én guest har mange bookings; ét room har mange bookings over tid; ét bar_product har mange bar_sales. Obligatoriske relationer er room_type_id, guest_id, room_id og product_id. country_name kan være afledt/denormaliseret, men country_code er den stabile analysekode. created_at, updated_at og sold_at er timestamps; check_in/check_out er datoer.
-
-## Kvalitetstjek
-
-- Er kravet entydigt? Delvist; åbne valg står i Clarify.
-- Kan det implementeres? Ja efter godkendelse af API, status, sæson og kundetilfredshed.
-- Kan det testes? Ja, via stories og tasks.
-- Er det dækket af stories og tasks? Ja, se user-stories.md, tasks.md og traceability.md.
-- Er der afhængigheder? Ja: T-001/T-002 før implementation og T-008 før klienter.
-
-## Implemented integration contract — 2026-10-28
-
-Resource URLs use `/api/bookings`, `/api/room-types`, `/api/rooms/availability`,
-and `/api/analytics/*`; `/health` is unprefixed. The normative OpenAPI file records
-request shapes, pagination, response statuses and validation. Guest contact fields
-map to the database's first_name/last_name/email/phone columns. The browser's `name`
-is split on the first space. Identity deduplication remains name plus country (C-002
-import assumption), so shared guests also share contact updates.
-
-Dashboard data is read from `/api/analytics/dashboard` into native Hyper extracts,
-then opened in Tableau Public. Refresh means a new API read and rebuilt extract;
-published Tableau Public pages do not poll the local API.
-
-
-## Spec-artefakter og sporbarhed
-
-- `constitution.md`: faste principper og begrænsninger.
-- `spec.md` (denne fil): funktioner, brugere, krav og succeskriterier.
-- `clarify.md`: formler og afklaringer.
-- `plan.md`: teknik, lag, dataflow og teststrategi.
-- `tasks.md`: afgrænsede opgaver og afhængigheder.
-- `user-stories.md`: stories og acceptkriterier.
-- `traceability.md`: krav → story → task → test.
-- `converge-2026-10-28.md`: implementeret, delvist implementeret og mangler med testbevis.
+constitution.md → spec.md → clarify.md → plan.md → tasks.md → implementering →
+converge-api-2026-10-28.md. Stories/acceptkriterier: user-stories.md; sporbarhed:
+traceability.md. specify.md er en henvisning til denne kanoniske specifikation.

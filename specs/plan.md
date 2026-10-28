@@ -30,7 +30,10 @@ Belægning bruger solgte værelsesnætter / aktive værelser * kalenderdage * 10
 
 ## Kundetilfredshed
 
-Ikke implementeret i MVP uden godkendt datakilde/definition. Ved aktivering kræves separat customer_satisfaction-model, import, endpoint, analyse-service, Tableau-view, story, task, test og traceability-rækker.
+Aktiveret ved brugerbeslutning 2026-10-28: booking_reviews har én rating 1–5 pr.
+booking. API'et har idempotent PUT og GET på bookingens review. Service-laget
+validerer afsluttet/confirmed, beregner gennemsnit og svarprocent for checkout-kohorten.
+Ingen ratings seedes. Se spec.md og revideret C-009.
 
 ## Docker, dokumentation og aflevering
 
@@ -57,3 +60,11 @@ proposal for direct MySQL access is superseded by the assignment's API requireme
 `to` is exclusive, including annual reports (2026-01-01 to 2027-01-01).
 Docker starts db → db-init → api → frontend. Tableau Public is a desktop client;
 the Hyper refresh utility currently runs on the host.
+
+## T-020 gennemført API-præcisering
+
+Selvstændige analyse-endpoints erstatter den tidligere generiske metric-sti.
+Periode-/filtermetadata og typede response-schemas følger spec.md. Barregistrering,
+feedback, 214 syntetiske referenceværelser og 20/10 produktkatalog er tilføjet.
+Swagger UI assets serveres lokalt fra API-containeren. Tableau arbejdes der ikke på
+under denne task; senere manuel dashboardopbygning skal tage udgangspunkt i API'et.

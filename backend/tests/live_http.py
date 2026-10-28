@@ -15,10 +15,11 @@ p = dict(room_id=101, check_in='2026-12-20', check_out='2026-12-22', guests_coun
          guest=dict(name='Live Verification', email='live@example.com', phone='+4512345678',country_code='DK'))
 b = call('/api/bookings','POST',p)
 try:
-    assert Decimal(str(call('/api/analytics/dashboard')['summary']['revenue'])) == Decimal(str(before))+1800
+    assert Decimal(str(call('/api/analytics/dashboard')['summary']['revenue'])) == Decimal(str(before))+2400
     assert call('/api/bookings/'+str(b['id']))['status'] == 'confirmed'
     p['check_out'] = '2026-12-23'
-    assert Decimal(call('/api/bookings/'+str(b['id']),'PUT',p)['price_total']) == 2700
+    p['status'] = 'confirmed'
+    assert Decimal(call('/api/bookings/'+str(b['id']),'PUT',p)['price_total']) == 3600
 finally:
     call('/api/bookings/'+str(b['id']),'DELETE')
 assert call('/api/analytics/dashboard')['summary']['revenue'] == before

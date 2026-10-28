@@ -52,3 +52,16 @@ test evidence and remaining requirements are recorded in
 [converge-2026-10-28.md](converge-2026-10-28.md). This dated audit supersedes older
 completion assumptions, including direct MySQL-to-Tableau access and API paths
 without the `/api` prefix. Remaining work is tracked as T-019, T-020 and T-021.
+
+## T-020 — API-fokus, 2026-10-28
+
+| Krav/story | Implementering | Testbevis |
+|---|---|---|
+| US-001–005 booking CRUD, filtre og live | services/bookings, repositories, api/main | test_api.py og test_spec_completion.py |
+| US-006 belægning/periode | services/analytics | test_analytics_filters_and_denominators |
+| US-007 indtjening, sæson, land, top og ADR | særskilte analytics endpoints | test_revenue_rankings_and_country_guests |
+| US-008 barsalg og Helene | services/feedback, analytics | test_bars_total_category_shares_and_live_input, test_bar_calendar_boundaries_use_copenhagen |
+| US-011 kundetilfredshed | booking_reviews, review endpoints | test_guest_feedback_and_response_rate |
+| US-012 OpenAPI/Swagger/Docker | schemas, lokal Swagger, Compose | test_openapi_contract, swagger-smoke.mjs |
+| 214 værelser, otte kategorier, 20/10 produkter | syntetisk reference-seed | test_reference_inventory |
+| US-009 Tableau | bygges senere manuelt efter brugerens prioritering | Uden for T-020 |

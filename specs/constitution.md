@@ -25,12 +25,12 @@ PDF-opgaven og PROJECT_GUIDE.md er kravgrundlag. Constitution fastlægger princi
 ## MVP-afgrænsning
 
 - Login, roller, betaling, WebSockets, produktionshosting og avancerede frontend-animationer er ikke MVP-krav.
-- Kundetilfredshed nævnes i PDF’en, men PDF’en giver ingen datakilde, skala eller formel. Det er derfor en eksplicit MVP-afgrænsning, indtil gruppen eller underviseren godkender definition og data. Se C-009.
+- Kundetilfredshed er aktiveret ved brugerbeslutning 2026-10-28: rating 1–5 pr. afsluttet booking, gennemsnit og svarprocent. Ingen opdigtede scores. Se revideret C-009.
 - Tableau skal vise godkendte KPI’er og dokumentere refresh; ægte push-refresh er ikke et MVP-krav.
 
 ## Kvalitetstjek
 
-- Er kravet entydigt? Ja, med kundetilfredshed som eksplicit afgrænset beslutning.
+- Er kravet entydigt? Ja, med kundetilfredshed 1–5 efter brugerbeslutning.
 - Kan det implementeres? Ja, beslutningerne er godkendt som arbejdsgrundlag.
 - Kan det testes? Ja, via lag-, API-, data-, analyse-, Docker- og Converge-tests.
 - Er det dækket af user stories og tasks? Ja, se user-stories.md, tasks.md og traceability.md.

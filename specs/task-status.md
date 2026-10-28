@@ -90,3 +90,10 @@ have been added. Canonical specification: spec.md; specify.md is a pointer.
 See converge-2026-10-28.md for verified commands and outstanding requirements.
 The assignment is not marked complete: Tableau interaction QA, inventory fidelity,
 additional filters and satisfaction scope remain open.
+
+## T-020 — API færdiggørelse, 2026-10-28
+
+API og Swagger er prioriteret; Tableau bygges manuelt senere.
+25 operationer, fulde filtre/rapporter, 1–5-bedømmelser og referenceinventar er
+implementeret. Swagger: http://localhost:8000/docs, lokale assets, Try it out testet.
+Se converge-api-2026-10-28.md for den aktuelle API-status og testbevis.

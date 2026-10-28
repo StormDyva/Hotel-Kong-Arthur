@@ -187,3 +187,28 @@ T-010/11/12 add nightly hotel/bar analytics; T-014 uses the API by default;
 T-015 generates API-backed Hyper extracts and a native workbook; T-016 supplies
 startup and SWA explanations. These are implementation results, not assertions of
 team approval or full task completion. See `converge-2026-10-28.md` for evidence/gaps.
+
+## T-020 — API op til opgavekrav (2026-10-28)
+
+Brugeren har prioriteret API og Swagger; Tableau bygges manuelt senere.
+Stories: US-001–US-008, US-011–US-012. Afhængigheder: eksisterende API/MySQL.
+Accept: særskilte OpenAPI-endpoints, bookingfiltre (status/room/guest/dato),
+analysefiltre (år/periode/land/type/sæson/medarbejder), gæstefordeling, indtjening
+pr. fysisk værelse/type/sæson/land og rangering, Helene-total/drinks/kategoriandele,
+barregistrering, samt 1–5 bedømmelse pr. afsluttet booking. Swagger skal fungere
+med lokalt serverede assets. Tests mod MySQL, OpenAPI-validering og Swagger-browser.
+Ingen Tableau-ændringer indgår.
+
+### Kundetilfredshed — brugerbeslutning
+Brugeren har valgt 1–5 pr. booking. PUT på bookingens review opretter eller erstatter
+én bedømmelse. Kun afsluttede, ikke-annullerede bookinger kan bedømmes.
+Svarprocent = bedømte / afsluttede bookinger med checkout i rapportperioden * 100.
+Ingen bedømmelser giver average_rating=null, antal=0 og warning, ikke opdigtede scores.
+
+### T-020 resultat
+
+Booking-/analysefiltre, selvstændige rapport-endpoints, barsalg, ratings, typed
+OpenAPI/fejl, lokale Swagger-assets og syntetisk referenceinventar er implementeret.
+Testbevis og formler: converge-api-2026-10-28.md. T-019 dækkes af eksplicit syntetisk
+referenceinventar. T-021 kundetilfredshed er aktiveret efter brugerens beslutning.
+Tableau-delene af tidligere T-020 er udskudt til brugerens manuelle arbejde.

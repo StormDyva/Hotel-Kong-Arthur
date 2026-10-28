@@ -103,3 +103,30 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 - Kan de implementeres og testes? Ja, med de angivne konsekvenser og acceptance tests.
 - Er de dækket af stories/tasks? Ja, se traceability.md og tasks.md.
 - Åbne afhængigheder: ingen kravbeslutninger. Eventuelle ændringer skal opdatere denne fil og traceability-matrixen.
+
+## C-009 ændret ved brugerbeslutning — 2026-10-28
+
+Kundetilfredshed aktiveres: 1–5 stjerner pr. booking, bekræftet af brugeren i chatten.
+Højst én bedømmelse pr. booking (idempotent PUT). Kun confirmed bookinger med
+check_out <= dags dato i Europe/Copenhagen kan bedømmes. Rapportens kohorte er
+checkout-dato i [from,to); gennemsnit på bedømte og svarprocent over afsluttede.
+Rating følger bookingens historik; annulleret booking indgår ikke i rapporten.
+
+## API-præciseringer — T-020
+
+Analyseperioder bruger [from,to); `year` vælger kalenderår og kan ikke kombineres
+med from/to. Standard er 2026. Land/type/sæson filtrerer hoteldata; employee_name
+filtrerer barsalg (default Helene Christine). Land/type/sæson filtrerer ikke baren,
+som ikke har relation til bookinger. Metadata viser dette eksplicit.
+Belægningsnævner: aktive værelser i valgt type × nætter i valgt sæson/periode.
+Landefilter ændrer tælleren, ikke hotelkapaciteten. Nationalitet for hele selskabet
+antages lig bookinggæstens land; distinct_bookers vises separat.
+Testinventar kan være syntetisk; antal og kategorier skal passe til opgaven uden at
+påstå at typefordeling og værelsesnumre er hotellets faktiske inventar.
+
+## C-004 revideret — juletid i højsæson (T-020)
+
+PDF-opgaven angiver sommer og juletid som højsæson. Tidligere lavsæson hele
+december erstattes af lavsæson til og med 19/12 og højsæson 20/12–31/12. De
+præcise juledatoer er en implementeringsantagelse, ikke en oplysning fra hotellet.
+Eksisterende prislinjer bevares som historiske snapshots.

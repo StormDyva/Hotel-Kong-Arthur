@@ -63,19 +63,23 @@ def availability(repo, start, end, guests):
 
 def save(repo, data, booking_id=None):
     stay(data.check_in, data.check_out, data.guests_count)
-    # Always room first, booking second: all writes use the same lock order.
-    rooms = repo.rooms(data.room_id, lock=True)
-    if not rooms:
-        raise DomainError(404, 'NOT_FOUND', 'Room not found')
-    room = rooms[0]
     old = None
+    initial = None
     if booking_id is not None:
-        rows = repo.bookings(booking_id, lock=True)
+        rows = repo.bookings(booking_id)
         if not rows:
             raise DomainError(404, 'NOT_FOUND', 'Booking not found')
-        old = rows[0]
-        if old['room_id'] != data.room_id:
-            raise DomainError(422, 'VALIDATION_ERROR', 'Room changes require cancellation and a new booking')
+        initial = rows[0]
+    # Lock all involved rooms in ascending order, then the booking itself.
+    room_ids = sorted({data.room_id} | ({initial['room_id']} if initial else set()))
+    locked = {room['id']: room for rid in room_ids for room in repo.rooms(rid, lock=True)}
+    if data.room_id not in locked:
+        raise DomainError(404, 'NOT_FOUND', 'Room not found')
+    room = locked[data.room_id]
+    if booking_id is not None:
+        old = repo.bookings(booking_id, lock=True)[0]
+        if old['room_id'] != initial['room_id']:
+            raise DomainError(409, 'BOOKING_CHANGED', 'Booking room changed concurrently; reload and retry')
         if old['status'] == 'cancelled':
             raise DomainError(409, 'CANCELLED', 'Cancelled bookings cannot be edited')
     if not room['active'] or not room['type_active'] or room['status'] != 'available':
@@ -85,7 +89,7 @@ def save(repo, data, booking_id=None):
     if repo.overlaps(data.room_id, data.check_in, data.check_out, booking_id or 0):
         raise DomainError(409, 'BOOKING_CONFLICT', 'Room already booked for these dates')
     # Preserve historical prices for an unchanged stay (idempotent PUT).
-    same_stay = old and old['check_in'] == data.check_in and old['check_out'] == data.check_out
+    same_stay = old and old['room_id'] == data.room_id and old['check_in'] == data.check_in and old['check_out'] == data.check_out
     lines = None if same_stay else quote(repo, room, data.check_in, data.check_out)
     total = old['price_total'] if same_stay else sum((l['line_total'] for l in lines), Decimal(0))
     first, _, last = data.guest.name.strip().partition(' ')
@@ -110,5 +114,7 @@ def cancel(repo, booking_id):
         raise DomainError(404, 'NOT_FOUND', 'Booking not found')
     repo.rooms(rows[0]['room_id'], lock=True)
     current = repo.bookings(booking_id, lock=True)[0]
+    if current['room_id'] != rows[0]['room_id']:
+        raise DomainError(409, 'BOOKING_CHANGED', 'Booking room changed concurrently; reload and retry')
     if current['status'] != 'cancelled':
         repo.cancel_booking(booking_id)

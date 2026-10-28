@@ -26,7 +26,7 @@ def client(repo):
 def payload(**kw):
     return dict(room_id=101, check_in='2028-03-31', check_out='2028-04-02', guests_count=1,
                 guest=dict(name='Integration Guest', email='test@example.com', phone='+4512345678', country_code='DK'),
-                price_total=1, **kw)
+                price_total=1, status='confirmed', **kw)
 
 
 def test_live_crud_and_prices(client, repo):
@@ -64,7 +64,8 @@ def test_golden_analytics(repo):
     r = analytics.report(repo)
     assert r['summary']['revenue'] == 12700
     assert r['summary']['room_nights'] == 6
-    assert r['summary']['available_room_nights'] == 16*365
+    assert r['summary']['available_room_nights'] == 214*365
+    assert r['summary']['occupancy_percent'] == 0.01
     assert r['summary']['bar_revenue'] == 575
     assert next(x for x in r['bar_categories'] if x['category']=='cocktail')['percent'] == Decimal('43.48')
     r = analytics.report(repo, date(2026,6,11), date(2026,6,12))

@@ -173,3 +173,18 @@ Guests follow the existing unique (first_name,last_name,country_code) identity;
 contact updates are shared between bookings referring to the same identity.
 Seed scripts are tracked in schema_migrations with a `seed_` filename prefix and
 run once, so service restarts do not reset booking edits.
+
+## T-020 — referenceinventar, sæsoner og feedback
+
+booking_reviews har booking_id som både primary og foreign key, rating CHECK 1–5
+samt created_at/updated_at. Højst én rating pr. booking; afsluttet/confirmed
+valideres i service-laget under samme rum-/bookinglåse som bookingwrites.
+
+Det syntetiske referenceinventar har typefordeling 36/50/61/40/10/8/5/4 i rækkefølgen
+Standard enkelt / Grand lit / Standard dobbelt / Superior dobbelt / Junior suite /
+Spa executive / Suite / LOFT. Kapaciteter er 1/2/2/2/3/3/4/4, dvs. 428 pladser i
+214 rum. Fordelingen er en demoantagelse, ikke leveret hotelinventar.
+Julehøjsæson er 20.–31. december; den tidligere lavsæson slutter 19. december.
+
+Mysql-klienten bruger nu eksplicit utf8mb4. Migration 006 reparerer de kendte
+reference-labels, som tidligere var indlæst med forkert klienttegnsæt.
