@@ -248,3 +248,11 @@ US-001/002/005. Bevar enkelt søg → værelse → gæst → bekræft-flow. Vis 
 forslag pr. type som standard med mulighed for typefilter/alle rum. Brug API-priser,
 send ikke klientberegnet pris, vis feltfejl og genvej til oversigten. Accept: browser
 opretter en booking mod MySQL, genfinder den efter reload, og testbookingen annulleres.
+
+## T-026 — API-PR klar til manuel Tableau-integration
+
+Acceptomfang: API, bookingprototype og dokumenteret Tableau-datakontrakt/refresh.
+Dashboardet bygges manuelt senere og blokerer ikke denne API-PR. Containeriserede
+tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskrivelsen
+samles om den færdige implementering og PR markeres ready for review, uden merge.
+Se docs/tableau-api-handoff.md.

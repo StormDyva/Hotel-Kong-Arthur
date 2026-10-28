@@ -14,6 +14,13 @@ mysql_root() {
         "${MYSQL_DATABASE}" "$@"
 }
 
+if [ "${RESET_TEST_DATABASE:-0}" = "1" ]; then
+    if [ "${MYSQL_DATABASE}" != "hotel_kong_arthur_test" ] || [ "${MYSQL_HOST}" != "test-db" ]; then
+        echo "Refusing reset outside the dedicated test database/host" >&2
+        exit 1
+    fi
+fi
+
 echo "Waiting for MySQL at ${MYSQL_HOST}..."
 until mysqladmin --protocol=TCP \
     --host="${MYSQL_HOST}" \
@@ -22,6 +29,10 @@ until mysqladmin --protocol=TCP \
     ping --silent >/dev/null 2>&1; do
     sleep 2
 done
+
+if [ "${RESET_TEST_DATABASE:-0}" = "1" ]; then
+    mysql_root -e "DROP DATABASE IF EXISTS hotel_kong_arthur_test; CREATE DATABASE hotel_kong_arthur_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+fi
 
 mysql_root <<'SQL'
 CREATE TABLE IF NOT EXISTS schema_migrations (

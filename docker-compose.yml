@@ -103,6 +103,7 @@ services:
       MYSQL_DATABASE: hotel_kong_arthur_test
       MYSQL_ROOT_PASSWORD: test_root_password
       RUN_CHECKS: "1"
+      RESET_TEST_DATABASE: "1"
     volumes:
       - ./database/migrations:/migrations:ro
       - ./database/seed:/seed:ro

@@ -49,3 +49,10 @@ søgning, ét forslag pr. type, server-emailvalidering, oprettelse, 2.000 DKK ve
 sæsonskift og genfinding i oversigten efter reload. Testbooking annulleres bagefter.
 Frontend-unit: 59 består. Mock-browser: 19/19 består. Dette er browser/API-testbevis,
 ikke Tableau-dashboardgodkendelse.
+
+## T-026 — acceptomfang for API-PR
+
+Brugeren præciserer, at denne PR skal levere en API klar til Tableau; gruppen
+bygger dashboard manuelt senere. API-handoff, felter og lokal refresh beskrives i
+docs/tableau-api-handoff.md. Manglende dashboard-demo er et senere afleveringspunkt,
+ikke en blokering for API-PR'ens review. Menneskelig review/merge er stadig påkrævet.

@@ -1,4 +1,4 @@
-# Aktuel status — T-025
+# Aktuel status — T-026
 
 API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
 Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.
@@ -118,3 +118,8 @@ alle 24 kombinationer, andet giver flade landerækker. Begge returnerer JSON-tal
 23 backend-/kontrakttests bestået, heraf fem nye målrettede tests i test_revenue_rows.py.
 
 T-025: Enkel bookingprototype med reelt opret/reload/oversigts-flow verificeret.
+
+T-026: API er klar til Tableau-integration; handoff i docs/tableau-api-handoff.md.
+Testprofil nulstiller kun sin egen database før fixtures (host/navn kontrolleres).
+26 containeriserede tests og 59 frontendtests består. Dashboardet er senere manuelt
+arbejde og blokerer ikke API-PR-review. PR markeres ready, uden automatisk merge.

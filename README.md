@@ -69,6 +69,7 @@ Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 
 ## Tableau
 
+Se [API-handoff til Tableau](docs/tableau-api-handoff.md) for endpoints, felter og refresh.
 Dashboardet bygges manuelt senere efter brugerens prioritering. API'et leverer
 JSON-analyser som datagrundlag. Eksisterende Tableau-artefakter fra den tidligere
 iteration er ikke ændret eller genvalideret som del af API-opgaven.
@@ -152,3 +153,8 @@ Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
 Se [release-checklisten](docs/release-checklist.md) og [driftsvejledningen](docs/operations.md).
 API-/Compose-accept og samlet projektaccept er forskellige vurderinger. Tableau-
 dashboardets manuelle afstemning og opdateringsdemo udestår fortsat.
+
+Testprofilen nulstiller altid hotel_kong_arthur_test på test-db før fixtures indlæses,
+så tidligere importforsøg ikke påvirker testresultaterne. Appens database nulstilles
+ikke. RESET_TEST_DATABASE må kun bruges med denne præcise testdatabase og host;
+scriptet afviser andre kombinationer. Kør ikke flere test-runners samtidigt.

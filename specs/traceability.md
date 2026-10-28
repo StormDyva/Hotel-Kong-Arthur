@@ -86,3 +86,7 @@ opdatering og menneskeligt PR-review er fortsat åbne acceptpunkter.
 T-025 / US-001/002/005: frontend booking-form/rooms-view/main →
 frontend/tests/live-booking-smoke.mjs. Rigtigt API-flow, serverfeltfejl, sæsonpris
 og genfinding efter reload; 59 unit-tests og 19 mock-browserchecks.
+
+T-026: Tableau-klar API → docs/tableau-api-handoff.md, aktuelle numeriske exports
+og KPI-kald → runtimekontrol, OpenAPI-lighed, 26 containeriserede tests og 59 frontendtests.
+Testprofilens reset er afgrænset til hotel_kong_arthur_test på test-db.

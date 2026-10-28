@@ -55,3 +55,8 @@ fremadrettet migration. Slet ikke arbejdsdata for at få en grøn healthcheck.
 
 Tableau Public og den valgfrie Hyper-bro kører på værtsmaskinen, ikke i Compose.
 Det manuelle dashboard og dets opdatering er fortsat en udestående leverance.
+
+Testprofilen nulstiller altid hotel_kong_arthur_test på test-db før fixtures indlæses,
+så tidligere importforsøg ikke påvirker testresultaterne. Appens database nulstilles
+ikke. RESET_TEST_DATABASE må kun bruges med denne præcise testdatabase og host;
+scriptet afviser andre kombinationer. Kør ikke flere test-runners samtidigt.
