@@ -212,3 +212,13 @@ OpenAPI/fejl, lokale Swagger-assets og syntetisk referenceinventar er implemente
 Testbevis og formler: converge-api-2026-10-28.md. T-019 dækkes af eksplicit syntetisk
 referenceinventar. T-021 kundetilfredshed er aktiveret efter brugerens beslutning.
 Tableau-delene af tidligere T-020 er udskudt til brugerens manuelle arbejde.
+
+## T-022 — Flade indtjeningsrækker til Tableau
+
+Brugerkrav: GET /analytics/revenue/by-room-type-season og
+GET /analytics/revenue/by-country returnerer arrays med færdigberegnet indtjening.
+Service-laget summerer gemt natpris × antal nætter (natlige prislinjer og quantity).
+Alle otte typer × tre sæsoner medtages, også ved 0. Ingen Tableau-beregninger.
+Beløb returneres som JSON-tal i DKK. Filtre: year eller from/to, samme periodevalg
+som øvrige analyser. Annullerede bookinger udelades, checkout er eksklusiv.
+Test: 24 kombinationer, nulperiode, sæson-/periodegrænse, landegruppering og kontrakt.

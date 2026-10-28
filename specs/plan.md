@@ -68,3 +68,11 @@ Periode-/filtermetadata og typede response-schemas følger spec.md. Barregistrer
 feedback, 214 syntetiske referenceværelser og 20/10 produktkatalog er tilføjet.
 Swagger UI assets serveres lokalt fra API-containeren. Tableau arbejdes der ikke på
 under denne task; senere manuel dashboardopbygning skal tage udgangspunkt i API'et.
+
+## T-022 — Tableau-rækker
+
+api/main eksponerer de to flade revenue-endpoints; services/revenue_rows står for
+multiplikation, gruppering og nuludfyldning. Repository returnerer prislinjer og
+room type/season-dimensioner uden at aggregere omsætningen. Decimal anvendes under
+beregningen; de nye response-modeller leverer numerisk revenue i JSON. Ingen Tableau-
+filer eller eksisterende analysekontrakter ændres.

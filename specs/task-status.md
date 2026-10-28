@@ -97,3 +97,10 @@ API og Swagger er prioriteret; Tableau bygges manuelt senere.
 25 operationer, fulde filtre/rapporter, 1–5-bedømmelser og referenceinventar er
 implementeret. Swagger: http://localhost:8000/docs, lokale assets, Try it out testet.
 Se converge-api-2026-10-28.md for den aktuelle API-status og testbevis.
+
+## T-022 — færdige Tableau-rækker, 2026-10-28
+
+Implementeret: /analytics/revenue/by-room-type-season og /analytics/revenue/by-country.
+Logiklaget beregner og grupperer historisk natpris × nætter. Første endpoint giver
+alle 24 kombinationer, andet giver flade landerækker. Begge returnerer JSON-tal.
+23 backend-/kontrakttests bestået, heraf fem nye målrettede tests i test_revenue_rows.py.

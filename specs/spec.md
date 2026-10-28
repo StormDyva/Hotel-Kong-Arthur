@@ -131,3 +131,20 @@ Tableau-rendering er uden for denne API-task.
 constitution.md → spec.md → clarify.md → plan.md → tasks.md → implementering →
 converge-api-2026-10-28.md. Stories/acceptkriterier: user-stories.md; sporbarhed:
 traceability.md. specify.md er en henvisning til denne kanoniske specifikation.
+
+## T-022 — færdige flade indtjeningsrækker til Tableau
+
+- GET `/analytics/revenue/by-room-type-season` → `[{roomType,season,revenue}]`.
+  Alle otte database-typer (også inaktive historiske typer) krydses med alle tre
+  sæsoner. Dermed returneres altid 24 rækker i referenceinventaret, også uden data.
+  Sæsonlabels er Lav, Mellem og Høj; typer bruger databasens navne.
+- GET `/analytics/revenue/by-country` → `[{country,revenue}]`. Lande med omsætning
+  grupperes efter landekode og vises med dansk label, fx Sverige. Ukendte labels
+  bruger databasens country_name eller koden. Tom periode returnerer [].
+- Begge endpoints bruger year eller from/to (default 2026, eksklusiv to), uden wrapper.
+  Penge returneres her som JSON-tal i DKK for direkte numerisk brug i Tableau.
+- Service-laget summerer gemte natpriser × quantity for periodens faktiske
+  overnatninger. Ens priser svarer til natpris × antal nætter; ved sæsonskift deles
+  opholdet på de historiske natpriser. Annullerede bookinger tæller ikke med.
+- Disse to specifikt ønskede URLs har ikke `/api`-præfiks. Eksisterende endpoints
+  bevarer deres kontrakt. Tableau skal vise disse færdige beløb uden prisberegning.

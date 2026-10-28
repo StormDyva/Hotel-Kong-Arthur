@@ -77,8 +77,8 @@ class Repository:
             WHERE p.room_type_id=:id AND p.active AND s.active''', id=room_type_id)
 
     def nights(self, start, end, country=None, room_type=None, season=None):
-        return self.rows('''SELECT l.night_date, l.line_total, s.code season,
-            b.id booking_id, b.guest_id, b.room_id, r.room_type_id, b.guests_count, g.country_code,
+        return self.rows('''SELECT l.night_date, l.line_total, l.price_per_night, l.quantity, s.code season,
+            b.id booking_id, b.guest_id, b.room_id, r.room_type_id, b.guests_count, g.country_code, g.country_name,
             rt.name room_type, r.room_number FROM booking_price_lines l
             JOIN bookings b ON b.id=l.booking_id JOIN guests g ON g.id=b.guest_id
             JOIN rooms r ON r.id=b.room_id JOIN room_types rt ON rt.id=r.room_type_id
@@ -153,3 +153,9 @@ class Repository:
         sale_id = self.execute("""INSERT INTO bar_sales(product_id,sold_at,quantity,unit_price,employee_name)
             VALUES(:product_id,:sold_at,:quantity,:unit_price,:employee_name)""", **values).lastrowid
         return self.one('SELECT * FROM bar_sales WHERE id=:id', id=sale_id)
+
+    def revenue_dimensions(self):
+        return (
+            self.rows('SELECT id,name FROM room_types ORDER BY id'),
+            self.rows('SELECT id,code,name FROM seasons ORDER BY id'),
+        )

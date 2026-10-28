@@ -282,3 +282,14 @@ class Room(BaseModel):
     status: Literal['available','maintenance','inactive']
     created_at: UTCDatetime
     updated_at: UTCDatetime
+
+
+class RoomTypeSeasonRevenueRow(BaseModel):
+    roomType: str
+    season: str
+    revenue: float = Field(ge=0, description='Backend-calculated revenue in DKK, returned as a JSON number')
+
+
+class CountryRevenueRow(BaseModel):
+    country: str
+    revenue: float = Field(ge=0, description='Backend-calculated revenue in DKK, returned as a JSON number')

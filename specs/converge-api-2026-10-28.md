@@ -49,3 +49,15 @@ Referenceinventar, julegrænser og fordelingen af nationalitet på hele selskabe
 dokumenterede modelantagelser. Aktuel aktiv inventarstatus bruges også ved historiske
 rapporter, fordi systemet ikke har historiske inventar-snapshots. Autentifikation og
 produktion er uden for den aftalte lokale MVP. Ingen Tableau-filer er ændret i T-020.
+
+## T-022 tillæg — flade rækker
+
+To ekstra GET-operationer (nu 27 i Swagger):
+`/analytics/revenue/by-room-type-season` og `/analytics/revenue/by-country`.
+Disse returnerer arrays uden wrapper med numerisk revenue i DKK. Første endpoint
+nuludfylder hele type × sæson-produktet. Multiplikation og summering ligger i
+services/revenue_rows.py. Samme periode-/annulleringsregler som den øvrige API.
+
+23 backend-/kontrakttests bestået, inklusive fem nye målrettede tests. Tests beviser
+24 kombinationer, ingen-data, historisk inaktiv type, landelabel, decimalpriser,
+sæsonskift, eksklusiv checkout, annullering og ugyldige perioder.

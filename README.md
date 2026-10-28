@@ -62,7 +62,7 @@ information updates that shared guest. No authentication is provided in this loc
 
 ## Swagger og API-test
 
-Åbn http://localhost:8000/docs. Alle 25 operationer er samlet efter Bookings,
+Åbn http://localhost:8000/docs. Alle 27 operationer er samlet efter Bookings,
 Inventory, Analytics, Bar og Guest feedback. Vælg en operation, Try it out og Execute.
 Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 [trin-for-trin API-test](docs/api-testing.md) for konkrete booking-, bar- og review-kald.
@@ -82,7 +82,8 @@ curl 'http://localhost:8000/api/analytics/dashboard?from=2026-01-01&to=2027-01-0
 ```
 
 The checked-in contract is `openapi/openapi.yaml`; a test compares it against
-FastAPI's served schema. All canonical resource URLs start with `/api`.
+FastAPI's served schema. Existing resources use `/api`. The flat Tableau revenue exports use the requested
+`/analytics/revenue/by-room-type-season` and `/analytics/revenue/by-country` URLs.
 
 ## Verification
 

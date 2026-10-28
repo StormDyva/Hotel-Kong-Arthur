@@ -2,8 +2,9 @@ openapi: 3.1.0
 info:
   title: Hotel Kong Arthur API
   description: Three-layer REST API backed by MySQL. Dates use [from,to), checkout
-    is exclusive. Money is DKK; decimal amounts are JSON strings. Analytics default
-    to calendar 2026. Hotel filters do not filter bar sales. Demo inventory is synthetic.
+    is exclusive. Money is DKK. Existing /api responses use decimal strings; flat
+    /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026.
+    Hotel filters do not filter bar sales. Demo inventory is synthetic.
   version: 1.1.0
 paths:
   /health:
@@ -2077,6 +2078,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /analytics/revenue/by-room-type-season:
+    get:
+      tags:
+      - Tableau revenue
+      summary: 'Flat revenue rows: every room type × season'
+      description: All 24 combinations, including zero revenue. Backend sums historical
+        nightly price × quantity. Confirmed stays only; checkout and to are exclusive.
+        DKK numbers, not strings. Default year 2026.
+      operationId: room_type_season_rows_analytics_revenue_by_room_type_season_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomTypeSeasonRevenueRow'
+                title: Response Room Type Season Rows Analytics Revenue By Room Type
+                  Season Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/revenue/by-country:
+    get:
+      tags:
+      - Tableau revenue
+      summary: Flat revenue rows by country
+      description: Backend sums historical nightly price × quantity by booking guest
+        country. Danish country labels where mapped; database name/code otherwise.
+        Confirmed stays only; default year 2026. DKK JSON numbers. Empty period returns
+        [].
+      operationId: country_revenue_rows_analytics_revenue_by_country_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryRevenueRow'
+                title: Response Country Revenue Rows Analytics Revenue By Country
+                  Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     AnalyticsResponse_BarReport_:
@@ -2602,6 +2762,21 @@ components:
       - revenue
       - percent
       title: Category
+    CountryRevenueRow:
+      properties:
+        country:
+          type: string
+          title: Country
+        revenue:
+          type: number
+          minimum: 0.0
+          title: Revenue
+          description: Backend-calculated revenue in DKK, returned as a JSON number
+      type: object
+      required:
+      - country
+      - revenue
+      title: CountryRevenueRow
     DashboardReport:
       properties:
         from_date:
@@ -3017,6 +3192,25 @@ components:
       - name
       - capacity
       title: RoomType
+    RoomTypeSeasonRevenueRow:
+      properties:
+        roomType:
+          type: string
+          title: Roomtype
+        season:
+          type: string
+          title: Season
+        revenue:
+          type: number
+          minimum: 0.0
+          title: Revenue
+          description: Backend-calculated revenue in DKK, returned as a JSON number
+      type: object
+      required:
+      - roomType
+      - season
+      - revenue
+      title: RoomTypeSeasonRevenueRow
     Sale:
       properties:
         id:

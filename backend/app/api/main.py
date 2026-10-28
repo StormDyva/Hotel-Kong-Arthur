@@ -12,11 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException
 from app.repositories.database import engine, Repository
-from app.services import bookings, analytics, feedback
+from app.services import bookings, analytics, feedback, revenue_rows
 from .schemas import (
     BookingWrite, BookingUpdate, Booking, BookingPage, DashboardReport,
     ErrorResponse, AnalyticsResponse, Summary, Group, BarReport, TopPerformers,
-    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room,
+    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow,
 )
 
 ERRORS = {code: dict(model=ErrorResponse, description=description) for code, description in {
@@ -25,7 +25,7 @@ ERRORS = {code: dict(model=ErrorResponse, description=description) for code, des
 app = FastAPI(title='Hotel Kong Arthur API', version='1.1.0', docs_url=None, redoc_url=None,
     responses=ERRORS, description=(
         'Three-layer REST API backed by MySQL. Dates use [from,to), checkout is exclusive. '
-        'Money is DKK; decimal amounts are JSON strings. Analytics default to calendar 2026. '
+        'Money is DKK. Existing /api responses use decimal strings; flat /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026. '
         'Hotel filters do not filter bar sales. Demo inventory is synthetic.'))
 app.add_middleware(CORSMiddleware,
     allow_origins=os.getenv('CORS_ORIGINS','http://localhost:5500,http://127.0.0.1:5500').split(','),
@@ -199,3 +199,24 @@ for path,model,summary,description in [
     ('customer-satisfaction',Satisfaction,'Guest ratings and response rate','Checkout cohort in [from,to). Only completed confirmed bookings qualify. Average is null without ratings; no synthetic scores.'),
 ]:
     register_metric(path,model,summary,description)
+
+
+class RevenuePeriodQuery:
+    def __init__(self, from_date: date|None=Query(None,alias='from'),
+                 to_date: date|None=Query(None,alias='to'),
+                 year: int|None=Query(None,ge=1900,le=9998)):
+        self.start,self.end=analytics.period(from_date,to_date,year)
+
+
+@app.get('/analytics/revenue/by-room-type-season',response_model=list[RoomTypeSeasonRevenueRow],
+         tags=['Tableau revenue'], summary='Flat revenue rows: every room type × season',
+         description='All 24 combinations, including zero revenue. Backend sums historical nightly price × quantity. Confirmed stays only; checkout and to are exclusive. DKK numbers, not strings. Default year 2026.')
+def room_type_season_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return revenue_rows.room_type_season(repo,query.start,query.end)
+
+
+@app.get('/analytics/revenue/by-country',response_model=list[CountryRevenueRow],
+         tags=['Tableau revenue'], summary='Flat revenue rows by country',
+         description='Backend sums historical nightly price × quantity by booking guest country. Danish country labels where mapped; database name/code otherwise. Confirmed stays only; default year 2026. DKK JSON numbers. Empty period returns [].')
+def country_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return revenue_rows.by_country(repo,query.start,query.end)

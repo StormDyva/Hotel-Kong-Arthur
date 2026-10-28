@@ -65,3 +65,10 @@ without the `/api` prefix. Remaining work is tracked as T-019, T-020 and T-021.
 | US-012 OpenAPI/Swagger/Docker | schemas, lokal Swagger, Compose | test_openapi_contract, swagger-smoke.mjs |
 | 214 værelser, otte kategorier, 20/10 produkter | syntetisk reference-seed | test_reference_inventory |
 | US-009 Tableau | bygges senere manuelt efter brugerens prioritering | Uden for T-020 |
+
+## T-022 — flade indtjeningsrækker
+
+US-007 → services/revenue_rows.py → de to /analytics/revenue endpoints.
+Testbevis: test_revenue_rows.py kontrollerer 24 unikke kombinationer (også ved 0 og
+inaktiv historisk type), numeriske beløb, sæson-/periodeklip, dansk landelabel,
+annulleringer og ugyldige perioder. Ingen prisberegning flyttes til Tableau.

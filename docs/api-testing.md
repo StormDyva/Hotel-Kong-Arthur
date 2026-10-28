@@ -93,3 +93,16 @@ Swagger-smoke kræver Node 22+ og Chrome på macOS; den åbner en isoleret headl
 browser, tæller operationerne og udfører et rigtigt Swagger GET mod MySQL.
 MySQL-tests bruger det syntetiske reference-seed; mutationer rulles tilbage.
 Samtidighedstesten opretter og rydder sine egne testdata.
+
+## Færdige indtjeningsrækker til Tableau (T-022)
+
+Under Swagger-gruppen **Tableau revenue** findes:
+
+- `GET /analytics/revenue/by-room-type-season?year=2026`: 24 flade rækker med
+  roomType, season (Lav/Mellem/Høj) og revenue som tal, inklusive nul-kombinationer.
+- `GET /analytics/revenue/by-country?year=2026`: flade country/revenue-rækker med
+  navne som Danmark, Sverige og Tyskland. Lande uden omsætning udelades.
+
+Begge understøtter også from/to i stedet for year. Backenden beregner og summerer
+natpris × antal nætter i logiklaget ud fra historiske prislinjer. Tableau bruger
+revenue direkte som et numerisk mål; valutaen er DKK.
