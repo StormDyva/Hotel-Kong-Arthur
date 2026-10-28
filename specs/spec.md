@@ -40,7 +40,13 @@ MySQL og Swagger startes med docker compose up --build.
   Klientens price_total accepteres som kompatibilitetsfelt, men bestemmer aldrig prisen.
   Uændret værelse/datoer bevarer pris; ændret ophold genberegnes. Valuta er DKK.
 - Svar indeholder bl.a. guest_id, guest, room_id/number/type/capacity, datoer, antal,
-  price_total, gennemsnitlig price_per_night, status og UTC-timestamps.
+  price_total, gennemsnitlig price_per_night, status, data_origin og UTC-timestamps.
+- Imported customer-stay rows are exposed as read-only synthetic bookings so clients
+  can query the complete dataset. Their dates, room assignment and party size are
+  generated; source room category, country, season, stay length and total are retained.
+  `data_origin=synthetic_import` identifies them; API responses anonymize guest names
+  and omit contact details. Only operational bookings can be edited or cancelled.
+  See [decision record](../docs/decisions/synthetic-import-bookings.md).
 
 ## Inventar og barsalg
 

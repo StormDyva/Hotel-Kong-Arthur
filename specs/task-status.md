@@ -1,4 +1,11 @@
-# Aktuel status — T-026
+# Aktuel status — T-027
+
+De 1.000 importerede ophold seedes som anonymiserede, skrivebeskyttede syntetiske
+API-bookinger (`data_origin=synthetic_import`). Compose-opstart kørte migration og
+seed; `/api/bookings?from=2027-01-01&page_size=1` viste `total=1000`, og databasen
+viste 1.000 syntetiske + 4 operationelle bookinger. Alle 5.379 syntetiske
+prislinjer summerer til deres bookingbeløb. `py_compile` og `git diff --check`
+bestod; fuld pytest-suite er ikke kørt i denne task.
 
 API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
 Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.

@@ -252,6 +252,14 @@ opretter en booking mod MySQL, genfinder den efter reload, og testbookingen annu
 ## T-026 — API-PR klar til manuel Tableau-integration
 
 Acceptomfang: API, bookingprototype og dokumenteret Tableau-datakontrakt/refresh.
+
+## T-027 — eksponér importerede ophold som syntetiske API-bookinger
+
+Brugerønske: de 1.000 importerede ophold skal kunne hentes fra `/api/bookings`.
+Generér deterministiske datoer, værelser og én gæst pr. ophold. Bevar kildebeløb,
+opholdslængde, værelseskategori, land og sæson. Marker `data_origin` i API-kontrakten,
+anonymisér gæsten i API-svar, og gør disse rækker skrivebeskyttede. Kør seed automatisk
+ved databaseinitialisering; seed skal kunne genkendes via batch og kilde-row.
 Dashboardet bygges manuelt senere og blokerer ikke denne API-PR. Containeriserede
 tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskrivelsen
 samles om den færdige implementering og PR markeres ready for review, uden merge.

@@ -14,6 +14,7 @@ Approved as working agreement – 2026-10-26. Status viser specifikationsdæknin
 | Live/opdaterbare data | specify, clarify | US-005 | T-009 | POST/PUT/DELETE → GET | Dækket |
 | CSV/XSLT seed/import | specify, clarify | US-010 | T-004 | import smoke/re-run | Dækket |
 | ITAKEA kundedata-import | specify, clarify | US-005, US-008, US-010 | T-005 | mapping/import/idempotency tests | Dækket |
+| Importerede ophold i booking-API | spec | US-005 | T-027 | Compose seed + API runtime-verifikation | Dækket |
 | Booking CRUD frontend | specify | US-001–US-004 | T-014 | browser smoke | Dækket |
 | Belægningsgrad | clarify, plan | US-006 | T-010–T-011 | formel/golden tests | Dækket |
 | Hotelindtjening | specify, plan | US-007 | T-011 | golden dataset | Dækket |

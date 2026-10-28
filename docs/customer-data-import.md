@@ -12,6 +12,27 @@ lokalt og placeres i `data/raw/`:
 Råfiler er ignoreret af Git, fordi de indeholder personlignende navne og derfor
 ikke skal pushes til det offentlige projektrepository.
 
+## Automatisk seed ved databaseoprettelse
+
+`database/seed/004_anonymized_customer_source.sql` indlæses automatisk af
+`db-init`, når en database initialiseres. Seedet indeholder de 1.000 opholdsrækker
+og 30 drinksrækker, men gæstenavne er erstattet med generiske labels. De øvrige
+felter og drinksdata er bevaret. Rå XLSX-filerne behøver derfor ikke at ligge hos
+andre brugere. Eksisterende rækker med samme kilde-ID bevares ved genkørsel.
+
+Det efterfølgende `005_synthetic_customer_bookings.sql` opretter 1.000
+skrivebeskyttede API-bookinger fra opholdsrækkerne. Check-in, checkout, værelses-ID
+og én gæst pr. ophold er syntetiske antagelser; kildebeløb, opholdslængde,
+værelseskategori, land og sæson bevares. API-svar markerer disse rækker med
+`data_origin=synthetic_import`, anonymiserer navne og udelader kontaktdata.
+Syntetiske bookinger vises også i bookingbaserede analyser for deres genererede år.
+Drinkaggregaterne ligger fortsat i `customer_bar_sales_aggregates`; de opretter
+ikke daterede `bar_sales`, fordi medarbejder og salgstidspunkt mangler.
+
+`db-init` anvender hvert seed én gang pr. databasevolume via `schema_migrations`.
+Når et seed tilføjes i en eksisterende checkout, køres `db-init` igen ved næste
+`docker compose up`.
+
 ## Importkommando
 
 Generér idempotent SQL med Python-standardbiblioteket:
@@ -48,8 +69,10 @@ mapper sådan:
 | Season | `customer_stay_records.season_code` |
 | Price | `customer_stay_records.price_total` |
 
-Der oprettes ikke bookings, fordi filen mangler check-in, check-out, status og
-sikkert værelsesnummer. Der opfindes heller ikke room IDs.
+Booking-seedet genererer check-in, checkout, værelses-ID, status `confirmed` og
+`guests_count=1`. Det er syntetiske analysefelter, ikke historisk dokumentation.
+`data_origin` gør oprindelsen synlig, og API'et tillader ikke redigering eller
+annullering af dem.
 
 `drinks_menu_with_sales.xlsx` mapper sådan:
 
@@ -70,8 +93,8 @@ men medarbejder- og vagtfiltre kræver en senere dateret salgskilde.
 - `guests.import_key` identificerer en kilderække med filhash og source_record_id.
   Navn og land bruges ikke som personidentitet.
 - Samme import kan køres igen uden nye gæster, staging-rækker eller produkter.
-- Gæste-XLSX’ens ekstra delvist tomme række afvises med årsag og gemmes som
-  `row_status = rejected`.
+- Den seedede gæste-XLSX indeholder 1.000 gyldige rækker; seedet accepterer alle
+  1.000 og gemmer ingen afviste rækker.
 
 
 T-023 erstatter navnebaseret deduplikering: guests.import_key er SHA-256 af

@@ -2577,6 +2577,13 @@ components:
         status:
           type: string
           title: Status
+        data_origin:
+          type: string
+          enum:
+          - operational
+          - synthetic_import
+          title: Data Origin
+          description: 'synthetic_import rows have generated dates, rooms, and party sizes; read-only.'
       type: object
       required:
       - id
@@ -2595,6 +2602,7 @@ components:
       - price_per_night
       - currency
       - status
+      - data_origin
       title: Booking
     BookingPage:
       properties:

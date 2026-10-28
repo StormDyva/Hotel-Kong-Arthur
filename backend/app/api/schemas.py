@@ -77,6 +77,7 @@ class Booking(BaseModel):
     price_per_night: Decimal
     currency: str
     status: str
+    data_origin: Literal['operational', 'synthetic_import']
 
 class BookingPage(BaseModel):
     items: list[Booking]
