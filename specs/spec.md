@@ -163,3 +163,11 @@ På bedømte bookinger er navn, land, værelse, datoer og gæsteantal låst (409
 Eksportens guests-datasæt bruger booking_guests. Hele selskabet henføres til
 bookinggæstens land, da øvrige nationaliteter ikke registreres. Samlet Tableau-
 dashboard og opdateringsdemonstration er fortsat uden endelig godkendelse.
+
+## T-025 — enkel bookingfrontend
+
+Browserprototypen på localhost:5500 søger ledighed, viser et forslag pr. type
+(mulighed for typefilter/alle rum), modtager gæstekontakt og opretter via API'et.
+Tilbuds- og bekræftelsesprisen kommer fra backend. Serverfeltfejl vises i formularen.
+Efter bekræftelse kan man gå direkte til oversigten. Et rigtigt browserflow
+verificerer MySQL-persistens efter reload; testbookingen annulleres til sidst.

@@ -1,4 +1,4 @@
-# Aktuel status — T-024
+# Aktuel status — T-025
 
 API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
 Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.
@@ -116,3 +116,5 @@ Implementeret: /analytics/revenue/by-room-type-season og /analytics/revenue/by-c
 Logiklaget beregner og grupperer historisk natpris × nætter. Første endpoint giver
 alle 24 kombinationer, andet giver flade landerækker. Begge returnerer JSON-tal.
 23 backend-/kontrakttests bestået, heraf fem nye målrettede tests i test_revenue_rows.py.
+
+T-025: Enkel bookingprototype med reelt opret/reload/oversigts-flow verificeret.

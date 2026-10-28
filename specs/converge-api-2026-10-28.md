@@ -41,3 +41,11 @@ henføres til bookinggæstens land. distinct_bookers er profil-/snapshotantal, i
 sikkert identificerede personer. Aktivt inventar er nutidigt, ikke historiske snapshots.
 Allerede overskrevne kontaktværdier og fejltilskrevne ratings kræver autoritativ
 kilde/manuelt review. Autentifikation og produktion er ikke del af den lokale MVP.
+
+## T-025 — live bookingprototype
+
+Oprettelse i frontend er nu verificeret gennem en rigtig browser mod API/MySQL:
+søgning, ét forslag pr. type, server-emailvalidering, oprettelse, 2.000 DKK ved
+sæsonskift og genfinding i oversigten efter reload. Testbooking annulleres bagefter.
+Frontend-unit: 59 består. Mock-browser: 19/19 består. Dette er browser/API-testbevis,
+ikke Tableau-dashboardgodkendelse.

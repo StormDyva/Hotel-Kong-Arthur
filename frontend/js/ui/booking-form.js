@@ -15,15 +15,13 @@ export function readGuestForm(form) {
   };
 }
 
-// Payload til POST /api/bookings. price_total er den registrerede pris (C-007).
+// Backend beregner og gemmer prisen; klienten sender kun bookingoplysninger.
 export function buildBookingPayload(criteria, room, guest) {
-  const nights = nightsBetween(criteria.check_in, criteria.check_out);
   return {
     room_id: room.room_id,
     check_in: criteria.check_in,
     check_out: criteria.check_out,
     guests_count: Number(criteria.guests_count),
-    price_total: room.price_per_night * nights,
     currency: 'DKK',
     guest,
   };
@@ -31,14 +29,14 @@ export function buildBookingPayload(criteria, room, guest) {
 
 export function stayDetailsHtml(stay) {
   const nights = nightsBetween(stay.check_in, stay.check_out);
-  const total = stay.price_total ?? stay.price_per_night * nights;
+  const total = stay.price_total ?? stay.total_price ?? stay.price_per_night * nights;
   return `
     <dl class="summary-list">
       <div><dt>Værelse</dt><dd>${escapeHtml(stay.room_number)} · ${escapeHtml(stay.room_type)}</dd></div>
       <div><dt>Check-in</dt><dd>${formatDate(stay.check_in)}</dd></div>
       <div><dt>Check-out</dt><dd>${formatDate(stay.check_out)}</dd></div>
       <div><dt>Gæster</dt><dd>${escapeHtml(pluralize(Number(stay.guests_count), 'gæst', 'gæster'))}</dd></div>
-      <div><dt>Pris pr. nat</dt><dd>${formatDKK(stay.price_per_night)}</dd></div>
+      <div><dt>Gennemsnit pr. nat</dt><dd>${formatDKK(stay.price_per_night)}</dd></div>
       <div class="summary-total"><dt>I alt (${escapeHtml(pluralize(nights, 'nat', 'nætter'))})</dt><dd>${formatDKK(total)}</dd></div>
     </dl>`;
 }
@@ -62,6 +60,7 @@ export function initBookingForm({ section, confirmation, service, onBack, onCrea
   const formAlert = section.querySelector('[data-form-alert]');
   const submit = form.querySelector('[type="submit"]');
   let current = null;
+  let submitting = false;
 
   form.elements.country_code.innerHTML = countryOptionsHtml();
 
@@ -72,7 +71,7 @@ export function initBookingForm({ section, confirmation, service, onBack, onCrea
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!current) return;
+    if (!current || submitting) return;
     formAlert.hidden = true;
 
     const guest = readGuestForm(form);
@@ -80,6 +79,7 @@ export function initBookingForm({ section, confirmation, service, onBack, onCrea
     showFieldErrors(form, errors);
     if (!valid) return;
 
+    submitting = true;
     setBusy(submit, true, 'Opretter booking…');
     try {
       const booking = await service.createBooking(buildBookingPayload(current.criteria, current.room, guest));
@@ -94,6 +94,7 @@ export function initBookingForm({ section, confirmation, service, onBack, onCrea
       formAlert.textContent = error.message;
       formAlert.hidden = false;
     } finally {
+      submitting = false;
       setBusy(submit, false);
     }
   });

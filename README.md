@@ -105,6 +105,7 @@ uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
 PYTHONPATH=backend MYSQL_PORT=3307 backend/.venv/bin/pytest -q backend/tests
 node backend/tests/swagger-smoke.mjs
+npm --prefix frontend run smoke:live
 npm --prefix frontend test
 npm --prefix frontend run smoke
 docker compose --profile test run --rm test-runner

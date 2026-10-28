@@ -5,7 +5,10 @@ Start hele applikationen fra repository-roden med `docker compose up --build -d`
 Frontend bruger den rigtige API som standard. nginx videresender `/api/`,
 `/analytics/`, `/health`, `/docs`, `/openapi.json` og Swagger-assets til API-containeren.
 
-Flow: søg ledige værelser → vælg værelse → indtast gæst → opret → se/redigér/annullér.
+Flow: søg ledige værelser → vælg værelse → indtast gæst → bekræft → se bookingnummer.
+Der vises som standard ét ledigt rum pr. type. Vælg type eller alle rum i feltet
+Vis værelser. Efter bekræftelse kan man gå direkte til bookingoversigten.
+API'ets samlede tilbudspris vises; klienten sender ikke en beregnet pris ved oprettelse.
 Frontendens service-lag er js/services/booking-service.js; HTTP-kontrakten findes i
 ../openapi/openapi.yaml og Swagger på http://localhost:8000/docs.
 
@@ -27,3 +30,9 @@ Brug da `?mock=true`, eller `?mock=false&api=http://localhost:8000` for MySQL-AP
 `npm run smoke` kører det isolerede mock-flow i Chrome (19 checks).
 CHROME_PATH, SMOKE_PORT og SMOKE_DEBUG_PORT kan overskrive browser/porte.
 Den containeriserede MySQL-/API-test findes i repositoryets README.
+
+`npm run smoke:live` tester den rigtige frontend/API/MySQL: søgning, otte forslag,
+servervalidering af email, oprettelse, sæsonpris og genfinding efter reload.
+Testbookingen markeres tydeligt og annulleres bagefter; historikken bevares.
+BOOKING_BASE_URL og CHROME_PATH kan ændre adresse/browser (default localhost:5500
+og Chrome på macOS). SCREENSHOT_PATH kan gemme et skærmbillede.

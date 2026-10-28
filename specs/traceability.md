@@ -82,3 +82,7 @@ færdigt Tableau-dashboardbevis.
 T-024: Compose-opstart/testtargets/proxy/persistens og aktuelle dokumenter →
 docs/release-checklist.md med konkrete friske testresultater. Samlet Tableau-
 opdatering og menneskeligt PR-review er fortsat åbne acceptpunkter.
+
+T-025 / US-001/002/005: frontend booking-form/rooms-view/main →
+frontend/tests/live-booking-smoke.mjs. Rigtigt API-flow, serverfeltfejl, sæsonpris
+og genfinding efter reload; 59 unit-tests og 19 mock-browserchecks.

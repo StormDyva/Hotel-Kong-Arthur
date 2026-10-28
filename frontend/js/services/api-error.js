@@ -12,7 +12,7 @@ export class ApiError extends Error {
   // details: [{ field: 'check_out', message: '...' }] -> { check_out: '...' }
   get fieldErrors() {
     return Object.fromEntries(
-      this.details.filter((d) => d && d.field).map((d) => [d.field, d.message]),
+      this.details.filter((d) => d && d.field).map((d) => [d.field.replace(/^guest\./, ''), d.message]),
     );
   }
 }

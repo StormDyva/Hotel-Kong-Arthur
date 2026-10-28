@@ -241,3 +241,10 @@ projekt; proxy, custom porte/CORS, persistens og OpenAPI kontrolleret. README,
 startguide, projektguide, datadictionary, frontend, Tableau, import, SWA og specs
 skal beskrive nuværende adfærd; gamle rapporter markeres historiske. Samlet
 Tableau-accept må ikke hævdes. Testbevis: docs/release-checklist.md.
+
+## T-025 — enkel bookingprototype mod rigtig API
+
+US-001/002/005. Bevar enkelt søg → værelse → gæst → bekræft-flow. Vis ét ledigt
+forslag pr. type som standard med mulighed for typefilter/alle rum. Brug API-priser,
+send ikke klientberegnet pris, vis feltfejl og genvej til oversigten. Accept: browser
+opretter en booking mod MySQL, genfinder den efter reload, og testbookingen annulleres.

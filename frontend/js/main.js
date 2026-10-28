@@ -17,7 +17,7 @@ const reception = initReception(document.getElementById('view-reception'), {
   service: bookingService,
 });
 
-initTabs(document.querySelector('.tabs'), {
+const tabs = initTabs(document.querySelector('.tabs'), {
   onChange(panelId) {
     if (panelId === 'view-reception') reception.refresh();
   },
@@ -54,4 +54,8 @@ confirmation.querySelector('[data-new-booking]').addEventListener('click', () =>
   bookingForm.reset();
   searchForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
   searchForm.elements.check_in.focus({ preventScroll: true });
+});
+
+confirmation.querySelector('[data-show-bookings]').addEventListener('click', () => {
+  tabs.select('view-reception');
 });

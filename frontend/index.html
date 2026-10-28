@@ -30,7 +30,8 @@
 
   <main class="container">
     <section id="view-booking" class="view" role="tabpanel" aria-labelledby="tab-booking">
-      <h1 class="visually-hidden">Ny booking</h1>
+      <h1>Ny booking</h1>
+      <p class="muted">Vælg datoer og værelse, udfyld gæstens oplysninger og bekræft bookingen.</p>
 
       <section id="search" class="card" aria-labelledby="search-title">
         <h2 id="search-title"><span class="step">1</span> Søg ledige værelser</h2>
@@ -59,6 +60,7 @@
       <section id="rooms" class="card" aria-labelledby="rooms-title" hidden>
         <h2 id="rooms-title"><span class="step">2</span> Ledige værelser</h2>
         <p class="muted" data-rooms-summary></p>
+        <div class="field"><label for="room-type-filter">Vis værelser</label><select id="room-type-filter" data-room-type-filter></select></div>
         <div class="room-grid" data-rooms-list aria-live="polite"></div>
       </section>
 
@@ -104,6 +106,7 @@
         <div data-confirmation></div>
         <div class="form-actions">
           <button type="button" class="btn btn-primary" data-new-booking>Ny booking</button>
+          <button type="button" class="btn btn-secondary" data-show-bookings>Se bookingoversigten</button>
         </div>
       </section>
     </section>
