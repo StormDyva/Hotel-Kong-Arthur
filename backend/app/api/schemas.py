@@ -77,7 +77,7 @@ class Booking(BaseModel):
     price_per_night: Decimal
     currency: str
     status: str
-    data_origin: Literal['operational', 'synthetic_import']
+    data_origin: Literal['operational', 'synthetic_import'] = Field(description='synthetic_import rows have generated dates, rooms, and party sizes; read-only.')
 
 class BookingPage(BaseModel):
     items: list[Booking]

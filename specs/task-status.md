@@ -130,3 +130,8 @@ T-026: API er klar til Tableau-integration; handoff i docs/tableau-api-handoff.m
 Testprofil nulstiller kun sin egen database før fixtures (host/navn kontrolleres).
 26 containeriserede tests og 59 frontendtests består. Dashboardet er senere manuelt
 arbejde og blokerer ikke API-PR-review. PR markeres ready, uden automatisk merge.
+
+T-028: local school dataset loaded: 1000 exact CSV rows and linked demo bookings,
+100 additional mock bookings, operational rows preserved. Source stays use generated
+2026 dates/rooms with exact source totals; API source names remain anonymized.
+Repeated loader adds zero records. See docs/customer-data-import.md for reproduction.

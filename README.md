@@ -162,3 +162,11 @@ Testprofilen nulstiller altid hotel_kong_arthur_test på test-db før fixtures i
 så tidligere importforsøg ikke påvirker testresultaterne. Appens database nulstilles
 ikke. RESET_TEST_DATABASE må kun bruges med denne præcise testdatabase og host;
 scriptet afviser andre kombinationer. Kør ikke flere test-runners samtidigt.
+
+## School-project dataset
+
+The local CSV loader preserves all 1,000 exact input rows and links them to their
+anonymized demo bookings, places generated stays in 2026 and adds 100 extra mock
+bookings. This optional step needs the local CSV; see
+[the exact CSV loading command](docs/customer-data-import.md#exact-csv--extra-school-project-data-t-028).
+Repeated runs do not create duplicates. No original names/raw files are committed.

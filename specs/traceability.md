@@ -91,3 +91,8 @@ og genfinding efter reload; 59 unit-tests og 19 mock-browserchecks.
 T-026: Tableau-klar API → docs/tableau-api-handoff.md, aktuelle numeriske exports
 og KPI-kald → runtimekontrol, OpenAPI-lighed, 26 containeriserede tests og 59 frontendtests.
 Testprofilens reset er afgrænset til hotel_kong_arthur_test på test-db.
+
+T-028: exact CSV + 100 mock bookings → csv_source_rows migration and
+load_school_csv.py. Runtime checks compare every raw/source guest field, source
+price and nightly totals, 2026 dates and zero overlaps. Repeat loader adds zero rows.
+API source bookings remain anonymized; no raw names are committed.

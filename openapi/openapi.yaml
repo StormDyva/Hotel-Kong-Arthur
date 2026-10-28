@@ -2583,7 +2583,8 @@ components:
           - operational
           - synthetic_import
           title: Data Origin
-          description: 'synthetic_import rows have generated dates, rooms, and party sizes; read-only.'
+          description: synthetic_import rows have generated dates, rooms, and party
+            sizes; read-only.
       type: object
       required:
       - id
