@@ -77,7 +77,7 @@ class Booking(BaseModel):
     price_per_night: Decimal
     currency: str
     status: str
-    data_origin: Literal['operational', 'synthetic_import']
+    data_origin: Literal['operational', 'synthetic_import'] = Field(description='synthetic_import rows have generated dates, rooms, and party sizes; read-only.')
 
 class BookingPage(BaseModel):
     items: list[Booking]
@@ -101,6 +101,7 @@ class Summary(BaseModel):
     available_room_nights: int
     occupancy_percent: float
     adr: Decimal
+    revpar: Decimal = Field(description='Room revenue / available room nights, in DKK. Zero for zero capacity.')
     bar_revenue: Decimal
     inventory_rooms: int
 
@@ -294,3 +295,17 @@ class RoomTypeSeasonRevenueRow(BaseModel):
 class CountryRevenueRow(BaseModel):
     country: str
     revenue: float = Field(ge=0, description='Backend-calculated revenue in DKK, returned as a JSON number')
+
+
+class MonthlyRevPAR(BaseModel):
+    month: str
+    revenue: Decimal
+    available_room_nights: int
+    revpar: Decimal
+
+
+class RevPARReport(BaseModel):
+    revpar: Decimal
+    revenue: Decimal
+    available_room_nights: int
+    monthly: list[MonthlyRevPAR]

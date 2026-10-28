@@ -71,7 +71,7 @@ def test_golden_analytics(repo):
     r = analytics.report(repo, date(2026,6,11), date(2026,6,12))
     assert r['summary']['revenue'] == 1800
     assert r['summary']['room_nights'] == 1
-    assert analytics.report(repo, date(2040,1,1), date(2041,1,1))['summary']['revenue'] == 0
+    assert analytics.report(repo, date(2090,1,1), date(2091,1,1))['summary']['revenue'] == 0
 
 
 def test_cancellation_after_maintenance(client, repo):

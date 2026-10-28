@@ -102,3 +102,40 @@ kildens filhash og source_record_id. Nøglen identificerer en importeret kilder�
 ikke en person. Gentagen import bruger samme kilde-ID; bookinger bruger NULL-nøgle
 og separate gæstesnapshots. Allerede importerede legacy-rækker får ved første
 genimport nye eksplicitte gæsterelationer, hvorefter genimport er stabil.
+
+## Exact CSV + extra school-project data (T-028)
+
+The running school dataset includes every row of international_names_with_rooms_1000.csv.
+The original seven string values are preserved in csv_source_rows.raw_record, keyed
+by file SHA-256 and source line, and linked to the existing source-derived booking.
+Original names are also restored into the linked local guests/customer_stay_records
+fields; API source bookings still display anonymized names. A shared guest link
+causes the loader to abort rather than overwrite another booking.
+The CSV already has 54 Unicode replacement characters; they are preserved, not guessed.
+
+After normal Compose startup, run from the repository root (Python dependencies:
+backend/requirements-dev.txt; MYSQL_PORT is your host database port):
+
+```sh
+MYSQL_PORT=3307 backend/.venv/bin/python database/import/load_school_csv.py \
+  --csv ../hoteldata-master/international_names_with_rooms_1000.csv
+```
+
+Alternatively put the file in ignored data/raw and use that path. Do not commit raw
+names, the CSV, or generated SQL containing them. The loader depends on main's
+anonymized source/booking seed and migration 009. It checks every source row against
+its seeded country/category/nights/season/total and aborts atomically on mismatches.
+
+Dates, room assignments and one person per source stay are synthetic. The loader
+places source stays within 2026 in the correct season, without overlaps, so default
+API/Tableau year filters include all 1,000. Source total prices are preserved exactly;
+cents are distributed across nightly snapshots. Existing operational bookings are
+untouched. The 100 additional bookings have generated contacts and current seasonal
+prices; they are marked synthetic_import with a separate school-project mock batch.
+Re-running adds neither CSV rows nor mock bookings and preserves existing assignments.
+No fabricated guest ratings are added.
+
+The anonymized seed is automatically loaded by Compose; the exact local CSV and
+100-extra-mock step is explicit because the raw file is not committed. Historical
+notes about the seed's generated future years describe the default seed before this
+optional school-project loader, not the current loaded 2026 dataset.

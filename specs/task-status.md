@@ -1,13 +1,11 @@
-# Aktuel status — T-027
+# Aktuel status — T-028
 
-De 1.000 importerede ophold seedes som anonymiserede, skrivebeskyttede syntetiske
-API-bookinger (`data_origin=synthetic_import`). Compose-opstart kørte migration og
-seed; `/api/bookings?from=2027-01-01&page_size=1` viste `total=1000`, og databasen
-viste 1.000 syntetiske + 4 operationelle bookinger. Alle 5.379 syntetiske
-prislinjer summerer til deres bookingbeløb. `py_compile` og `git diff --check`
-bestod; fuld pytest-suite er ikke kørt i denne task.
+T-028: 1000 exact CSV rows and source bookings plus 100 extra mocks are loaded
+locally in 2026, alongside operational bookings. Raw source names are preserved
+locally and synthetic bookings remain anonymized in API responses. See the CSV
+loader documentation. Prior seed-only future-year reports are historical.
 
-API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
+API: 28 operationer; 29 backend-/kontrakttests og 59 frontendtests.
 Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.
 Gæstesnapshots, låste bedømte ophold, import_key og korrekt gæsteeksport er gældende.
 Aktuel verifikation: [Converge](converge-api-2026-10-28.md) og
@@ -128,5 +126,14 @@ T-025: Enkel bookingprototype med reelt opret/reload/oversigts-flow verificeret.
 
 T-026: API er klar til Tableau-integration; handoff i docs/tableau-api-handoff.md.
 Testprofil nulstiller kun sin egen database før fixtures (host/navn kontrolleres).
-26 containeriserede tests og 59 frontendtests består. Dashboardet er senere manuelt
+29 containeriserede tests og 59 frontendtests består. Dashboardet er senere manuelt
 arbejde og blokerer ikke API-PR-review. PR markeres ready, uden automatisk merge.
+
+T-028: local school dataset loaded: 1000 exact CSV rows and linked demo bookings,
+100 additional mock bookings, operational rows preserved. Source stays use generated
+2026 dates/rooms with exact source totals; API source names remain anonymized.
+Repeated loader adds zero records. See docs/customer-data-import.md for reproduction.
+
+T-027: RevPAR i summary og GET /api/analytics/revpar med månedstal. Beregning i
+service-laget, nulkapacitet håndteres med warning. Tre nye MySQL-tests dækker
+summer/denominator, filtre, delvise måneder og annullering. 29 tests består.

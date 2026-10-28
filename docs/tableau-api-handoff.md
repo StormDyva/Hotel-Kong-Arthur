@@ -74,3 +74,12 @@ I har ændret bookinger/salg. Ratings er ikke seedet.
 Demonstrér senere: opret en booking i frontend → genhent API-tal → opdatér
 Tableau-datakilden → se det ændrede beløb og belægning. Test dashboardfiltre og
 oplysninger om periode/refresh. Dette er gruppens manuelle dashboardopgave.
+
+## RevPAR (T-027)
+
+GET `/api/analytics/revpar?year=2026`: data.revpar er periodens værelsesomsætning pr.
+tilgængelig værelsesnat. data.monthly har færdige month/revpar-rækker til en kurve,
+samt revenue og available_room_nights til forklaring. Ingen pris-/procentberegning
+kræves i Tableau. Decimalfelterne returneres som strenge ligesom øvrige /api-tal;
+konverter datatypen ved import. Eksportbroens summary indeholder også revpar.
+Brug samlet data.revpar for hele perioden; det er ikke gennemsnittet af månedstallene.

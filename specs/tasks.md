@@ -264,3 +264,19 @@ Dashboardet bygges manuelt senere og blokerer ikke denne API-PR. Containerisered
 tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskrivelsen
 samles om den færdige implementering og PR markeres ready for review, uden merge.
 Se docs/tableau-api-handoff.md.
+
+## T-028 — exact CSV data plus extra school-project mock bookings
+
+User authorizes all 1,000 CSV stays to appear as demo bookings with synthetic
+room assignments/dates. Reuse main's existing anonymized source bookings, preserve
+every exact CSV row in local database, verify all seven source fields and link each
+row to its existing booking. Add 100 clearly marked extra mock bookings for 2026.
+Raw names/files are not committed. Import must be idempotent and preserve existing
+bookings. Encoding defects already present in the CSV remain visible in raw JSON.
+
+## T-027 — RevPAR i backend og Tableau-datagrundlag
+
+US-007: beregn værelsesomsætning / tilgængelige værelsesnætter i service-laget.
+Tilføj revpar i summary og et selvstændigt GET /api/analytics/revpar med samlet tal
+og månedsrækker til Tableau-kurven. Samme periode/type/land/sæson-regler; nulnævner
+returnerer 0 med warning. OpenAPI, Swagger og handoff opdateres; tests mod MySQL.
