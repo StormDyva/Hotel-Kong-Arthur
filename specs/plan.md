@@ -55,3 +55,8 @@ menneskeligt review; samlet Tableau-accept vurderes særskilt.
 RevPAR beregnes i analytics-service som revenue / available_room_nights.
 Månedlige rækker klipper kapacitet og omsætning til perioden; der beregnes ikke
 gennemsnit af afrundede måneds-RevPAR. Schema/Swagger og Tableau-handoff følger med.
+
+T-028: migration 009 stores exact CSV JSON and links to existing source bookings.
+load_school_csv.py is a local, transactional school-data import utility; extra mock
+creation reuses the existing booking service. Raw CSV stays out of Git. It places
+source/demo stays in 2026 for practical default-year charts and verifies idempotence.

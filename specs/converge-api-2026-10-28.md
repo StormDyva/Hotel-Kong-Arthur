@@ -60,3 +60,20 @@ ikke en blokering for API-PR'ens review. Menneskelig review/merge er stadig påk
 T-027: RevPAR i summary og GET /api/analytics/revpar med månedstal. Beregning i
 service-laget, nulkapacitet håndteres med warning. Tre nye MySQL-tests dækker
 summer/denominator, filtre, delvise måneder og annullering. 29 tests består.
+
+## T-028 — loaded school dataset
+
+Runtime database: 1,000 exact CSV JSON rows, 1,000 linked source demo bookings,
+100 additional generated bookings and preserved operational records. Source dates
+are generated within 2026; CSV price/category/country/nights/season are retained.
+Original names are stored locally in guests/source records/CSV JSON while API names
+remain anonymized. All raw values and normalized source guest fields were compared
+with the local file. Nightly totals match source totals; confirmed overlaps = 0.
+Repeated loader: 0 new mock bookings. Source contains 54 existing replacement
+characters, retained verbatim. No raw names are committed.
+
+29 containerized API/OpenAPI tests passed after reconciling the merged source seed:
+empty-period fixtures use years beyond generated source stays; product tests use
+catalog minimums/current prices rather than assuming the pre-import catalog.
+The pending RevPAR change is retained. The checked-in contract is generated from
+its schemas; the data_origin description now lives in the schema as well.
