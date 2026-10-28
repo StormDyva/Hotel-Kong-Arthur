@@ -7,12 +7,19 @@ set -eu
 : "${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}"
 
 mysql_root() {
-    mysql --protocol=TCP \
+    mysql --default-character-set=utf8mb4 --protocol=TCP \
         --host="${MYSQL_HOST}" \
         --user=root \
         --password="${MYSQL_ROOT_PASSWORD}" \
         "${MYSQL_DATABASE}" "$@"
 }
+
+if [ "${RESET_TEST_DATABASE:-0}" = "1" ]; then
+    if [ "${MYSQL_DATABASE}" != "hotel_kong_arthur_test" ] || [ "${MYSQL_HOST}" != "test-db" ]; then
+        echo "Refusing reset outside the dedicated test database/host" >&2
+        exit 1
+    fi
+fi
 
 echo "Waiting for MySQL at ${MYSQL_HOST}..."
 until mysqladmin --protocol=TCP \
@@ -22,6 +29,10 @@ until mysqladmin --protocol=TCP \
     ping --silent >/dev/null 2>&1; do
     sleep 2
 done
+
+if [ "${RESET_TEST_DATABASE:-0}" = "1" ]; then
+    mysql_root -e "DROP DATABASE IF EXISTS hotel_kong_arthur_test; CREATE DATABASE hotel_kong_arthur_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+fi
 
 mysql_root <<'SQL'
 CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -48,12 +59,23 @@ for migration in /migrations/*.sql; do
 done
 
 for seed in /seed/*.sql; do
+    version="seed_$(basename "${seed}")"
+    applied=$(mysql_root -Nse "SELECT COUNT(*) FROM schema_migrations WHERE version = '${version}';")
+    if [ "${applied}" = "1" ]; then
+        echo "Skipping applied seed ${version}"
+        continue
+    fi
     echo "Applying seed ${seed}"
     mysql_root < "${seed}"
+    mysql_root -e "INSERT INTO schema_migrations (version) VALUES ('${version}');"
 done
 
 if [ "${RUN_CHECKS:-0}" = "1" ]; then
     for check in /tests/*.sql; do
+        if [ "$(basename "${check}")" = "customer_import_checks.sql" ] && [ "${RUN_CUSTOMER_IMPORT_CHECKS:-0}" != "1" ]; then
+            echo "Skipping customer import checks: import fixture is not loaded"
+            continue
+        fi
         echo "Running database check ${check}"
         mysql_root < "${check}"
     done

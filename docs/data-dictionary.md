@@ -59,7 +59,8 @@ bookinger. En senere API/service skal kontrollere både `active` og `status`.
 
 ### `guests`
 
-En gæst kan have mange bookinger. Land bruges som stabil analysekategori.
+API-bookinger ejer separate gæstesnapshots. Legacy-rækker kan stadig være delt;
+kontaktrettelser bruger copy-on-write. Land er analysekategori, ikke identitet.
 
 | Kolonne | Type | Betydning |
 |---|---|---|
@@ -70,6 +71,7 @@ En gæst kan have mange bookinger. Land bruges som stabil analysekategori.
 | `phone` | VARCHAR(40) | Telefonnummer; nullable |
 | `country_code` | CHAR(2) | ISO-lignende landekode |
 | `country_name` | VARCHAR(120) | Visningsnavn for land |
+| `import_key` | CHAR(64), nullable, UNIQUE | Eksplicit kilderække-ID; NULL for bookingsnapshots |
 | `created_at`, `updated_at` | TIMESTAMP | Auditfelter |
 
 Den gamle unikke constraint på land er fjernet, så flere gæster fra samme
@@ -84,9 +86,9 @@ kalenderperioder.
 
 Godkendt MVP-kalender:
 
-- `low`: 1/1–31/3 og 1/11–31/12
+- `low`: 1/1–31/3 og 1/11–19/12
 - `mid`: 1/4–31/5 og 1/9–31/10
-- `high`: 1/6–31/8
+- `high`: 1/6–31/8 og 20/12–31/12
 
 ### `room_type_prices`
 
@@ -159,6 +161,37 @@ faktiske historiske salgspris, mens `bar_products.price` er katalog/referencepri
 ## Seed og kildedata
 
 Der findes ingen CSV/XSLT-kildedata i dette repository. Seed-filen er derfor
-et lille, deterministisk testdatasæt med otte værelsestyper, 16 værelser,
+et lille, deterministisk testdatasæt med otte værelsestyper og oprindeligt 16 værelser (seed 002 udvider til 214),
 fire gæster, tre sæsoner, sæsonpriser, bookinger samt barprodukter og salg.
 Den må ikke præsenteres som hotellets historiske produktionsdata.
+
+## Integration amendment — 2026-10-28
+
+Migration 004 allows soft-cancellation after a room becomes unavailable, while
+retaining availability/capacity validation for confirmed booking writes.
+API-created price lines are nightly snapshots. The service serializes writes by
+locking the room before checking overlaps. Cancellation locks the same room first.
+Migration 007 removes name/country identity. Booking guest snapshots isolate contact edits; import_key provides source-row idempotence.
+Seed scripts are tracked in schema_migrations with a `seed_` filename prefix and
+run once, so service restarts do not reset booking edits.
+
+## T-020 — referenceinventar, sæsoner og feedback
+
+booking_reviews har booking_id som både primary og foreign key, rating CHECK 1–5
+samt created_at/updated_at. Højst én rating pr. booking; afsluttet/confirmed
+valideres i service-laget under samme rum-/bookinglåse som bookingwrites.
+
+Det syntetiske referenceinventar har typefordeling 36/50/61/40/10/8/5/4 i rækkefølgen
+Standard enkelt / Grand lit / Standard dobbelt / Superior dobbelt / Junior suite /
+Spa executive / Suite / LOFT. Kapaciteter er 1/2/2/2/3/3/4/4, dvs. 428 pladser i
+214 rum. Fordelingen er en demoantagelse, ikke leveret hotelinventar.
+Julehøjsæson er 20.–31. december; den tidligere lavsæson slutter 19. december.
+
+Mysql-klienten bruger nu eksplicit utf8mb4. Migration 006 reparerer de kendte
+reference-labels, som tidligere var indlæst med forkert klienttegnsæt.
+
+
+T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
+kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
+Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
+ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.

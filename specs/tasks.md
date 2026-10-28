@@ -177,3 +177,82 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Kan de testes? Ja, hver task har konkret test/verifikation.
 - Dækker de alle PDF-krav? Ja, se traceability.md.
 - Er kundetilfredshed håndteret? Ja, som eksplicit afgrænsning eller aktivering i T-013.
+
+## Integration run — 2026-10-28
+
+Work proceeds in dependency order on `feature/T-009-live-api-tableau` under the user
+request to connect the application, MySQL and Tableau according to both PDFs.
+T-006/7/8/9 implement the API foundation, contract, CRUD and live dataflow;
+T-010/11/12 add nightly hotel/bar analytics; T-014 uses the API by default;
+T-015 generates API-backed Hyper extracts and a native workbook; T-016 supplies
+startup and SWA explanations. These are implementation results, not assertions of
+team approval or full task completion. See `converge-2026-10-28.md` for evidence/gaps.
+
+## T-020 — API op til opgavekrav (2026-10-28)
+
+Brugeren har prioriteret API og Swagger; Tableau bygges manuelt senere.
+Stories: US-001–US-008, US-011–US-012. Afhængigheder: eksisterende API/MySQL.
+Accept: særskilte OpenAPI-endpoints, bookingfiltre (status/room/guest/dato),
+analysefiltre (år/periode/land/type/sæson/medarbejder), gæstefordeling, indtjening
+pr. fysisk værelse/type/sæson/land og rangering, Helene-total/drinks/kategoriandele,
+barregistrering, samt 1–5 bedømmelse pr. afsluttet booking. Swagger skal fungere
+med lokalt serverede assets. Tests mod MySQL, OpenAPI-validering og Swagger-browser.
+Ingen Tableau-ændringer indgår.
+
+### Kundetilfredshed — brugerbeslutning
+Brugeren har valgt 1–5 pr. booking. PUT på bookingens review opretter eller erstatter
+én bedømmelse. Kun afsluttede, ikke-annullerede bookinger kan bedømmes.
+Svarprocent = bedømte / afsluttede bookinger med checkout i rapportperioden * 100.
+Ingen bedømmelser giver average_rating=null, antal=0 og warning, ikke opdigtede scores.
+
+### T-020 resultat
+
+Booking-/analysefiltre, selvstændige rapport-endpoints, barsalg, ratings, typed
+OpenAPI/fejl, lokale Swagger-assets og syntetisk referenceinventar er implementeret.
+Testbevis og formler: converge-api-2026-10-28.md. T-019 dækkes af eksplicit syntetisk
+referenceinventar. T-021 kundetilfredshed er aktiveret efter brugerens beslutning.
+Tableau-delene af tidligere T-020 er udskudt til brugerens manuelle arbejde.
+
+## T-022 — Flade indtjeningsrækker til Tableau
+
+Brugerkrav: GET /analytics/revenue/by-room-type-season og
+GET /analytics/revenue/by-country returnerer arrays med færdigberegnet indtjening.
+Service-laget summerer gemt natpris × antal nætter (natlige prislinjer og quantity).
+Alle otte typer × tre sæsoner medtages, også ved 0. Ingen Tableau-beregninger.
+Beløb returneres som JSON-tal i DKK. Filtre: year eller from/to, samme periodevalg
+som øvrige analyser. Annullerede bookinger udelades, checkout er eksklusiv.
+Test: 24 kombinationer, nulperiode, sæson-/periodegrænse, landegruppering og kontrakt.
+
+## T-023 — Gæstesnapshots, bedømmelsesintegritet og eksport
+
+Ret de reproducerede reviewfund. API-oprettelse får selvstændig gæsterække pr.
+booking; kontaktændringer bruger copy-on-write, uændret PUT genbruger samme række.
+Navn/land fjernes som unik identitet. Historisk import bruger eksplicit kilde-ID.
+Bedømt booking afviser ændring af navn/land, datoer, værelse eller selskabsstørrelse
+med 409; email/telefon må rettes. Tableau-guests bruger booking_guests.
+Accept: regressionstests mod MySQL, idempotent import og eksportdata med fire gæster.
+Tableau-dashboardets samlede opdateringsdemo er fortsat ikke godkendt.
+
+
+## T-024 — Compose og dokumentationsafstemning før PR-accept
+
+Accept: ren Compose-opstart og containeriserede API-/kontrakttests i separat
+projekt; proxy, custom porte/CORS, persistens og OpenAPI kontrolleret. README,
+startguide, projektguide, datadictionary, frontend, Tableau, import, SWA og specs
+skal beskrive nuværende adfærd; gamle rapporter markeres historiske. Samlet
+Tableau-accept må ikke hævdes. Testbevis: docs/release-checklist.md.
+
+## T-025 — enkel bookingprototype mod rigtig API
+
+US-001/002/005. Bevar enkelt søg → værelse → gæst → bekræft-flow. Vis ét ledigt
+forslag pr. type som standard med mulighed for typefilter/alle rum. Brug API-priser,
+send ikke klientberegnet pris, vis feltfejl og genvej til oversigten. Accept: browser
+opretter en booking mod MySQL, genfinder den efter reload, og testbookingen annulleres.
+
+## T-026 — API-PR klar til manuel Tableau-integration
+
+Acceptomfang: API, bookingprototype og dokumenteret Tableau-datakontrakt/refresh.
+Dashboardet bygges manuelt senere og blokerer ikke denne API-PR. Containeriserede
+tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskrivelsen
+samles om den færdige implementering og PR markeres ready for review, uden merge.
+Se docs/tableau-api-handoff.md.

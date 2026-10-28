@@ -1,3 +1,15 @@
+# Aktuel status — T-026
+
+API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
+Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.
+Gæstesnapshots, låste bedømte ophold, import_key og korrekt gæsteeksport er gældende.
+Aktuel verifikation: [Converge](converge-api-2026-10-28.md) og
+[release-checkliste](../docs/release-checklist.md). Tableau-dashboardet er ikke samlet godkendt.
+
+---
+
+## Historisk tasklog (tidligere status, ikke aktuel acceptvurdering)
+
 # Task status og handoff
 
 ## Senest opdateret
@@ -81,3 +93,33 @@ Startkommandoer:
 - Kør git diff --check før commit.
 - Commit ikke secrets eller lokale .env-filer.
 - Markér ikke en task færdig uden testbevis og review.
+
+## Integration update — 2026-10-28
+
+Branch: feature/T-009-live-api-tableau. Backend/API/MySQL and browser integration,
+analytics, OpenAPI/Swagger, Tableau extracts/workbook and handoff documentation
+have been added. Canonical specification: spec.md; specify.md is a pointer.
+See converge-2026-10-28.md for verified commands and outstanding requirements.
+The assignment is not marked complete: Tableau interaction QA, inventory fidelity,
+additional filters and satisfaction scope remain open.
+
+## T-020 — API færdiggørelse, 2026-10-28
+
+API og Swagger er prioriteret; Tableau bygges manuelt senere.
+På daværende tidspunkt: 25 operationer, fulde filtre/rapporter, 1–5-bedømmelser og referenceinventar er
+implementeret. Swagger: http://localhost:8000/docs, lokale assets, Try it out testet.
+Se converge-api-2026-10-28.md for den aktuelle API-status og testbevis.
+
+## T-022 — færdige Tableau-rækker, 2026-10-28
+
+Implementeret: /analytics/revenue/by-room-type-season og /analytics/revenue/by-country.
+Logiklaget beregner og grupperer historisk natpris × nætter. Første endpoint giver
+alle 24 kombinationer, andet giver flade landerækker. Begge returnerer JSON-tal.
+23 backend-/kontrakttests bestået, heraf fem nye målrettede tests i test_revenue_rows.py.
+
+T-025: Enkel bookingprototype med reelt opret/reload/oversigts-flow verificeret.
+
+T-026: API er klar til Tableau-integration; handoff i docs/tableau-api-handoff.md.
+Testprofil nulstiller kun sin egen database før fixtures (host/navn kontrolleres).
+26 containeriserede tests og 59 frontendtests består. Dashboardet er senere manuelt
+arbejde og blokerer ikke API-PR-review. PR markeres ready, uden automatisk merge.

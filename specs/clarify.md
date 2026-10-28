@@ -27,9 +27,9 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 
 ### C-004 – Sæsondefinition
 
-- **Beslutning:** Lavsæson: 1/1–31/3 og 1/11–31/12. Mellemsæson: 1/4–31/5 og 1/9–31/10. Højsæson: 1/6–31/8.
+- **Beslutning:** Lavsæson: 1/1–31/3 og 1/11–19/12. Mellemsæson: 1/4–31/5 og 1/9–31/10. Højsæson: 1/6–31/8 og 20/12–31/12.
 - **Begrundelse:** Reproducerbar tre-sæson-model, der passer til sæsonpriser.
-- **Konsekvens:** Sæson bestemmes pr. overnatningsnat. Helligdage og juletid håndteres ikke særskilt i MVP.
+- **Konsekvens:** Sæson bestemmes pr. overnatningsnat. Julegrænserne 20.–31. december er en projektantagelse.
 - **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
 
 ### C-005 – Belægningsgrad
@@ -62,10 +62,10 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 
 ### C-009 – Kundetilfredshed
 
-- **Beslutning:** Kundetilfredshed afgrænses fra MVP, fordi PDF’en ikke angiver data, skala, formel, endpoint eller Tableau-visning.
-- **Begrundelse:** Et tal uden autoritativ datakilde ville være ikke-verificerbart. Der opfindes ikke et mål.
-- **Konsekvens:** Ingen customer-satisfaction-model i MVP. Hvis gruppen/underviser leverer definition og data, tilføjes model, import, API, analyse, Tableau-view, story, task og tests.
-- **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
+Brugerbeslutning 2026-10-28: aktiv 1–5-rating pr. afsluttet confirmed booking.
+Gennemsnit og svarprocent beregnes for checkout-kohorten. Ingen syntetiske ratings.
+Bedømte ophold låser gæst/ophold; kun email/telefon må rettes. Tidligere fravalg er
+ophævet. Se den daterede beslutning nedenfor.
 
 ### C-010 – Manglende data og division med nul
 
@@ -93,7 +93,7 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 | DELETE som soft-cancel | Approved | Projektgruppen | 2026-10-26 |
 | Faktisk bookingpris | Approved | Projektgruppen | 2026-10-26 |
 | Helene-filter | Approved | Projektgruppen | 2026-10-26 |
-| Kundetilfredshed uden for MVP | Approved | Projektgruppen | 2026-10-26 |
+| Kundetilfredshed 1–5 pr. booking | Brugerbeslutning | Brugeren | 2026-10-28 |
 | Manglende data | Approved | Projektgruppen | 2026-10-26 |
 | Dobbeltbooking/kapacitet | Approved | Projektgruppen | 2026-10-26 |
 
@@ -103,3 +103,30 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 - Kan de implementeres og testes? Ja, med de angivne konsekvenser og acceptance tests.
 - Er de dækket af stories/tasks? Ja, se traceability.md og tasks.md.
 - Åbne afhængigheder: ingen kravbeslutninger. Eventuelle ændringer skal opdatere denne fil og traceability-matrixen.
+
+## C-009 ændret ved brugerbeslutning — 2026-10-28
+
+Kundetilfredshed aktiveres: 1–5 stjerner pr. booking, bekræftet af brugeren i chatten.
+Højst én bedømmelse pr. booking (idempotent PUT). Kun confirmed bookinger med
+check_out <= dags dato i Europe/Copenhagen kan bedømmes. Rapportens kohorte er
+checkout-dato i [from,to); gennemsnit på bedømte og svarprocent over afsluttede.
+Rating følger bookingens historik; annulleret booking indgår ikke i rapporten.
+
+## API-præciseringer — T-020
+
+Analyseperioder bruger [from,to); `year` vælger kalenderår og kan ikke kombineres
+med from/to. Standard er 2026. Land/type/sæson filtrerer hoteldata; employee_name
+filtrerer barsalg (default Helene Christine). Land/type/sæson filtrerer ikke baren,
+som ikke har relation til bookinger. Metadata viser dette eksplicit.
+Belægningsnævner: aktive værelser i valgt type × nætter i valgt sæson/periode.
+Landefilter ændrer tælleren, ikke hotelkapaciteten. Nationalitet for hele selskabet
+antages lig bookinggæstens land; distinct_bookers vises separat.
+Testinventar kan være syntetisk; antal og kategorier skal passe til opgaven uden at
+påstå at typefordeling og værelsesnumre er hotellets faktiske inventar.
+
+## C-004 revideret — juletid i højsæson (T-020)
+
+PDF-opgaven angiver sommer og juletid som højsæson. Tidligere lavsæson hele
+december erstattes af lavsæson til og med 19/12 og højsæson 20/12–31/12. De
+præcise juledatoer er en implementeringsantagelse, ikke en oplysning fra hotellet.
+Eksisterende prislinjer bevares som historiske snapshots.

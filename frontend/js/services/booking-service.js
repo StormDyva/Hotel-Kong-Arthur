@@ -47,7 +47,17 @@ export function createHttpApi({ baseUrl, fetchImpl = globalThis.fetch?.bind(glob
 
   return {
     searchAvailability: (criteria) => request('GET', ENDPOINTS.availability, { query: criteria }),
-    listBookings: (filters) => request('GET', ENDPOINTS.bookings, { query: filters }),
+    async listBookings(filters) {
+      const items = [];
+      let page = 1;
+      while (true) {
+        const data = await request('GET', ENDPOINTS.bookings, { query: { ...filters, page, page_size: 100 } });
+        if (Array.isArray(data)) return data;
+        items.push(...(data?.items ?? []));
+        if (!data?.total || items.length >= data.total || !data.items?.length) return items;
+        page += 1;
+      }
+    },
     createBooking: (payload) => request('POST', ENDPOINTS.bookings, { body: payload }),
     updateBooking: (id, payload) => request('PUT', ENDPOINTS.booking(id), { body: payload }),
     cancelBooking: (id) => request('DELETE', ENDPOINTS.booking(id)),

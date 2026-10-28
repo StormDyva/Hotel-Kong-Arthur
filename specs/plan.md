@@ -1,49 +1,53 @@
-# Plan
+# Teknisk plan — gældende implementering
 
-## Status
+Revision 2026-10-28, gennem T-024. Funktioner/acceptkriterier: spec.md;
+regler/antagelser: clarify.md; aktuel teststatus: converge-api-2026-10-28.md.
 
-Approved as working agreement – 2026-10-26. Planen må bruges som grundlag for T-003 og frem.
+## Teknologistak og lag
 
-## Teknologistak og source of truth
+Python/FastAPI, SQLAlchemy/PyMySQL, MySQL 8 og HTML/CSS/vanilla JavaScript.
+api/ ejer HTTP, schemas og fejl. services/ ejer validering, sæsonpriser,
+indtjeningsgruppering, belægning, ADR og tilfredshed. repositories/ ejer SQL og
+persistence. OpenAPI YAML valideres og sammenlignes med den genererede kontrakt.
+Swagger UI serveres lokalt fra API-containeren.
 
-Python/FastAPI, SQLAlchemy, MySQL, Docker Compose og simpel HTML/CSS/vanilla JavaScript. openapi/openapi.yaml er normativ API-kontrakt; FastAPI-kode og Swagger UI skal valideres mod den. MySQL-schema/migrations er normativ datamodel; seed-data følger migrations.
+## Data og transaktioner
 
-## 3-lagsarkitektur
+Room types → rooms/prices; seasons → perioder/prices; bookings → price lines/review.
+Hver ny booking har gæstesnapshot; kontaktrettelser bruger copy-on-write, uændret
+PUT bevarer ID. Import-idempotens har eksplicit kilde-ID, ikke navn/land.
+Rum låses i ID-rækkefølge før bookinglåsen. Overlap og skriveresultat er i samme
+transaktion, der committes før HTTP-svaret. DELETE annullerer, ikke hårdsletter.
+Bedømte ophold låser navn/land, rum, datoer og antal; email/telefon kan rettes.
 
-Presentation/API: routes, request/response schemas, HTTP, JSON og fejl. Service: bookingregler, overlap, kapacitet, sæsoner, periodeklip og analyseformler. Repository: SQLAlchemy queries, transaktioner og persistence. Controllers indeholder ikke SQL; repositories kender ikke HTTP; services testes uden webserver.
+Historiske natpriser bevares; prisændringer omskriver ikke eksisterende ophold.
+Indtjening, sæsonfordeling og periodeklip sker i backendens services. De to flade
+/analytics/revenue endpoints returnerer JSON-tal, inklusive 24 nuludfyldte type/
+sæson-kombinationer. Øvrige /api-responser bruger Decimal-strenge som dokumenteret.
+Rating 1–5 gemmes én gang pr. afsluttet confirmed booking. Gennemsnit/svarprocent
+beregnes fra faktisk indsendte bedømmelser, aldrig syntetiske scores.
 
-## Datamodel og relationer
+## Live data og Tableau
 
-room_types 1-til-mange rooms og room_type_prices; seasons 1-til-mange season_periods og room_type_prices; guests 1-til-mange bookings; rooms 1-til-mange bookings; bookings 1-til-mange booking_price_lines; bar_products 1-til-mange bar_sales. Booking har obligatoriske guest, room, check_in, check_out, guests_count, price_total, currency og status. Status er confirmed eller cancelled. Datoer er ISO 8601; timestamps lagres UTC. Valuta er DKK. guests_count må ikke overstige room_type.capacity. price_total beregnes som summen af booking_price_lines og gemmes som historisk snapshot.
+Browser/hotelklient → REST → services → repositories → MySQL. Næste GET læser
+aktuelle data. Kundens historiske filer er import/staging, ikke levende bookinger.
+Tableau skal vise API-beregnede rækker; et direkte MySQL-flow er ikke løsningen.
+Valgfri API → CSV/Hyper-bro kører på værtsmaskinen. Det manuelle dashboard og en
+booking → opdateret Tableau-demo er stadig udestående. Ingen WebSocket-/push-garanti.
 
-## API-kontrakt
+## Docker
 
-OpenAPI skal beskrive alle endpoints fra Specify med schemas, query-parametre, paginering, statuskoder, idempotens, fejlformat og eksempler. POST returnerer 201, PUT er fuld idempotent opdatering, DELETE soft-canceller og er idempotent. GET /bookings har page/page_size (maks. 100), status, room_id, guest_id, from og to. Analytics har from/to og relevante land-, room_type-, season- og employee_name-filtre.
+Compose: db → db-init → api → frontend, styret af healthchecks og completed-successfully.
+Persistent mysql_data-volume. Hostadresser bindes til localhost, porte kommer fra
+.env.example. API bruger internt db:3306, uanset hostport. Frontend-proxyen dækker
+/api, /analytics, health, Swagger og assets. CORS følger FRONTEND_PORT.
+Dockerfile-target runtime indeholder applikationsafhængigheder; target test indeholder
+pytest/kontraktværktøjer. Testprofilen bruger egen test-db og init før api-tests.
 
-## Live- og Tableau-dataflow
+## Verifikation og review
 
-Frontend eller hotelklient skriver bookingændringer via POST/PUT/DELETE til API → service-validering → repository-transaktion → MySQL. GET og analyse læser MySQL ved hvert request. CSV/XSLT importeres kun via seed/importflow. Tableau bruger dokumenteret MySQL-live connection eller refreshable extract; MVP’en lover manuel/planlagt refresh, ikke WebSockets.
-
-## Analyse
-
-Belægning bruger solgte værelsesnætter / aktive værelser * kalenderdage * 100. Bookingperioder klippes til analyseperioden; check-out er eksklusiv. Indtjening summerer faktisk price_total for ikke-annullerede bookings; ved perioder krydses bookingens pris proportionalt efter overnatningsnætter, hvis rapporten kræver periodeindtjening. Sæsonindtjening fordeles pr. nat. Baromsætning er quantity * unit_price, med Helene-filter og kategoriandele. Nævner 0 giver 0 plus warning; ingen data giver tomme grupper og metadata.
-
-## Kundetilfredshed
-
-Ikke implementeret i MVP uden godkendt datakilde/definition. Ved aktivering kræves separat customer_satisfaction-model, import, endpoint, analyse-service, Tableau-view, story, task, test og traceability-rækker.
-
-## Docker, dokumentation og aflevering
-
-Compose skal starte db, api og eventuelt frontend med persistent MySQL-volume og healthcheck. Leverancer er README.md med arkitekturdiagram, CONTRIBUTING.md samt afklaring af PDF’ens navn CONTRIBUTE.md, OpenAPI/Swagger, specs, tests og Converge-resultat. Ingen produktionskode implementeres i denne docs-task.
-
-## Teststrategi
-
-Unit: datoer, sæson, overlap, kapacitet, annullering og formler. Integration: migrations, constraints, transaktioner og queries. API: schemas, statuskoder, pagination, filtre, idempotens og fejl. E2E/smoke: Compose, Swagger, frontend CRUD, live MySQL-opdatering, Tableau-refresh og Converge-check.
-
-## Kvalitetstjek
-
-- Er planen entydig? Ja, med åbne valg i Clarify.
-- Kan den implementeres? Ja efter T-002 og OpenAPI-godkendelse.
-- Kan den testes? Ja, teststrategien dækker alle lag.
-- Er den dækket af stories/tasks? Ja, se traceability.md.
-- Afhængigheder: Clarify → schema/API → analyser → frontend/Tableau → Converge.
+`docker compose --profile test run --build --rm api-tests` kører MySQL-, regression-
+og OpenAPI-tests. Frontend: npm test; isoleret Chrome-smoke er separat. Compose
+verificeres på en ren, separat testinstallation, inklusive genoprettelse med samme
+volume. Se docs/operations.md og docs/release-checklist.md. Intet merges uden
+menneskeligt review; samlet Tableau-accept vurderes særskilt.

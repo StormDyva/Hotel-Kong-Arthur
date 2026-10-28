@@ -47,13 +47,12 @@ describe('bookingformular og bekræftelse', () => {
   const room = { room_id: 12, room_number: '204', room_type: 'Standard dobbeltværelse', capacity: 2, price_per_night: 1600, total_price: 4800 };
   const guest = { name: 'Ole Jensen', email: 'ole@example.com', phone: '+45 11 22 33 44', country_code: 'DK' };
 
-  test('payload til POST /api/bookings indeholder pris og gæst', () => {
+  test('payload til POST /api/bookings overlader prisen til backend', () => {
     assert.deepEqual(buildBookingPayload(criteria, room, guest), {
       room_id: 12,
       check_in: '2026-11-20',
       check_out: '2026-11-23',
       guests_count: 2,
-      price_total: 4800,
       currency: 'DKK',
       guest,
     });

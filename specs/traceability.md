@@ -44,3 +44,49 @@ Approved as working agreement – 2026-10-26. Status viser specifikationsdæknin
 - Kan matrixen testes? Ja, gennem task-verifikationerne.
 - Er implementeringsstatus blandet sammen med spec-status? Nej; implementation vurderes først i Converge.
 - Er der mangler? Kun de eksplicit markerede PDF-navne- og kundetilfredshedspunkter.
+
+## Integration evidence — 2026-10-28
+
+The canonical requirement document is [spec.md](spec.md). Current implementation,
+test evidence and remaining requirements are recorded in
+[converge-2026-10-28.md](converge-2026-10-28.md). This dated audit supersedes older
+completion assumptions, including direct MySQL-to-Tableau access and API paths
+without the `/api` prefix. Remaining work is tracked as T-019, T-020 and T-021.
+
+## T-020 — API-fokus, 2026-10-28
+
+| Krav/story | Implementering | Testbevis |
+|---|---|---|
+| US-001–005 booking CRUD, filtre og live | services/bookings, repositories, api/main | test_api.py og test_spec_completion.py |
+| US-006 belægning/periode | services/analytics | test_analytics_filters_and_denominators |
+| US-007 indtjening, sæson, land, top og ADR | særskilte analytics endpoints | test_revenue_rankings_and_country_guests |
+| US-008 barsalg og Helene | services/feedback, analytics | test_bars_total_category_shares_and_live_input, test_bar_calendar_boundaries_use_copenhagen |
+| US-011 kundetilfredshed | booking_reviews, review endpoints | test_guest_feedback_and_response_rate |
+| US-012 OpenAPI/Swagger/Docker | schemas, lokal Swagger, Compose | test_openapi_contract, swagger-smoke.mjs |
+| 214 værelser, otte kategorier, 20/10 produkter | syntetisk reference-seed | test_reference_inventory |
+| US-009 Tableau | bygges senere manuelt efter brugerens prioritering | Uden for T-020 |
+
+## T-022 — flade indtjeningsrækker
+
+US-007 → services/revenue_rows.py → de to /analytics/revenue endpoints.
+Testbevis: test_revenue_rows.py kontrollerer 24 unikke kombinationer (også ved 0 og
+inaktiv historisk type), numeriske beløb, sæson-/periodeklip, dansk landelabel,
+annulleringer og ugyldige perioder. Ingen prisberegning flyttes til Tableau.
+
+T-023: Reviewfund 1–3 → migration 007, bookings.save, Repository.save_guest,
+importørens import_key og refresh.guest_rows → test_review_regressions.py.
+Samlet dashboard/refresh-accept er stadig udestående; eksporttest er ikke et
+færdigt Tableau-dashboardbevis.
+
+
+T-024: Compose-opstart/testtargets/proxy/persistens og aktuelle dokumenter →
+docs/release-checklist.md med konkrete friske testresultater. Samlet Tableau-
+opdatering og menneskeligt PR-review er fortsat åbne acceptpunkter.
+
+T-025 / US-001/002/005: frontend booking-form/rooms-view/main →
+frontend/tests/live-booking-smoke.mjs. Rigtigt API-flow, serverfeltfejl, sæsonpris
+og genfinding efter reload; 59 unit-tests og 19 mock-browserchecks.
+
+T-026: Tableau-klar API → docs/tableau-api-handoff.md, aktuelle numeriske exports
+og KPI-kald → runtimekontrol, OpenAPI-lighed, 26 containeriserede tests og 59 frontendtests.
+Testprofilens reset er afgrænset til hotel_kong_arthur_test på test-db.

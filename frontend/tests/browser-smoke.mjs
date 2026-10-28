@@ -127,6 +127,8 @@ async function scenario() {
     search.elements.guests_count.value = '2';
     search.requestSubmit();
     await waitFor(() => document.querySelectorAll('.room-card').length, 'værelseskort');
+    const roomFilter = $('#room-type-filter');
+    roomFilter.value = 'all'; roomFilter.dispatchEvent(new Event('change'));
     const cards = [...document.querySelectorAll('.room-card')];
     const card204 = cards.find((c) => c.dataset.roomId === '12');
     check('mock-ledige værelser vises', cards.length >= 1 && cards.every(visible), `${cards.length} værelser`);
@@ -181,6 +183,7 @@ async function scenario() {
     $('#tab-booking').click();
     search.requestSubmit();
     await waitFor(() => !$('[data-rooms-list]').hasAttribute('aria-busy') && $('.room-card'), 'ny søgning');
+    roomFilter.value = 'all'; roomFilter.dispatchEvent(new Event('change'));
     check('annulleret værelse er ledigt igen', visible($('.room-card[data-room-id="12"]')));
   } catch (error) {
     check('scenariet gennemført uden fejl', false, error.message);
@@ -190,7 +193,7 @@ async function scenario() {
 
 async function main() {
   const server = await startServer();
-  const url = `http://127.0.0.1:${server.address().port}/`;
+  const url = `http://127.0.0.1:${server.address().port}/?mock=true`;
   const profile = mkdtempSync(join(tmpdir(), 'hka-smoke-'));
   const chrome = spawn(CHROME, [
     '--headless=new',

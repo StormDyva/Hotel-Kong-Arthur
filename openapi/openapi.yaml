@@ -1,0 +1,3392 @@
+openapi: 3.1.0
+info:
+  title: Hotel Kong Arthur API
+  description: Three-layer REST API backed by MySQL. Dates use [from,to), checkout
+    is exclusive. Money is DKK. Existing /api responses use decimal strings; flat
+    /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026.
+    Hotel filters do not filter bar sales. Demo inventory is synthetic.
+  version: 1.1.0
+paths:
+  /health:
+    get:
+      tags:
+      - System
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/rooms:
+    get:
+      tags:
+      - Inventory
+      summary: Rooms
+      operationId: rooms_api_rooms_get
+      parameters:
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+                title: Response Rooms Api Rooms Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/rooms/availability:
+    get:
+      tags:
+      - Inventory
+      summary: Availability
+      operationId: availability_api_rooms_availability_get
+      parameters:
+      - name: check_in
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          title: Check In
+      - name: check_out
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          title: Check Out
+      - name: guests_count
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 4
+          minimum: 1
+          title: Guests Count
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Availability'
+                title: Response Availability Api Rooms Availability Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/room-types:
+    get:
+      tags:
+      - Inventory
+      summary: Room Types
+      operationId: room_types_api_room_types_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoomType'
+                type: array
+                title: Response Room Types Api Room Types Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bookings:
+    get:
+      tags:
+      - Bookings
+      summary: List Bookings
+      operationId: list_bookings_api_bookings_get
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - confirmed
+            - cancelled
+            type: string
+          - type: 'null'
+          title: Status
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 100
+          title: Page Size
+      - name: room_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Id
+      - name: guest_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Guest Id
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPage'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+      - Bookings
+      summary: Create Booking
+      operationId: create_booking_api_bookings_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingWrite'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bookings/{booking_id}:
+    get:
+      tags:
+      - Bookings
+      summary: Get Booking
+      operationId: get_booking_api_bookings__booking_id__get
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Bookings
+      summary: Update Booking
+      operationId: update_booking_api_bookings__booking_id__put
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Bookings
+      summary: Cancel Booking
+      operationId: cancel_booking_api_bookings__booking_id__delete
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '204':
+          description: Successful Response
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bookings/{booking_id}/review:
+    put:
+      tags:
+      - Guest feedback
+      summary: Save Review
+      operationId: save_review_api_bookings__booking_id__review_put
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewWrite'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+      - Guest feedback
+      summary: Get Review
+      operationId: get_review_api_bookings__booking_id__review_get
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bar-products:
+    get:
+      tags:
+      - Bar
+      summary: Bar Products
+      operationId: bar_products_api_bar_products_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BarProduct'
+                type: array
+                title: Response Bar Products Api Bar Products Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bar-sales:
+    post:
+      tags:
+      - Bar
+      summary: Create Sale
+      operationId: create_sale_api_bar_sales_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleWrite'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/dashboard:
+    get:
+      tags:
+      - Analytics
+      summary: Dashboard
+      operationId: dashboard_api_analytics_dashboard_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardReport'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/occupancy:
+    get:
+      tags:
+      - Analytics
+      summary: Occupancy and average daily rate
+      description: Sold nights / active inventory nights × 100. Country filters only
+        the numerator; season/type also filter inventory.
+      operationId: analytics_occupancy_api_analytics_occupancy_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_Summary_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue:
+    get:
+      tags:
+      - Analytics
+      summary: Hotel revenue for a year or period
+      description: Sum of nightly historical price snapshots for confirmed bookings.
+        Checkout is exclusive.
+      operationId: analytics_revenue_api_analytics_revenue_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_Summary_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue-by-room:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue by physical room
+      description: Sorted by revenue descending. Room number identifies the physical
+        room.
+      operationId: analytics_revenue_by_room_api_analytics_revenue_by_room_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue-by-room-type:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue by room type
+      description: Sorted by revenue descending.
+      operationId: analytics_revenue_by_room_type_api_analytics_revenue_by_room_type_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue-by-country:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue by country
+      description: Country is the booking guest country.
+      operationId: analytics_revenue_by_country_api_analytics_revenue_by_country_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue-by-season:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue by season
+      description: Season is determined per occupied night.
+      operationId: analytics_revenue_by_season_api_analytics_revenue_by_season_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revenue-by-room-type-season:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue by room type and season
+      description: Cross-season stays are split by nightly snapshots.
+      operationId: analytics_revenue_by_room_type_season_api_analytics_revenue_by_room_type_season_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/guests-by-country:
+    get:
+      tags:
+      - Analytics
+      summary: Guests by country
+      description: booking_guests counts party sizes once per matching booking; distinct_bookers
+        counts booking guest snapshots, not identified repeat visitors. All party
+        members are attributed to the booker country.
+      operationId: analytics_guests_by_country_api_analytics_guests_by_country_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/top-performers:
+    get:
+      tags:
+      - Analytics
+      summary: Most profitable room, type and country
+      description: Highest total revenue in the selected period. Empty groups return
+        null.
+      operationId: analytics_top_performers_api_analytics_top_performers_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_TopPerformers_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/bar-sales:
+    get:
+      tags:
+      - Analytics
+      summary: Bar revenue, drinks and category shares
+      description: Default employee is Helene Christine. Includes total_revenue, products
+        and categories with percentage of total revenue. Hotel filters do not affect
+        bar sales.
+      operationId: analytics_bar_sales_api_analytics_bar_sales_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_BarReport_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/customer-satisfaction:
+    get:
+      tags:
+      - Analytics
+      summary: Guest ratings and response rate
+      description: Checkout cohort in [from,to). Only completed confirmed bookings
+        qualify. Average is null without ratings; no synthetic scores.
+      operationId: analytics_customer_satisfaction_api_analytics_customer_satisfaction_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_Satisfaction_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/revenue/by-room-type-season:
+    get:
+      tags:
+      - Tableau revenue
+      summary: 'Flat revenue rows: every room type × season'
+      description: All 24 combinations, including zero revenue. Backend sums historical
+        nightly price × quantity. Confirmed stays only; checkout and to are exclusive.
+        DKK numbers, not strings. Default year 2026.
+      operationId: room_type_season_rows_analytics_revenue_by_room_type_season_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomTypeSeasonRevenueRow'
+                title: Response Room Type Season Rows Analytics Revenue By Room Type
+                  Season Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /analytics/revenue/by-country:
+    get:
+      tags:
+      - Tableau revenue
+      summary: Flat revenue rows by country
+      description: Backend sums historical nightly price × quantity by booking guest
+        country. Danish country labels where mapped; database name/code otherwise.
+        Confirmed stays only; default year 2026. DKK JSON numbers. Empty period returns
+        [].
+      operationId: country_revenue_rows_analytics_revenue_by_country_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryRevenueRow'
+                title: Response Country Revenue Rows Analytics Revenue By Country
+                  Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AnalyticsResponse_BarReport_:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          $ref: '#/components/schemas/BarReport'
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[BarReport]
+    AnalyticsResponse_Satisfaction_:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          $ref: '#/components/schemas/Satisfaction'
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[Satisfaction]
+    AnalyticsResponse_Summary_:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          $ref: '#/components/schemas/Summary'
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[Summary]
+    AnalyticsResponse_TopPerformers_:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          $ref: '#/components/schemas/TopPerformers'
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[TopPerformers]
+    AnalyticsResponse_list_Group__:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Data
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[list[Group]]
+    AppliedFilters:
+      properties:
+        country_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country Code
+        room_type_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Room Type Id
+        season:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Season
+        employee_name:
+          type: string
+          title: Employee Name
+      type: object
+      required:
+      - country_code
+      - room_type_id
+      - season
+      - employee_name
+      title: AppliedFilters
+    Availability:
+      properties:
+        room_id:
+          type: integer
+          title: Room Id
+        room_number:
+          type: string
+          title: Room Number
+        room_type:
+          type: string
+          title: Room Type
+        capacity:
+          type: integer
+          title: Capacity
+        total_price:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total Price
+        price_per_night:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price Per Night
+        currency:
+          type: string
+          title: Currency
+      type: object
+      required:
+      - room_id
+      - room_number
+      - room_type
+      - capacity
+      - total_price
+      - price_per_night
+      - currency
+      title: Availability
+    BarProduct:
+      properties:
+        id:
+          type: integer
+          title: Id
+        name:
+          type: string
+          title: Name
+        category:
+          type: string
+          title: Category
+        price:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price
+        currency:
+          type: string
+          title: Currency
+      type: object
+      required:
+      - id
+      - name
+      - category
+      - price
+      - currency
+      title: BarProduct
+    BarReport:
+      properties:
+        total_revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Total Revenue
+        employee_name:
+          type: string
+          title: Employee Name
+        products:
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+          title: Products
+        categories:
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+          title: Categories
+      type: object
+      required:
+      - total_revenue
+      - employee_name
+      - products
+      - categories
+      title: BarReport
+    Booking:
+      properties:
+        id:
+          type: integer
+          title: Id
+        room_id:
+          type: integer
+          title: Room Id
+        room_number:
+          type: string
+          title: Room Number
+        room_type:
+          type: string
+          title: Room Type
+        capacity:
+          type: integer
+          title: Capacity
+        check_in:
+          type: string
+          format: date
+          title: Check In
+        check_out:
+          type: string
+          format: date
+          title: Check Out
+        guests_count:
+          type: integer
+          title: Guests Count
+        guest:
+          $ref: '#/components/schemas/GuestView'
+        guest_id:
+          type: integer
+          title: Guest Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        price_total:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price Total
+        price_per_night:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price Per Night
+        currency:
+          type: string
+          title: Currency
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - room_id
+      - room_number
+      - room_type
+      - capacity
+      - check_in
+      - check_out
+      - guests_count
+      - guest
+      - guest_id
+      - created_at
+      - updated_at
+      - price_total
+      - price_per_night
+      - currency
+      - status
+      title: Booking
+    BookingPage:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Booking'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+        applied_filters:
+          additionalProperties: true
+          type: object
+          title: Applied Filters
+          default: {}
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - page_size
+      title: BookingPage
+    BookingUpdate:
+      properties:
+        room_id:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Room Id
+        check_in:
+          type: string
+          format: date
+          title: Check In
+        check_out:
+          type: string
+          format: date
+          title: Check Out
+        guests_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Guests Count
+        guest:
+          $ref: '#/components/schemas/Guest'
+        currency:
+          type: string
+          const: DKK
+          title: Currency
+          default: DKK
+        price_total:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Price Total
+        status:
+          type: string
+          const: confirmed
+          title: Status
+      additionalProperties: false
+      type: object
+      required:
+      - room_id
+      - check_in
+      - check_out
+      - guests_count
+      - guest
+      - status
+      title: BookingUpdate
+      example:
+        check_in: '2026-11-20'
+        check_out: '2026-11-23'
+        currency: DKK
+        guest:
+          country_code: DK
+          email: test@example.com
+          name: Test Gæst
+          phone: +45 12345678
+        guests_count: 1
+        room_id: 101
+        status: confirmed
+    BookingWrite:
+      properties:
+        room_id:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Room Id
+        check_in:
+          type: string
+          format: date
+          title: Check In
+        check_out:
+          type: string
+          format: date
+          title: Check Out
+        guests_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Guests Count
+        guest:
+          $ref: '#/components/schemas/Guest'
+        currency:
+          type: string
+          const: DKK
+          title: Currency
+          default: DKK
+        price_total:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Price Total
+        status:
+          type: string
+          const: confirmed
+          title: Status
+          default: confirmed
+      additionalProperties: false
+      type: object
+      required:
+      - room_id
+      - check_in
+      - check_out
+      - guests_count
+      - guest
+      title: BookingWrite
+      example:
+        check_in: '2026-11-20'
+        check_out: '2026-11-23'
+        currency: DKK
+        guest:
+          country_code: DK
+          email: test@example.com
+          name: Test Gæst
+          phone: +45 12345678
+        guests_count: 1
+        room_id: 101
+        status: confirmed
+    Category:
+      properties:
+        category:
+          type: string
+          title: Category
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        percent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Percent
+      type: object
+      required:
+      - category
+      - revenue
+      - percent
+      title: Category
+    CountryRevenueRow:
+      properties:
+        country:
+          type: string
+          title: Country
+        revenue:
+          type: number
+          minimum: 0.0
+          title: Revenue
+          description: Backend-calculated revenue in DKK, returned as a JSON number
+      type: object
+      required:
+      - country
+      - revenue
+      title: CountryRevenueRow
+    DashboardReport:
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+        currency:
+          type: string
+          title: Currency
+        employee_name:
+          type: string
+          title: Employee Name
+        refreshed_at:
+          type: string
+          format: date-time
+          title: Refreshed At
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        summary:
+          $ref: '#/components/schemas/Summary'
+        by_room_type:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Room Type
+        by_country:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Country
+        by_season:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Season
+        by_room_type_season:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Room Type Season
+        daily:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Daily
+        bar_products:
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+          title: Bar Products
+        bar_categories:
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+          title: Bar Categories
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+        by_room:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Room
+        top_room:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+        top_room_type:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+        top_country:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+        satisfaction:
+          $ref: '#/components/schemas/Satisfaction'
+      type: object
+      required:
+      - from_date
+      - to_date
+      - currency
+      - employee_name
+      - refreshed_at
+      - warnings
+      - summary
+      - by_room_type
+      - by_country
+      - by_season
+      - by_room_type_season
+      - daily
+      - bar_products
+      - bar_categories
+      - period
+      - applied_filters
+      - generated_at
+      - hotel_filters_apply_to_bar
+      - by_room
+      - top_room
+      - top_room_type
+      - top_country
+      - satisfaction
+      title: DashboardReport
+    Distribution:
+      properties:
+        rating:
+          type: integer
+          title: Rating
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - rating
+      - count
+      title: Distribution
+    ErrorDetail:
+      properties:
+        field:
+          type: string
+          title: Field
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - field
+      - message
+      title: ErrorDetail
+    ErrorResponse:
+      properties:
+        error:
+          type: string
+          title: Error
+        message:
+          type: string
+          title: Message
+        details:
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          type: array
+          title: Details
+          default: []
+      type: object
+      required:
+      - error
+      - message
+      title: ErrorResponse
+    Group:
+      properties:
+        label:
+          type: string
+          title: Label
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        room_nights:
+          type: integer
+          title: Room Nights
+        guest_nights:
+          type: integer
+          title: Guest Nights
+        bookings:
+          type: integer
+          title: Bookings
+        distinct_bookers:
+          type: integer
+          title: Distinct Bookers
+        booking_guests:
+          type: integer
+          title: Booking Guests
+      type: object
+      required:
+      - label
+      - revenue
+      - room_nights
+      - guest_nights
+      - bookings
+      - distinct_bookers
+      - booking_guests
+      title: Group
+    Guest:
+      properties:
+        name:
+          type: string
+          maxLength: 241
+          minLength: 1
+          title: Name
+        email:
+          type: string
+          maxLength: 254
+          pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+          title: Email
+        phone:
+          type: string
+          maxLength: 40
+          minLength: 5
+          pattern: ^\+?[0-9 ()-]+$
+          title: Phone
+        country_code:
+          type: string
+          pattern: ^[A-Z]{2}$
+          title: Country Code
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - email
+      - phone
+      - country_code
+      title: Guest
+    GuestView:
+      properties:
+        name:
+          type: string
+          title: Name
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        phone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Phone
+        country_code:
+          type: string
+          title: Country Code
+      type: object
+      required:
+      - name
+      - email
+      - phone
+      - country_code
+      title: GuestView
+    Health:
+      properties:
+        status:
+          type: string
+          title: Status
+        database:
+          type: string
+          title: Database
+      type: object
+      required:
+      - status
+      - database
+      title: Health
+    Period:
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+        end_exclusive:
+          type: boolean
+          title: End Exclusive
+        timezone:
+          type: string
+          title: Timezone
+      type: object
+      required:
+      - from_date
+      - to_date
+      - end_exclusive
+      - timezone
+      title: Period
+    Product:
+      properties:
+        product:
+          type: string
+          title: Product
+        category:
+          type: string
+          title: Category
+        quantity:
+          type: integer
+          title: Quantity
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+      type: object
+      required:
+      - product
+      - category
+      - quantity
+      - revenue
+      title: Product
+    Review:
+      properties:
+        booking_id:
+          type: integer
+          title: Booking Id
+        rating:
+          type: integer
+          title: Rating
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - booking_id
+      - rating
+      - created_at
+      - updated_at
+      title: Review
+    ReviewWrite:
+      properties:
+        rating:
+          type: integer
+          maximum: 5.0
+          minimum: 1.0
+          title: Rating
+          examples:
+          - 4
+      additionalProperties: false
+      type: object
+      required:
+      - rating
+      title: ReviewWrite
+    Room:
+      properties:
+        id:
+          type: integer
+          title: Id
+        room_number:
+          type: string
+          title: Room Number
+        room_type_id:
+          type: integer
+          title: Room Type Id
+        room_type:
+          type: string
+          title: Room Type
+        capacity:
+          type: integer
+          title: Capacity
+        active:
+          type: boolean
+          title: Active
+        type_active:
+          type: boolean
+          title: Type Active
+        status:
+          type: string
+          enum:
+          - available
+          - maintenance
+          - inactive
+          title: Status
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - room_number
+      - room_type_id
+      - room_type
+      - capacity
+      - active
+      - type_active
+      - status
+      - created_at
+      - updated_at
+      title: Room
+    RoomType:
+      properties:
+        id:
+          type: integer
+          title: Id
+        name:
+          type: string
+          title: Name
+        capacity:
+          type: integer
+          title: Capacity
+      type: object
+      required:
+      - id
+      - name
+      - capacity
+      title: RoomType
+    RoomTypeSeasonRevenueRow:
+      properties:
+        roomType:
+          type: string
+          title: Roomtype
+        season:
+          type: string
+          title: Season
+        revenue:
+          type: number
+          minimum: 0.0
+          title: Revenue
+          description: Backend-calculated revenue in DKK, returned as a JSON number
+      type: object
+      required:
+      - roomType
+      - season
+      - revenue
+      title: RoomTypeSeasonRevenueRow
+    Sale:
+      properties:
+        id:
+          type: integer
+          title: Id
+        product_id:
+          type: integer
+          title: Product Id
+        sold_at:
+          type: string
+          format: date-time
+          title: Sold At
+        quantity:
+          type: integer
+          title: Quantity
+        unit_price:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Unit Price
+        employee_name:
+          type: string
+          title: Employee Name
+        currency:
+          type: string
+          title: Currency
+      type: object
+      required:
+      - id
+      - product_id
+      - sold_at
+      - quantity
+      - unit_price
+      - employee_name
+      - currency
+      title: Sale
+    SaleWrite:
+      properties:
+        product_id:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Product Id
+          examples:
+          - 1
+        sold_at:
+          type: string
+          format: date-time
+          title: Sold At
+          description: 'Timezone required. UTC instant must fit MySQL TIMESTAMP: 1970-01-01T00:00:01Z
+            through 2038-01-19T03:14:07Z.'
+          examples:
+          - '2026-10-28T17:30:00+01:00'
+        quantity:
+          type: integer
+          maximum: 10000.0
+          exclusiveMinimum: 0.0
+          title: Quantity
+          examples:
+          - 2
+        unit_price:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,8}|(?=[\d.]{1,11}0*$)\d{0,8}\.\d{0,2}0*$)
+          - type: 'null'
+          title: Unit Price
+          description: Optional actual unit price in DKK; defaults to the product
+            price
+        employee_name:
+          type: string
+          maxLength: 160
+          minLength: 1
+          title: Employee Name
+          examples:
+          - Helene Christine
+      additionalProperties: false
+      type: object
+      required:
+      - product_id
+      - sold_at
+      - quantity
+      - employee_name
+      title: SaleWrite
+    Satisfaction:
+      properties:
+        average_rating:
+          anyOf:
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Average Rating
+        rated_bookings:
+          type: integer
+          title: Rated Bookings
+        eligible_bookings:
+          type: integer
+          title: Eligible Bookings
+        response_percent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Response Percent
+        distribution:
+          items:
+            $ref: '#/components/schemas/Distribution'
+          type: array
+          title: Distribution
+        scale_min:
+          type: integer
+          title: Scale Min
+        scale_max:
+          type: integer
+          title: Scale Max
+      type: object
+      required:
+      - average_rating
+      - rated_bookings
+      - eligible_bookings
+      - response_percent
+      - distribution
+      - scale_min
+      - scale_max
+      title: Satisfaction
+    Summary:
+      properties:
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        room_nights:
+          type: integer
+          title: Room Nights
+        available_room_nights:
+          type: integer
+          title: Available Room Nights
+        occupancy_percent:
+          type: number
+          title: Occupancy Percent
+        adr:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Adr
+        bar_revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Bar Revenue
+        inventory_rooms:
+          type: integer
+          title: Inventory Rooms
+      type: object
+      required:
+      - revenue
+      - room_nights
+      - available_room_nights
+      - occupancy_percent
+      - adr
+      - bar_revenue
+      - inventory_rooms
+      title: Summary
+    TopPerformers:
+      properties:
+        top_room:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+        top_room_type:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+        top_country:
+          anyOf:
+          - $ref: '#/components/schemas/Group'
+          - type: 'null'
+      type: object
+      required:
+      - top_room
+      - top_room_type
+      - top_country
+      title: TopPerformers

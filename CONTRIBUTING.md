@@ -42,3 +42,12 @@ Opret derefter en Pull Request. Mindst ét andet gruppemedlem skal reviewe den, 
 
 Ved konflikt i API, database, Docker eller analyseformler skal gruppen beslutte løsningen, før koden merges. Beslutningen dokumenteres i docs/decisions/.
 
+
+
+## Verifikation før review
+
+Start med README.md og docs/release-checklist.md. Kør containeriserede tests med
+`docker compose --profile test run --build --rm api-tests`; frontend-unit-tests med
+`npm --prefix frontend test`. Kontraktændringer kræver opdateret OpenAPI og specs.
+API-, database- og Dockerændringer kræver mindst to reviewers før merge. Samlet
+Tableau-accept kræver en konkret dashboard-demo; en bestået API-test er ikke nok.

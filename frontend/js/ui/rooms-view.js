@@ -31,7 +31,24 @@ export function roomsListHtml(rooms, nights) {
 export function initRoomsView(section, { service, onSelect }) {
   const list = section.querySelector('[data-rooms-list]');
   const summary = section.querySelector('[data-rooms-summary]');
+  const filter = section.querySelector('[data-room-type-filter]');
   let rooms = [];
+  let nights = 0;
+  function render() {
+    let visible = rooms;
+    if (filter.value === 'suggested') {
+      const types = new Set();
+      visible = rooms.filter((room) => {
+        if (types.has(room.room_type)) return false;
+        types.add(room.room_type);
+        return true;
+      });
+    } else if (filter.value !== 'all') {
+      visible = rooms.filter((room) => room.room_type === filter.value);
+    }
+    list.innerHTML = roomsListHtml(visible, nights);
+  }
+  filter.addEventListener('change', render);
 
   list.addEventListener('click', (event) => {
     const button = event.target.closest('[data-select-room]');
@@ -44,7 +61,7 @@ export function initRoomsView(section, { service, onSelect }) {
     async load(criteria) {
       section.hidden = false;
       rooms = [];
-      const nights = nightsBetween(criteria.check_in, criteria.check_out);
+      nights = nightsBetween(criteria.check_in, criteria.check_out);
       summary.textContent =
         `${formatDate(criteria.check_in)} – ${formatDate(criteria.check_out)} · ` +
         `${pluralize(nights, 'nat', 'nætter')} · ${pluralize(criteria.guests_count, 'gæst', 'gæster')}`;
@@ -52,7 +69,11 @@ export function initRoomsView(section, { service, onSelect }) {
       list.innerHTML = '<p class="loading">Søger efter ledige værelser…</p>';
       try {
         rooms = await service.searchAvailability(criteria);
-        list.innerHTML = roomsListHtml(rooms, nights);
+        filter.replaceChildren();
+        filter.add(new Option('Ét ledigt værelse pr. type', 'suggested'));
+        filter.add(new Option(`Alle ledige værelser (${rooms.length})`, 'all'));
+        [...new Set(rooms.map((room) => room.room_type))].forEach((type) => filter.add(new Option(type, type)));
+        render();
       } catch (error) {
         list.innerHTML = `<p class="alert alert-error">${escapeHtml(error.message)}</p>`;
       } finally {

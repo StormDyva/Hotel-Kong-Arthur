@@ -49,7 +49,7 @@ describe('service-lag mod REST-API', () => {
       [
         'GET http://api.test/api/rooms/availability?check_in=2026-11-01&check_out=2026-11-03&guests_count=2',
         'POST http://api.test/api/bookings',
-        'GET http://api.test/api/bookings?status=confirmed',
+        'GET http://api.test/api/bookings?status=confirmed&page=1&page_size=100',
         'PUT http://api.test/api/bookings/1',
         'DELETE http://api.test/api/bookings/1',
       ],
@@ -61,7 +61,7 @@ describe('service-lag mod REST-API', () => {
   test('tomme filtre sendes ikke som query-parametre', async () => {
     const { service, calls } = apiService();
     await service.listBookings({ status: undefined });
-    assert.equal(calls[0].url, 'http://api.test/api/bookings');
+    assert.equal(calls[0].url, 'http://api.test/api/bookings?page=1&page_size=100');
   });
 
   test('paginerede lister normaliseres til arrays', async () => {
@@ -123,4 +123,13 @@ describe('service-lag i mock-tilstand', () => {
     assert.equal(booking.price_total, room.total_price);
     assert.equal((await service.cancelBooking(booking.id)).status, 'cancelled');
   });
+});
+
+test('henter alle sider til receptionens søgning', async () => {
+  const { service, calls } = apiService([
+    { status: 200, body: { items: [{ id: 1 }], total: 2 } },
+    { status: 200, body: { items: [{ id: 2 }], total: 2 } },
+  ]);
+  assert.deepEqual(await service.listBookings(), [{ id: 1 }, { id: 2 }]);
+  assert.match(calls[1].url, /page=2/);
 });

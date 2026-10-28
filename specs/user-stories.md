@@ -10,11 +10,11 @@ Som receptionist ønsker jeg at oprette en booking, så hotellets kapacitet og i
 
 Acceptkriterier:
 
-- POST /bookings returnerer 201 og JSON-resource.
+- POST /api/bookings returnerer 201 og JSON-resource.
 - Obligatoriske felter, ISO-datoer, DKK, pris, gæsteantal og status valideres.
 - guests_count overstiger ikke værelsestypens capacity.
 - Overlappende confirmed booking afvises med ensartet fejl.
-- Data kan genfindes via GET /bookings og MySQL.
+- Data kan genfindes via GET /api/bookings og MySQL.
 
 ## US-002 – Se og filtrér bookinger
 
@@ -22,9 +22,9 @@ Som receptionist ønsker jeg at se og filtrere bookinger, så jeg kan finde rese
 
 Acceptkriterier:
 
-- GET /bookings har page/page_size og dokumenterede status-, dato-, room- og guest-filtre.
+- GET /api/bookings har page/page_size og dokumenterede status-, dato-, room- og guest-filtre.
 - page_size afvises over 100.
-- GET /bookings/{id} returnerer booking eller 404.
+- GET /api/bookings/{id} returnerer booking eller 404.
 - Frontend viser liste, tomt resultat og fejl.
 
 ## US-003 – Redigér booking
@@ -116,13 +116,16 @@ Acceptkriterier:
 
 ## US-011 – Vurder kundetilfredshed
 
-Som projektgruppe ønsker jeg at kunne vurdere kundetilfredshedskravet, så vi ikke opfinder et upræcist KPI.
+Som hoteladministrator ønsker jeg gæstebedømmelser og svarprocent, så jeg kan
+vurdere tilfredshed og hvor repræsentativt datagrundlaget er.
 
 Acceptkriterier:
 
-- PDF-kravet er dokumenteret som afgrænset i MVP.
-- Ingen customer-satisfaction-tal vises uden godkendt data, skala og formel.
-- En eventuel senere aktivering har særskilt model, API, analyse, Tableau, task og test.
+- En afsluttet, ikke-annulleret booking kan få præcis én rating 1–5 via PUT.
+- Gentagen PUT opdaterer samme rating; GET viser resultatet.
+- Ugyldig score afvises; fremtidige/annullerede bookinger kan ikke bedømmes.
+- Analyse viser gennemsnit, svarprocent, kohortestørrelse og fordeling.
+- Ingen ratings giver null gennemsnit og warning, ikke et opdigtet tal.
 
 ## US-012 – Kontroller system og Converge
 

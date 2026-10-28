@@ -1,0 +1,9 @@
+-- Repair the known demo labels previously loaded by a Latin-1 mysql client.
+-- Hex literals avoid depending on client character encoding.
+UPDATE room_types SET name=CONVERT(UNHEX('5374616e6461726420656e6b656c7476c3a672656c7365') USING utf8mb4) WHERE id=1;
+UPDATE room_types SET name=CONVERT(UNHEX('4772616e64206c69742076c3a672656c7365') USING utf8mb4) WHERE id=2;
+UPDATE room_types SET name=CONVERT(UNHEX('5374616e6461726420646f6262656c7476c3a672656c7365') USING utf8mb4) WHERE id=3;
+UPDATE room_types SET name=CONVERT(UNHEX('5375706572696f7220646f6262656c7476c3a672656c7365') USING utf8mb4) WHERE id=4;
+UPDATE seasons SET name=CONVERT(UNHEX('4c617673c3a6736f6e') USING utf8mb4) WHERE id=1;
+UPDATE seasons SET name=CONVERT(UNHEX('4d656c6c656d73c3a6736f6e') USING utf8mb4) WHERE id=2;
+UPDATE seasons SET name=CONVERT(UNHEX('48c3b86a73c3a6736f6e') USING utf8mb4) WHERE id=3;
