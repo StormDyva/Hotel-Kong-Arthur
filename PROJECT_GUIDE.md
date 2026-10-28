@@ -18,7 +18,9 @@ Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
 - api/main.py og schemas.py: HTTP, JSON, validering, statuskoder, Swagger.
 - services/: bookingregler, sæsonpriser, nøgletal og bedømmelser.
 - repositories/: parameteriseret SQL, persistence og låse; intet HTTP.
-- MySQL: autoritativ runtime-kilde; historiske kundefiler er kun import/staging.
+- MySQL: autoritativ runtime-kilde; historiske kundefiler er import/staging.
+  Gæsteopholdene får derudover tydeligt markerede, skrivebeskyttede syntetiske
+  bookingrækker med genererede datoer, værelser og selskabsstørrelse.
 - Frontend: HTML/CSS/JavaScript; kalder API, aldrig MySQL direkte.
 - Tableau: bruger API-beregnede beløb. Flade /analytics/revenue-rækker er klar.
 

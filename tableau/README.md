@@ -14,7 +14,28 @@ Eksisterende TWB/TWBX-filer er tidligere prototyper/snapshots, ikke acceptbevis.
 Backenden beregner natpriser × nætter og summerer. periodens to og checkout er
 eksklusive. Tableau skal ikke gentage prisberegningen.
 
-## Eksportbro (valgfri, kører på værtsmaskinen)
+## Tableau-arbejdsbog og API-endpoints
+
+Eksportbroen bruger dashboard-endpointet til de otte fælles datasæt og henter
+derudover alle 13 analyse-endpoints separat. Hvert analysesvar får sin egen CSV,
+Hyper-datakilde og fane i arbejdsbogen. Det omfatter belægning, omsætning,
+gæstetal, bar og kundetilfredshed samt de to flade Tableau-eksporter.
+Skrive-endpoints (POST/PUT/DELETE) ændrer data og bruges derfor ikke som
+Tableau-datakilder.
+
+Refresh henter også alle sider fra `GET /api/bookings` og bygger to ekstra ark:
+alle bookinger og kun `data_origin=synthetic_import`. Pris er Value; Label
+indeholder booking-ID, datakilde, land, værelse, datoer, selskabsstørrelse og
+status. Gæstenavne og kontaktdata eksporteres ikke. De syntetiske rækker bruger
+opfundne datoer/værelser og kan derfor ligge uden for standard-analyseperioden 2026.
+
+Eksporten læser også de importerede ophold og drinksaggregater fra MySQL via
+`docker compose exec`. Den laver separate kilder for opholdsrækker og
+landesummeringer samt drinksdetaljer, omsætning og antal. Gæstenavne og
+kontaktfelter eksporteres ikke. Docker, API'et og databasen skal køre under
+refresh.
+
+## Eksportbro (kører på værtsmaskinen)
 
 Fra repository-roden, med API'et kørende:
 
@@ -27,8 +48,9 @@ python3 tableau/build_workbook.py
 
 Broen læser API'et, skriver CSV/Hyper under tableau/data og snapshot.json med periode
 og refresh-tid. Brug --from/--to og evt. --api for andre perioder/adresser.
-Rebyg workbook/pakke og genåbn for at undgå cachede extracts. Denne proces er ikke
-kontinuerlig live-opdatering eller automatisk refresh af en publiceret Public-side.
+Kør derefter `python3 tableau/build_workbook.py`; åbn `tableau/Hotel-Kong-Arthur.twbx`
+i Tableau Public. Genbyg workbook/pakke efter hver dataopdatering. Denne proces er
+ikke kontinuerlig live-opdatering eller automatisk refresh af en publiceret Public-side.
 Et lokalt API er ikke tilgængeligt fra Tableau Publics servere.
 
 Gæsteeksporten bruger booking_guests: en booking med fire personer tæller fire.

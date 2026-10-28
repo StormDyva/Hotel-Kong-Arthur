@@ -21,7 +21,9 @@ docker compose up --build -d
 Example development credentials are in `.env.example`. Copy to `.env` to override.
 Ports 5500, 8000 and 3307 are configurable. Services bind to localhost.
 `docker compose down` stops services while retaining database data in a named volume.
-Migrations and demo seed run once; restarting does not overwrite edited bookings.
+Migrations and seeds run once per database volume; the anonymized customer and
+drinks sample is loaded into a new database automatically. Restarting does not
+overwrite edited bookings.
 Do not delete the volume if you need to retain data.
 
 ## Architecture
@@ -127,8 +129,10 @@ Referencekataloget har 20 cocktails og 10 kaffeprodukter. Eksisterende fire
 barsalg og historiske bookinger er fortsat tydeligt demodata.
 
 Kundetilfredshed er implementeret med brugerens valgte 1–5-skala, gennemsnit og
-svarprocent. Ingen ratings seedes. Historiske kundefiler mangler datoer og
-medarbejderoplysninger og bruges derfor ikke som live bookinger eller Helene-salg.
+svarprocent. Ingen ratings seedes. De 1.000 kundestays er synlige på
+`/api/bookings` med `data_origin=synthetic_import`; datoer, værelser og gæsteantal
+er syntetiske, og rækkerne er skrivebeskyttede. Drinkaggregater bruges ikke som
+daterede salg eller Helene-salg.
 
 Ingen login/roller eller produktionshosting indgår i denne lokale prototype.
 Tableau bygges senere manuelt. Se den aktuelle

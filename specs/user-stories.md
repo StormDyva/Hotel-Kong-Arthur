@@ -58,6 +58,8 @@ Acceptkriterier:
 - Næste GET-request afspejler ændringen.
 - CSV/XSLT bruges kun til seed/import og ændrer ikke runtime-data direkte.
 - Begrænsningen ingen WebSockets/push er dokumenteret.
+- Imported customer rows exposed as generated booking data are marked
+  `synthetic_import` and remain read-only.
 
 ## US-006 – Se belægningsgrad
 

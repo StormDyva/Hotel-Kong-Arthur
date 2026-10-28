@@ -32,8 +32,21 @@ def quote(repo, room, start, end):
 
 def present(row):
     row = dict(row)
-    row['guest'] = dict(name=' '.join(filter(None, [row.pop('first_name'), row.pop('last_name')])),
-                        email=row.pop('email'), phone=row.pop('phone'), country_code=row.pop('country_code'))
+    if row.get('data_origin') == 'synthetic_import':
+        source_row = int(row['source_record_id'].split(':')[-1]) - 1
+        name = f"Syntetisk gæst {source_row:04d}"
+        email = phone = None
+    else:
+        name = ' '.join(filter(None, [row['first_name'], row['last_name']]))
+        email, phone = row['email'], row['phone']
+    row['guest'] = dict(name=name, email=email, phone=phone,
+                        country_code=row.pop('country_code'))
+    row.pop('first_name', None)
+    row.pop('last_name', None)
+    row.pop('email', None)
+    row.pop('phone', None)
+    row.pop('source_record_id', None)
+    row.pop('import_batch_id', None)
     row['price_per_night'] = row['price_total'] / (row['check_out']-row['check_in']).days
     return row
 
@@ -70,6 +83,8 @@ def save(repo, data, booking_id=None):
         if not rows:
             raise DomainError(404, 'NOT_FOUND', 'Booking not found')
         initial = rows[0]
+        if initial['data_origin'] == 'synthetic_import':
+            raise DomainError(409, 'SYNTHETIC_BOOKING_READ_ONLY', 'Synthetic imported bookings cannot be edited')
     # Lock all involved rooms in ascending order, then the booking itself.
     room_ids = sorted({data.room_id} | ({initial['room_id']} if initial else set()))
     locked = {room['id']: room for rid in room_ids for room in repo.rooms(rid, lock=True)}
@@ -122,6 +137,8 @@ def cancel(repo, booking_id):
     rows = repo.bookings(booking_id)
     if not rows:
         raise DomainError(404, 'NOT_FOUND', 'Booking not found')
+    if rows[0]['data_origin'] == 'synthetic_import':
+        raise DomainError(409, 'SYNTHETIC_BOOKING_READ_ONLY', 'Synthetic imported bookings cannot be cancelled')
     repo.rooms(rows[0]['room_id'], lock=True)
     current = repo.bookings(booking_id, lock=True)[0]
     if current['room_id'] != rows[0]['room_id']:

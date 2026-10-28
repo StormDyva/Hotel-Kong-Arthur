@@ -35,6 +35,9 @@ og i repositoryets openapi/openapi.yaml.
 
 Svaret skal være 201 og indeholde ID og serverberegnet pris. Gentag samme POST
 for at se 409 ved overlap. GET /api/bookings/{id} viser den gemte booking.
+GET /api/bookings returnerer også importerede ophold markeret med
+`data_origin: synthetic_import`. De har opfundne datoer/værelser og kan ikke
+redigeres eller annulleres; deres gæstenavne er anonymiserede.
 PUT bruger samme requestfelter inklusive status; ændr checkout eller værelse.
 DELETE annullerer og returnerer 204. Gentaget DELETE giver også 204.
 GET-listen understøtter status, room_id, guest_id, from/to og paginering.
