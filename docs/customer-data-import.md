@@ -26,7 +26,7 @@ Kør den genererede SQL mod den lokale MySQL-database, eksempelvis med Docker:
 
 ```bash
 docker compose exec -T db \
-  mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" \
+  sh -c 'exec mysql --default-character-set=utf8mb4 -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' \
   < /tmp/hotel-kong-arthur-customer-import.sql
 ```
 
@@ -67,8 +67,8 @@ men medarbejder- og vagtfiltre kræver en senere dateret salgskilde.
 - `import_batches` identificerer en fil med SHA-256.
 - `customer_stay_records` og `customer_bar_sales_aggregates` har unik nøgle på
   importbatch og kilde-række.
-- `guests` deduplikeres på fornavn, efternavn og country code. Det er en
-  dokumenteret antagelse, ikke en garanti for identitet.
+- `guests.import_key` identificerer en kilderække med filhash og source_record_id.
+  Navn og land bruges ikke som personidentitet.
 - Samme import kan køres igen uden nye gæster, staging-rækker eller produkter.
 - Gæste-XLSX’ens ekstra delvist tomme række afvises med årsag og gemmes som
   `row_status = rejected`.

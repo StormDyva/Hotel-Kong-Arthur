@@ -27,9 +27,9 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 
 ### C-004 – Sæsondefinition
 
-- **Beslutning:** Lavsæson: 1/1–31/3 og 1/11–31/12. Mellemsæson: 1/4–31/5 og 1/9–31/10. Højsæson: 1/6–31/8.
+- **Beslutning:** Lavsæson: 1/1–31/3 og 1/11–19/12. Mellemsæson: 1/4–31/5 og 1/9–31/10. Højsæson: 1/6–31/8 og 20/12–31/12.
 - **Begrundelse:** Reproducerbar tre-sæson-model, der passer til sæsonpriser.
-- **Konsekvens:** Sæson bestemmes pr. overnatningsnat. Helligdage og juletid håndteres ikke særskilt i MVP.
+- **Konsekvens:** Sæson bestemmes pr. overnatningsnat. Julegrænserne 20.–31. december er en projektantagelse.
 - **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
 
 ### C-005 – Belægningsgrad
@@ -62,10 +62,10 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 
 ### C-009 – Kundetilfredshed
 
-- **Beslutning:** Kundetilfredshed afgrænses fra MVP, fordi PDF’en ikke angiver data, skala, formel, endpoint eller Tableau-visning.
-- **Begrundelse:** Et tal uden autoritativ datakilde ville være ikke-verificerbart. Der opfindes ikke et mål.
-- **Konsekvens:** Ingen customer-satisfaction-model i MVP. Hvis gruppen/underviser leverer definition og data, tilføjes model, import, API, analyse, Tableau-view, story, task og tests.
-- **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
+Brugerbeslutning 2026-10-28: aktiv 1–5-rating pr. afsluttet confirmed booking.
+Gennemsnit og svarprocent beregnes for checkout-kohorten. Ingen syntetiske ratings.
+Bedømte ophold låser gæst/ophold; kun email/telefon må rettes. Tidligere fravalg er
+ophævet. Se den daterede beslutning nedenfor.
 
 ### C-010 – Manglende data og division med nul
 
@@ -93,7 +93,7 @@ Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefal
 | DELETE som soft-cancel | Approved | Projektgruppen | 2026-10-26 |
 | Faktisk bookingpris | Approved | Projektgruppen | 2026-10-26 |
 | Helene-filter | Approved | Projektgruppen | 2026-10-26 |
-| Kundetilfredshed uden for MVP | Approved | Projektgruppen | 2026-10-26 |
+| Kundetilfredshed 1–5 pr. booking | Brugerbeslutning | Brugeren | 2026-10-28 |
 | Manglende data | Approved | Projektgruppen | 2026-10-26 |
 | Dobbeltbooking/kapacitet | Approved | Projektgruppen | 2026-10-26 |
 

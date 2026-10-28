@@ -232,3 +232,12 @@ Bedømt booking afviser ændring af navn/land, datoer, værelse eller selskabsst
 med 409; email/telefon må rettes. Tableau-guests bruger booking_guests.
 Accept: regressionstests mod MySQL, idempotent import og eksportdata med fire gæster.
 Tableau-dashboardets samlede opdateringsdemo er fortsat ikke godkendt.
+
+
+## T-024 — Compose og dokumentationsafstemning før PR-accept
+
+Accept: ren Compose-opstart og containeriserede API-/kontrakttests i separat
+projekt; proxy, custom porte/CORS, persistens og OpenAPI kontrolleret. README,
+startguide, projektguide, datadictionary, frontend, Tableau, import, SWA og specs
+skal beskrive nuværende adfærd; gamle rapporter markeres historiske. Samlet
+Tableau-accept må ikke hævdes. Testbevis: docs/release-checklist.md.

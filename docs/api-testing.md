@@ -82,6 +82,10 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 
 ## Reproducerbar verifikation
 
+Uden lokal Python: kør `docker compose --profile test run --build --rm api-tests`
+fra roden. Det kører 26 tests i et separat test-image mod den isolerede testdatabase.
+Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
+
 ```sh
 uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt

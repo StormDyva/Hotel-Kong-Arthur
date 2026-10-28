@@ -77,3 +77,8 @@ T-023: Reviewfund 1–3 → migration 007, bookings.save, Repository.save_guest,
 importørens import_key og refresh.guest_rows → test_review_regressions.py.
 Samlet dashboard/refresh-accept er stadig udestående; eksporttest er ikke et
 færdigt Tableau-dashboardbevis.
+
+
+T-024: Compose-opstart/testtargets/proxy/persistens og aktuelle dokumenter →
+docs/release-checklist.md med konkrete friske testresultater. Samlet Tableau-
+opdatering og menneskeligt PR-review er fortsat åbne acceptpunkter.

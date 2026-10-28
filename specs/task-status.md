@@ -1,3 +1,15 @@
+# Aktuel status — T-024
+
+API: 27 operationer; 26 backend-/kontrakttests og 59 frontendtests.
+Compose har runtime-/test-targets, separat testdatabase, sundhedstjek og lokal proxy.
+Gæstesnapshots, låste bedømte ophold, import_key og korrekt gæsteeksport er gældende.
+Aktuel verifikation: [Converge](converge-api-2026-10-28.md) og
+[release-checkliste](../docs/release-checklist.md). Tableau-dashboardet er ikke samlet godkendt.
+
+---
+
+## Historisk tasklog (tidligere status, ikke aktuel acceptvurdering)
+
 # Task status og handoff
 
 ## Senest opdateret
@@ -94,7 +106,7 @@ additional filters and satisfaction scope remain open.
 ## T-020 — API færdiggørelse, 2026-10-28
 
 API og Swagger er prioriteret; Tableau bygges manuelt senere.
-25 operationer, fulde filtre/rapporter, 1–5-bedømmelser og referenceinventar er
+På daværende tidspunkt: 25 operationer, fulde filtre/rapporter, 1–5-bedømmelser og referenceinventar er
 implementeret. Swagger: http://localhost:8000/docs, lokale assets, Try it out testet.
 Se converge-api-2026-10-28.md for den aktuelle API-status og testbevis.
 

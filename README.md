@@ -39,9 +39,9 @@ flowchart LR
 
 The API presentation layer is `backend/app/api`, business rules and calculations
 are in `backend/app/services`, and SQL is in `backend/app/repositories`.
-`frontend` is served by nginx and proxies `/api` to the API service.
+`frontend` is served by nginx and proxies `/api`, `/analytics`, health, Swagger and its static assets to the API service.
 `db-init` waits for MySQL health; the API waits for successful initialization;
-nginx waits for the API health check. Swagger runs inside the API container.
+nginx waits for the API health check and has its own healthcheck. Swagger runs inside the API container.
 
 ## Follow a booking request
 
@@ -87,6 +87,19 @@ FastAPI's served schema. Existing resources use `/api`. The flat Tableau revenue
 
 ## Verification
 
+Containeriserede API-/kontrakttests på separat testdatabase (ingen lokal Python kræves):
+
+```sh
+docker compose --profile test run --build --rm api-tests
+```
+
+Testprofilen starter test-db → test-runner (migrations/seed) → api-tests (26 tests).
+Den berører ikke appens MySQL-volume. Runtime-imaget indeholder ikke pytest eller
+testværktøjer; Dockerfile har et separat test-target. API-testene omfatter også
+OpenAPI-validering og regressionstest af Tableau-gæsteeksportens rækker.
+
+Alternativt på værtsmaskinen, med den lokale appdatabase kørende:
+
 ```sh
 uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
@@ -124,10 +137,17 @@ Tableau bygges senere manuelt. Se den aktuelle
 The required artifacts are [constitution](specs/constitution.md),
 [spec](specs/spec.md), [plan](specs/plan.md), and [tasks](specs/tasks.md).
 `specify.md` is a compatibility pointer to `spec.md`. See
-[the dated Converge report](specs/converge-2026-10-28.md) for test evidence and gaps.
+[the current Converge report](specs/converge-api-2026-10-28.md) for test evidence and gaps.
 
 
 T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
 kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
 Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
 ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.
+
+
+## PR-accept
+
+Se [release-checklisten](docs/release-checklist.md) og [driftsvejledningen](docs/operations.md).
+API-/Compose-accept og samlet projektaccept er forskellige vurderinger. Tableau-
+dashboardets manuelle afstemning og opdateringsdemo udestår fortsat.

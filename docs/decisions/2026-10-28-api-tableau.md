@@ -1,3 +1,6 @@
+> Historisk beslutningsnotat fra den første integration. Aktuel kontrakt og
+> prioritering findes i specs/spec.md og PROJECT_GUIDE.md.
+
 # T-009 integration scope, 2026-10-28
 
 Sources: E26 Tværfaglig Opgave Hotel Kong Arthur and Tillægsspørgsmål_swa in the parent folder.

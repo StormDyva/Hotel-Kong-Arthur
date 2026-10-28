@@ -36,12 +36,12 @@
     this choice; no claim is made that team members already approved it. Production
     weaknesses include missing authentication/authorization, audit logs, API idempotency
     keys for POST, backup/recovery procedures, load tests and automatic Tableau refresh.
-    The shared guest identity assumption (name/country) also needs redesign.
+    Guest snapshots do not identify repeat visitors; real person identity requires a separate design.
 
 
 ## API-revision T-020
 
-25 selvstændige operationer dokumenteres i Swagger. Analyse-endpoints har år/periode,
+27 selvstændige operationer dokumenteres i Swagger. Analyse-endpoints har år/periode,
 land/type/sæson og medarbejderfiltre med eksplicitte definitioner i spec.md.
 Kundetilfredshed beregnes nu i service-laget fra 1–5-ratings i booking_reviews.
 Swagger UI assets serveres lokalt. Tableau bygges manuelt senere; det tidligere
