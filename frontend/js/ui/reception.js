@@ -143,7 +143,7 @@ export function initReception(root, { service }) {
     const { check_in: checkIn, check_out: checkOut } = editForm.elements;
     const nights = nightsBetween(checkIn.value, checkOut.value);
     editPrice.textContent = nights
-      ? `${pluralize(nights, 'nat', 'nætter')} × ${formatDKK(pricePerNight(editing))} = ${formatDKK(pricePerNight(editing) * nights)}`
+      ? `Estimat (endelig sæsonpris beregnes ved gem): ${pluralize(nights, 'nat', 'nætter')} × ${formatDKK(pricePerNight(editing))} = ${formatDKK(pricePerNight(editing) * nights)}`
       : 'Vælg gyldige datoer for at beregne prisen.';
   }
 

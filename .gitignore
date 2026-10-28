@@ -5,3 +5,10 @@ data/raw/
 .env
 .env.*
 !.env.example
+
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+tableau/data/
+hyperd.log

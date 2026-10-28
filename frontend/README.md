@@ -1,3 +1,15 @@
+# Current integrated setup
+
+Run `docker compose up --build -d` from the repository root and open
+http://localhost:5500. The frontend now uses the real API by default, via nginx.
+For the isolated mock demo use `?mock=true`. When running the Python static server
+instead of Docker use `?mock=false&api=http://localhost:8000` for the real API.
+The database now stores guest contact fields and the `/api` contract is implemented.
+Server-side seasonal pricing is authoritative; the edit preview is an estimate.
+
+The following original prototype notes describe the initial frontend and may differ
+from the integrated setup above. See the root README for current startup and limits.
+
 # Booking-UI – Hotel Kong Arthur (T-014)
 
 Browserprototype til receptionen, bygget med HTML, CSS og vanilla JavaScript (ES-moduler, ingen build-step og ingen afhængigheder).

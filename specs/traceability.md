@@ -44,3 +44,11 @@ Approved as working agreement – 2026-10-26. Status viser specifikationsdæknin
 - Kan matrixen testes? Ja, gennem task-verifikationerne.
 - Er implementeringsstatus blandet sammen med spec-status? Nej; implementation vurderes først i Converge.
 - Er der mangler? Kun de eksplicit markerede PDF-navne- og kundetilfredshedspunkter.
+
+## Integration evidence — 2026-10-28
+
+The canonical requirement document is [spec.md](spec.md). Current implementation,
+test evidence and remaining requirements are recorded in
+[converge-2026-10-28.md](converge-2026-10-28.md). This dated audit supersedes older
+completion assumptions, including direct MySQL-to-Tableau access and API paths
+without the `/api` prefix. Remaining work is tracked as T-019, T-020 and T-021.

@@ -190,7 +190,7 @@ async function scenario() {
 
 async function main() {
   const server = await startServer();
-  const url = `http://127.0.0.1:${server.address().port}/`;
+  const url = `http://127.0.0.1:${server.address().port}/?mock=true`;
   const profile = mkdtempSync(join(tmpdir(), 'hka-smoke-'));
   const chrome = spawn(CHROME, [
     '--headless=new',

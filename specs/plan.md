@@ -47,3 +47,13 @@ Unit: datoer, sæson, overlap, kapacitet, annullering og formler. Integration: m
 - Kan den testes? Ja, teststrategien dækker alle lag.
 - Er den dækket af stories/tasks? Ja, se traceability.md.
 - Afhængigheder: Clarify → schema/API → analyser → frontend/Tableau → Converge.
+
+## T-009 integration amendment — 2026-10-28
+
+Canonical resources now use `/api`, matching the booking frontend. See
+`openapi/openapi.yaml` for the implemented contract. Swagger is served by FastAPI.
+Tableau reads API-generated Hyper extracts through `tableau/refresh.py`; the earlier
+proposal for direct MySQL access is superseded by the assignment's API requirement.
+`to` is exclusive, including annual reports (2026-01-01 to 2027-01-01).
+Docker starts db → db-init → api → frontend. Tableau Public is a desktop client;
+the Hyper refresh utility currently runs on the host.

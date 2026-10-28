@@ -7,8 +7,8 @@
 // window.HKA_CONFIG før main.js indlæses, eller med URL-parametrene
 // ?mock=false&api=http://localhost:8000
 const defaults = {
-  useMock: true,
-  apiBaseUrl: 'http://localhost:8000',
+  useMock: false,
+  apiBaseUrl: globalThis.location?.origin ?? 'http://localhost:8000',
   mockLatencyMs: 250,
 };
 

@@ -48,12 +48,23 @@ for migration in /migrations/*.sql; do
 done
 
 for seed in /seed/*.sql; do
+    version="seed_$(basename "${seed}")"
+    applied=$(mysql_root -Nse "SELECT COUNT(*) FROM schema_migrations WHERE version = '${version}';")
+    if [ "${applied}" = "1" ]; then
+        echo "Skipping applied seed ${version}"
+        continue
+    fi
     echo "Applying seed ${seed}"
     mysql_root < "${seed}"
+    mysql_root -e "INSERT INTO schema_migrations (version) VALUES ('${version}');"
 done
 
 if [ "${RUN_CHECKS:-0}" = "1" ]; then
     for check in /tests/*.sql; do
+        if [ "$(basename "${check}")" = "customer_import_checks.sql" ] && [ "${RUN_CUSTOMER_IMPORT_CHECKS:-0}" != "1" ]; then
+            echo "Skipping customer import checks: import fixture is not loaded"
+            continue
+        fi
         echo "Running database check ${check}"
         mysql_root < "${check}"
     done

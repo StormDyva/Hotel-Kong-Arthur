@@ -81,3 +81,12 @@ Startkommandoer:
 - Kør git diff --check før commit.
 - Commit ikke secrets eller lokale .env-filer.
 - Markér ikke en task færdig uden testbevis og review.
+
+## Integration update — 2026-10-28
+
+Branch: feature/T-009-live-api-tableau. Backend/API/MySQL and browser integration,
+analytics, OpenAPI/Swagger, Tableau extracts/workbook and handoff documentation
+have been added. Canonical specification: spec.md; specify.md is a pointer.
+See converge-2026-10-28.md for verified commands and outstanding requirements.
+The assignment is not marked complete: Tableau interaction QA, inventory fidelity,
+additional filters and satisfaction scope remain open.

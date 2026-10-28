@@ -162,3 +162,14 @@ Der findes ingen CSV/XSLT-kildedata i dette repository. Seed-filen er derfor
 et lille, deterministisk testdatasæt med otte værelsestyper, 16 værelser,
 fire gæster, tre sæsoner, sæsonpriser, bookinger samt barprodukter og salg.
 Den må ikke præsenteres som hotellets historiske produktionsdata.
+
+## Integration amendment — 2026-10-28
+
+Migration 004 allows soft-cancellation after a room becomes unavailable, while
+retaining availability/capacity validation for confirmed booking writes.
+API-created price lines are nightly snapshots. The service serializes writes by
+locking the room before checking overlaps. Cancellation locks the same room first.
+Guests follow the existing unique (first_name,last_name,country_code) identity;
+contact updates are shared between bookings referring to the same identity.
+Seed scripts are tracked in schema_migrations with a `seed_` filename prefix and
+run once, so service restarts do not reset booking edits.

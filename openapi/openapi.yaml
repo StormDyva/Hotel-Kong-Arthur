@@ -1,0 +1,674 @@
+openapi: 3.1.0
+info:
+  title: Hotel Kong Arthur API
+  description: Three-layer booking and analytics API. Report end dates are exclusive.
+    Demo data, not actual hotel results.
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/rooms/availability:
+    get:
+      summary: Availability
+      operationId: availability_api_rooms_availability_get
+      parameters:
+      - name: check_in
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          title: Check In
+      - name: check_out
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          title: Check Out
+      - name: guests_count
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 4
+          minimum: 1
+          title: Guests Count
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/room-types:
+    get:
+      summary: Room Types
+      operationId: room_types_api_room_types_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/bookings:
+    get:
+      summary: List Bookings
+      operationId: list_bookings_api_bookings_get
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - confirmed
+            - cancelled
+            type: string
+          - type: 'null'
+          title: Status
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 100
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPage'
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+    post:
+      summary: Create Booking
+      operationId: create_booking_api_bookings_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingWrite'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/bookings/{booking_id}:
+    get:
+      summary: Get Booking
+      operationId: get_booking_api_bookings__booking_id__get
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+    put:
+      summary: Update Booking
+      operationId: update_booking_api_bookings__booking_id__put
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingWrite'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+    delete:
+      summary: Cancel Booking
+      operationId: cancel_booking_api_bookings__booking_id__delete
+      parameters:
+      - name: booking_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Booking Id
+      responses:
+        '204':
+          description: Successful Response
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/analytics/dashboard:
+    get:
+      summary: Dashboard
+      operationId: dashboard_api_analytics_dashboard_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          default: '2026-01-01'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          default: '2027-01-01'
+          title: To
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+  /api/analytics/{metric}:
+    get:
+      summary: Metric
+      operationId: metric_api_analytics__metric__get
+      parameters:
+      - name: metric
+        in: path
+        required: true
+        schema:
+          enum:
+          - occupancy
+          - revenue
+          - revenue-by-room-type
+          - revenue-by-country
+          - revenue-by-season
+          - bar-sales
+          type: string
+          title: Metric
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          default: '2026-01-01'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          default: '2027-01-01'
+          title: To
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Resource not found
+        '409':
+          description: Booking conflict or unavailable price/room
+        '422':
+          description: Invalid request
+        '503':
+          description: Database unavailable
+components:
+  schemas:
+    Booking:
+      properties:
+        id:
+          type: integer
+          title: Id
+        room_id:
+          type: integer
+          title: Room Id
+        room_number:
+          type: string
+          title: Room Number
+        room_type:
+          type: string
+          title: Room Type
+        capacity:
+          type: integer
+          title: Capacity
+        check_in:
+          type: string
+          format: date
+          title: Check In
+        check_out:
+          type: string
+          format: date
+          title: Check Out
+        guests_count:
+          type: integer
+          title: Guests Count
+        guest:
+          $ref: '#/components/schemas/Guest'
+        price_total:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price Total
+        price_per_night:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Price Per Night
+        currency:
+          type: string
+          title: Currency
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - id
+      - room_id
+      - room_number
+      - room_type
+      - capacity
+      - check_in
+      - check_out
+      - guests_count
+      - guest
+      - price_total
+      - price_per_night
+      - currency
+      - status
+      title: Booking
+    BookingPage:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Booking'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - page_size
+      title: BookingPage
+    BookingWrite:
+      properties:
+        room_id:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Room Id
+        check_in:
+          type: string
+          format: date
+          title: Check In
+        check_out:
+          type: string
+          format: date
+          title: Check Out
+        guests_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Guests Count
+        guest:
+          $ref: '#/components/schemas/Guest'
+        currency:
+          type: string
+          const: DKK
+          title: Currency
+          default: DKK
+        price_total:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          - type: 'null'
+          title: Price Total
+        status:
+          type: string
+          const: confirmed
+          title: Status
+          default: confirmed
+      type: object
+      required:
+      - room_id
+      - check_in
+      - check_out
+      - guests_count
+      - guest
+      title: BookingWrite
+    Category:
+      properties:
+        category:
+          type: string
+          title: Category
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        percent:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Percent
+      type: object
+      required:
+      - category
+      - revenue
+      - percent
+      title: Category
+    Dashboard:
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+        currency:
+          type: string
+          title: Currency
+        employee_name:
+          type: string
+          title: Employee Name
+        refreshed_at:
+          type: string
+          format: date-time
+          title: Refreshed At
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        summary:
+          $ref: '#/components/schemas/Summary'
+        by_room_type:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Room Type
+        by_country:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Country
+        by_season:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Season
+        by_room_type_season:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: By Room Type Season
+        daily:
+          items:
+            $ref: '#/components/schemas/Group'
+          type: array
+          title: Daily
+        bar_products:
+          items:
+            $ref: '#/components/schemas/Product'
+          type: array
+          title: Bar Products
+        bar_categories:
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+          title: Bar Categories
+      type: object
+      required:
+      - from_date
+      - to_date
+      - currency
+      - employee_name
+      - refreshed_at
+      - warnings
+      - summary
+      - by_room_type
+      - by_country
+      - by_season
+      - by_room_type_season
+      - daily
+      - bar_products
+      - bar_categories
+      title: Dashboard
+    Group:
+      properties:
+        label:
+          type: string
+          title: Label
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        room_nights:
+          type: integer
+          title: Room Nights
+        guest_nights:
+          type: integer
+          title: Guest Nights
+        bookings:
+          type: integer
+          title: Bookings
+      type: object
+      required:
+      - label
+      - revenue
+      - room_nights
+      - guest_nights
+      - bookings
+      title: Group
+    Guest:
+      properties:
+        name:
+          type: string
+          maxLength: 241
+          minLength: 1
+          title: Name
+        email:
+          type: string
+          maxLength: 254
+          pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+          title: Email
+        phone:
+          type: string
+          maxLength: 40
+          minLength: 5
+          title: Phone
+        country_code:
+          type: string
+          pattern: ^[A-Z]{2}$
+          title: Country Code
+      type: object
+      required:
+      - name
+      - email
+      - phone
+      - country_code
+      title: Guest
+    Product:
+      properties:
+        product:
+          type: string
+          title: Product
+        category:
+          type: string
+          title: Category
+        quantity:
+          type: integer
+          title: Quantity
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+      type: object
+      required:
+      - product
+      - category
+      - quantity
+      - revenue
+      title: Product
+    Summary:
+      properties:
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        room_nights:
+          type: integer
+          title: Room Nights
+        available_room_nights:
+          type: integer
+          title: Available Room Nights
+        occupancy_percent:
+          type: number
+          title: Occupancy Percent
+        adr:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Adr
+        bar_revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Bar Revenue
+        inventory_rooms:
+          type: integer
+          title: Inventory Rooms
+      type: object
+      required:
+      - revenue
+      - room_nights
+      - available_room_nights
+      - occupancy_percent
+      - adr
+      - bar_revenue
+      - inventory_rooms
+      title: Summary

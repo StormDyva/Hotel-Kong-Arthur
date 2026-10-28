@@ -6,7 +6,7 @@ Approved as working agreement – 2026-10-26. Dette dokument er den fælles ramm
 
 ## Autoritativt grundlag
 
-PDF-opgaven og PROJECT_GUIDE.md er kravgrundlag. Constitution fastlægger principper; Specify beskriver hvad, Clarify beslutninger og antagelser, Plan hvordan, og Tasks leverancer og verifikation.
+PDF-opgaven og PROJECT_GUIDE.md er kravgrundlag. Constitution fastlægger principper; spec.md beskriver hvad, Clarify beslutninger og antagelser, Plan hvordan, og Tasks leverancer og verifikation.
 
 ## Ufravigelige principper
 
@@ -35,3 +35,12 @@ PDF-opgaven og PROJECT_GUIDE.md er kravgrundlag. Constitution fastlægger princi
 - Kan det testes? Ja, via lag-, API-, data-, analyse-, Docker- og Converge-tests.
 - Er det dækket af user stories og tasks? Ja, se user-stories.md, tasks.md og traceability.md.
 - Er der afhængigheder? Ja: Clarify skal godkendes før schema, API og analyser.
+
+
+## Integrationsrevision 2026-10-28
+
+Artefakterne `constitution.md`, `spec.md`, `plan.md` og `tasks.md` skal ligge i
+GitHub-repositoryets `specs/`-mappe. `specify.md` peger på `spec.md` for at undgå to
+konkurrerende specifikationer. Nye ændringer og Converge-resultater er reviewudkast;
+denne revision påstår ikke, at gruppen eller underviseren har godkendt dem.
+Tableau skal hente aktuelle data gennem REST API'et, jf. begge opgavedokumenter.

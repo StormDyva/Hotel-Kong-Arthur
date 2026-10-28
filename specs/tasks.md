@@ -177,3 +177,13 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Kan de testes? Ja, hver task har konkret test/verifikation.
 - Dækker de alle PDF-krav? Ja, se traceability.md.
 - Er kundetilfredshed håndteret? Ja, som eksplicit afgrænsning eller aktivering i T-013.
+
+## Integration run — 2026-10-28
+
+Work proceeds in dependency order on `feature/T-009-live-api-tableau` under the user
+request to connect the application, MySQL and Tableau according to both PDFs.
+T-006/7/8/9 implement the API foundation, contract, CRUD and live dataflow;
+T-010/11/12 add nightly hotel/bar analytics; T-014 uses the API by default;
+T-015 generates API-backed Hyper extracts and a native workbook; T-016 supplies
+startup and SWA explanations. These are implementation results, not assertions of
+team approval or full task completion. See `converge-2026-10-28.md` for evidence/gaps.
