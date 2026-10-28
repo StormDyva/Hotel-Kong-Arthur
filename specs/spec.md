@@ -171,3 +171,15 @@ Browserprototypen på localhost:5500 søger ledighed, viser et forslag pr. type
 Tilbuds- og bekræftelsesprisen kommer fra backend. Serverfeltfejl vises i formularen.
 Efter bekræftelse kan man gå direkte til oversigten. Et rigtigt browserflow
 verificerer MySQL-persistens efter reload; testbookingen annulleres til sidst.
+
+## T-027 — RevPAR
+
+RevPAR = værelsesomsætning / tilgængelige værelsesnætter (DKK). Det er omsætning,
+ikke overskud; barsalg indgår ikke. Beregnes i services/analytics med historiske
+prislinjer og samme kapacitetsnævner som belægningsgraden. revpar indgår i summary.
+GET /api/analytics/revpar har de eksisterende filtre og returnerer data.revpar,
+revenue, available_room_nights samt monthly-rækker med month (YYYY-MM), revenue,
+available_room_nights og revpar. Første/sidste måned klippes til valgt periode.
+Alle periodens måneder medtages, også uden salg. Nulkapacitet giver 0 og warning.
+Land filtrerer kun omsætningen; type/sæson filtrerer også kapaciteten. Brug afrundede
+månedstal til visning, ikke til at genberegne periodens samlede RevPAR i Tableau.

@@ -51,12 +51,30 @@ def grouped(nights, field):
     return sorted(groups.values(), key=lambda g: (-g['revenue'], g['label']))
 
 
+def monthly_revpar(nights, inventory, start, end, season_periods=None):
+    months = {}
+    day = start
+    while day < end:
+        month = day.strftime('%Y-%m')
+        row = months.setdefault(month, dict(month=month, revenue=ZERO, available_room_nights=0))
+        if season_periods is None or season_contains(day, season_periods):
+            row['available_room_nights'] += inventory
+        day += timedelta(days=1)
+    for night in nights:
+        months[night['night_date'].strftime('%Y-%m')]['revenue'] += night['line_total']
+    for row in months.values():
+        capacity = row['available_room_nights']
+        row['revpar'] = round(row['revenue']/capacity, 2) if capacity else ZERO
+    return list(months.values())
+
+
 def report(repo, start=None, end=None, employee='Helene Christine', country=None, room_type=None, season=None, year=None):
     start, end = period(start, end, year)
     nights = repo.nights(start, end, country, room_type, season)
     rooms = [r for r in repo.rooms() if r['active'] and r['type_active']
              and (room_type is None or r['room_type_id'] == room_type)]
     days = (end-start).days
+    periods = None
     if season:
         periods = repo.season_periods(season)
         days = sum(season_contains(start+timedelta(days=i), periods) for i in range(days))
@@ -94,6 +112,9 @@ def report(repo, start=None, end=None, employee='Helene Christine', country=None
         rated_bookings=len(ratings), eligible_bookings=len(eligible),
         response_percent=round(Decimal(100)*len(ratings)/len(eligible), 2) if eligible else ZERO,
         distribution=[dict(rating=i, count=ratings.count(i)) for i in range(1,6)], scale_min=1, scale_max=5)
+    monthly = monthly_revpar(nights, len(rooms), start, end, periods)
+    if any(row['available_room_nights'] == 0 for row in monthly):
+        warnings.append('Some months have zero available room nights; their RevPAR is zero')
     metadata = dict(period=dict(from_date=start, to_date=end, end_exclusive=True, timezone='Europe/Copenhagen'),
         applied_filters=dict(country_code=country, room_type_id=room_type, season=season, employee_name=employee),
         generated_at=repo.now(), hotel_filters_apply_to_bar=False)
@@ -102,11 +123,12 @@ def report(repo, start=None, end=None, employee='Helene Christine', country=None
         summary=dict(revenue=revenue, room_nights=len(nights), available_room_nights=available,
             occupancy_percent=round(100*len(nights)/available, 2) if available else 0,
             adr=round(revenue/len(nights), 2) if nights else ZERO,
+            revpar=round(revenue/available, 2) if available else ZERO,
             bar_revenue=bar_total, inventory_rooms=len(rooms)), **groups,
         top_room=groups['by_room'][0] if groups['by_room'] else None,
         top_room_type=groups['by_room_type'][0] if groups['by_room_type'] else None,
         top_country=groups['by_country'][0] if groups['by_country'] else None,
-        satisfaction=satisfaction,
+        satisfaction=satisfaction, monthly_revpar=monthly,
         bar_products=sorted(products.values(), key=lambda p: (-p['revenue'],p['product'])),
         bar_categories=[dict(category=k, revenue=categories[k], percent=round(100*categories[k]/bar_total, 2) if bar_total else ZERO)
                         for k in sorted(set(categories)|{'cocktail','coffee'})])
@@ -116,6 +138,9 @@ def metric_result(data, metric):
     if metric == 'bar-sales':
         result = dict(total_revenue=data['summary']['bar_revenue'], employee_name=data['employee_name'],
                       products=data['bar_products'], categories=data['bar_categories'])
+    elif metric == 'revpar':
+        result = dict(revpar=data['summary']['revpar'], revenue=data['summary']['revenue'],
+                      available_room_nights=data['summary']['available_room_nights'], monthly=data['monthly_revpar'])
     elif metric == 'customer-satisfaction':
         result = data['satisfaction']
     elif metric == 'top-performers':

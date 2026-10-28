@@ -62,7 +62,7 @@ booking. Names and countries are not person identifiers. No authentication is pr
 
 ## Swagger og API-test
 
-Åbn http://localhost:8000/docs. Alle 27 operationer er samlet efter Bookings,
+Åbn http://localhost:8000/docs. Alle 28 operationer er samlet efter Bookings,
 Inventory, Analytics, Bar og Guest feedback. Vælg en operation, Try it out og Execute.
 Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 [trin-for-trin API-test](docs/api-testing.md) for konkrete booking-, bar- og review-kald.
@@ -94,7 +94,7 @@ Containeriserede API-/kontrakttests på separat testdatabase (ingen lokal Python
 docker compose --profile test run --build --rm api-tests
 ```
 
-Testprofilen starter test-db → test-runner (migrations/seed) → api-tests (26 tests).
+Testprofilen starter test-db → test-runner (migrations/seed) → api-tests (29 tests).
 Den berører ikke appens MySQL-volume. Runtime-imaget indeholder ikke pytest eller
 testværktøjer; Dockerfile har et separat test-target. API-testene omfatter også
 OpenAPI-validering og regressionstest af Tableau-gæsteeksportens rækker.
@@ -158,3 +158,6 @@ Testprofilen nulstiller altid hotel_kong_arthur_test på test-db før fixtures i
 så tidligere importforsøg ikke påvirker testresultaterne. Appens database nulstilles
 ikke. RESET_TEST_DATABASE må kun bruges med denne præcise testdatabase og host;
 scriptet afviser andre kombinationer. Kør ikke flere test-runners samtidigt.
+
+RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
+månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.
