@@ -256,3 +256,10 @@ Dashboardet bygges manuelt senere og blokerer ikke denne API-PR. Containerisered
 tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskrivelsen
 samles om den færdige implementering og PR markeres ready for review, uden merge.
 Se docs/tableau-api-handoff.md.
+
+## T-027 — RevPAR i backend og Tableau-datagrundlag
+
+US-007: beregn værelsesomsætning / tilgængelige værelsesnætter i service-laget.
+Tilføj revpar i summary og et selvstændigt GET /api/analytics/revpar med samlet tal
+og månedsrækker til Tableau-kurven. Samme periode/type/land/sæson-regler; nulnævner
+returnerer 0 med warning. OpenAPI, Swagger og handoff opdateres; tests mod MySQL.
