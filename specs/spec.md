@@ -187,3 +187,15 @@ source season and no overlaps. CSV category/country/nights/total remain unchange
 100 extra clearly marked synthetic bookings are added in a separate mock batch.
 Operational bookings are preserved. The loader is idempotent and transactional;
 raw names are not committed. API source-guest names stay anonymized. See import docs.
+
+## T-027 — RevPAR
+
+RevPAR = værelsesomsætning / tilgængelige værelsesnætter (DKK). Det er omsætning,
+ikke overskud; barsalg indgår ikke. Beregnes i services/analytics med historiske
+prislinjer og samme kapacitetsnævner som belægningsgraden. revpar indgår i summary.
+GET /api/analytics/revpar har de eksisterende filtre og returnerer data.revpar,
+revenue, available_room_nights samt monthly-rækker med month (YYYY-MM), revenue,
+available_room_nights og revpar. Første/sidste måned klippes til valgt periode.
+Alle periodens måneder medtages, også uden salg. Nulkapacitet giver 0 og warning.
+Land filtrerer kun omsætningen; type/sæson filtrerer også kapaciteten. Brug afrundede
+månedstal til visning, ikke til at genberegne periodens samlede RevPAR i Tableau.

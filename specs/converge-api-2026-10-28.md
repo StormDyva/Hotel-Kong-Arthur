@@ -14,7 +14,7 @@ Den dokumenterer verifikation; gruppens PR-review og Tableau-accept er særskilt
 | Bar | registrering, Helene-total, produktomsætning og kategoriandele; danske årsgrænser testet |
 | Tilfredshed | én faktisk rating 1–5 pr. afsluttet booking, gennemsnit/svarprocent/fordeling |
 | Referenceinventar | 214 syntetiske rum, otte opgavekategorier, 428 pladser, 20/10 produktkatalog |
-| OpenAPI/Swagger | 27 operationer; input/output/fejl; lokale assets; kontraktlighed og OA3.1-validering |
+| OpenAPI/Swagger | 28 operationer; input/output/fejl; lokale assets; kontraktlighed og OA3.1-validering |
 | Docker | ren isoleret opstart, healthchecks, separate runtime/test-targets, proxy og custom-port CORS |
 | Persistens | booking oprettet i isoleret installation og genlæst efter genskabelse med samme volume |
 | Dokumentation | README/startguide/projektguide/spec/plan/drift/frontend/import/data/SWA/Tableau afstemt |
@@ -23,10 +23,10 @@ Den dokumenterer verifikation; gruppens PR-review og Tableau-accept er særskilt
 
 ## Testbevis
 
-- `docker compose --profile test run --build --rm api-tests`: 26 tests består mod
+- `docker compose --profile test run --build --rm api-tests`: 29 tests består mod
   isoleret MySQL, inklusive OpenAPI og tre review-regressioner.
 - Frontend unit: 59 tests; isoleret mock-browser: 19 checks fra integrationsarbejdet.
-- Swagger-browser: 27 operationer og Try it out bar-GET med HTTP 200 fra API.
+- Swagger-browser: 28 operationer og Try it out bar-GET med HTTP 200 fra API.
 - API → MySQL → analyse → PUT → DELETE er afprøvet via rigtige HTTP-kald.
 - Compose/proxy/persistens og kommandoer: docs/release-checklist.md.
 - Kundeimport og gæsteeksport blev verificeret i T-023. Dashboardet er ikke verificeret.
@@ -56,3 +56,7 @@ Brugeren præciserer, at denne PR skal levere en API klar til Tableau; gruppen
 bygger dashboard manuelt senere. API-handoff, felter og lokal refresh beskrives i
 docs/tableau-api-handoff.md. Manglende dashboard-demo er et senere afleveringspunkt,
 ikke en blokering for API-PR'ens review. Menneskelig review/merge er stadig påkrævet.
+
+T-027: RevPAR i summary og GET /api/analytics/revpar med månedstal. Beregning i
+service-laget, nulkapacitet håndteres med warning. Tre nye MySQL-tests dækker
+summer/denominator, filtre, delvise måneder og annullering. 29 tests består.

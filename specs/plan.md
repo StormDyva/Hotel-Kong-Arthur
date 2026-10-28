@@ -51,3 +51,7 @@ og OpenAPI-tests. Frontend: npm test; isoleret Chrome-smoke er separat. Compose
 verificeres på en ren, separat testinstallation, inklusive genoprettelse med samme
 volume. Se docs/operations.md og docs/release-checklist.md. Intet merges uden
 menneskeligt review; samlet Tableau-accept vurderes særskilt.
+
+RevPAR beregnes i analytics-service som revenue / available_room_nights.
+Månedlige rækker klipper kapacitet og omsætning til perioden; der beregnes ikke
+gennemsnit af afrundede måneds-RevPAR. Schema/Swagger og Tableau-handoff følger med.

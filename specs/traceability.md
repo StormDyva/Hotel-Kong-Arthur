@@ -96,3 +96,6 @@ T-028: exact CSV + 100 mock bookings → csv_source_rows migration and
 load_school_csv.py. Runtime checks compare every raw/source guest field, source
 price and nightly totals, 2026 dates and zero overlaps. Repeat loader adds zero rows.
 API source bookings remain anonymized; no raw names are committed.
+
+T-027 / US-007 → analytics.monthly_revpar + report + RevPARReport → test_revpar.py.
+Periode/type/sæson/land samt tomme perioder og annullering dækkes af MySQL-tests.
