@@ -2,145 +2,167 @@
 
 ## Status
 
-Approved as working agreement – 2026-10-26. Stories er implementerings- og testgrundlag for MVP’en.
+Udkast til tillægsopgave uge 2. Ikke implementeringsgodkendt. Hver story beskriver
+et brugerbehov og konkrete acceptkriterier; åbne beslutninger står i
+`clarify.md`.
 
-## US-001 – Opret booking
+## US-001 – Håndtér bookinger
 
-Som receptionist ønsker jeg at oprette en booking, så hotellets kapacitet og indtjening kan opdateres.
-
-Acceptkriterier:
-
-- POST /api/bookings returnerer 201 og JSON-resource.
-- Obligatoriske felter, ISO-datoer, DKK, pris, gæsteantal og status valideres.
-- guests_count overstiger ikke værelsestypens capacity.
-- Overlappende confirmed booking afvises med ensartet fejl.
-- Data kan genfindes via GET /api/bookings og MySQL.
-
-## US-002 – Se og filtrér bookinger
-
-Som receptionist ønsker jeg at se og filtrere bookinger, så jeg kan finde reservationer.
+Som receptionist ønsker jeg at oprette, finde, redigere og annullere bookinger i
+en browser-frontend, så hotellets belægning og indtjening altid er korrekt.
 
 Acceptkriterier:
 
-- GET /api/bookings har page/page_size og dokumenterede status-, dato-, room- og guest-filtre.
-- page_size afvises over 100.
-- GET /api/bookings/{id} returnerer booking eller 404.
-- Frontend viser liste, tomt resultat og fejl.
+- Frontend har formular til oprettelse og redigering med validering og viser
+  succes eller fejl.
+- POST `/api/bookings` returnerer 201. PUT kræver en komplet, gyldig resource og
+  er idempotent.
+- Datoer (ISO), gæsteantal i forhold til værelsestypens kapacitet og overlap med
+  en confirmed booking valideres. Overlap giver 409.
+- DELETE sætter status til cancelled (rækken bevares) og er idempotent. Et
+  annulleret værelse kan bookes igen.
+- GET `/api/bookings` har paginering (max `page_size` 100) og filtre på status,
+  dato og værelse. Ukendt id giver 404.
 
-## US-003 – Redigér booking
+## US-002 – Se aktuelle data
 
-Som receptionist ønsker jeg at redigere en booking, så ændringer afspejles i driftstallene.
-
-Acceptkriterier:
-
-- PUT accepterer komplet gyldig resource og er idempotent.
-- Dato, kapacitet, pris og overlap valideres igen.
-- Ændringen ses i API, MySQL og relevante analyser.
-
-## US-004 – Annullér booking
-
-Som receptionist ønsker jeg at annullere en booking, så værelset frigives uden at historikken går tabt.
+Som hoteladministrator ønsker jeg, at nøgletal bygger på de seneste bookinger og
+ikke kun på historiske filer, så mine beslutninger er baseret på aktuel drift.
 
 Acceptkriterier:
 
-- DELETE ændrer status til cancelled og er idempotent.
-- Rækken bevares; cancelled tæller ikke i overlap, belægning eller indtjening.
-- Samme værelse kan bookes igen efter annullering.
-- Frontend viser handlingens resultat.
+- Ændringer via POST/PUT/DELETE ses i næste GET og i analyse-endpoints uden
+  genimport.
+- CSV/XLSX bruges kun til reproducerbar seed/import i PostgreSQL, ændrer ikke
+  API-kontrakten og håndterer genkørsel uden dubletter.
+- Importerede historiske rækker er markeret `synthetic_import` og
+  skrivebeskyttede.
+- Definitionen af live (REST-opdatering, ingen push) er dokumenteret.
+- Databaseskiftet ændrer ikke API-kontrakten (samme endpoints, felter og
+  fejlkoder), og eksisterende API-tests består mod PostgreSQL.
 
-## US-005 – Opdatér live bookingdata
+## US-003 – Se belægningsgrad
 
-Som hotelklient ønsker jeg at skrive bookingændringer til API’et, så MySQL indeholder den aktuelle drift.
-
-Acceptkriterier:
-
-- POST/PUT/DELETE er dokumenteret som primær MVP-opdateringsmekanisme.
-- Næste GET-request afspejler ændringen.
-- CSV/XSLT bruges kun til seed/import og ændrer ikke runtime-data direkte.
-- Begrænsningen ingen WebSockets/push er dokumenteret.
-
-## US-006 – Se belægningsgrad
-
-Som hoteladministrator ønsker jeg belægningsgrad for en periode, så jeg kan vurdere kapacitetsudnyttelsen.
+Som hoteladministrator ønsker jeg at se belægningsgrad pr. måned og for en valgt
+periode, så jeg kan planlægge kampagner i svage perioder.
 
 Acceptkriterier:
 
-- from og to er obligatoriske eller har dokumenteret default.
-- Formlen, tæller, nævner og eksklusiv check-out er dokumenteret.
-- Perioder klipper bookingnætter korrekt, og cancelled ignoreres.
-- Nævner 0 giver 0 med warning.
+- Formlen er dokumenteret: solgte værelsesnætter / (214 værelser × antal nætter).
+  Check-out er eksklusivt.
+- Bookingnætter uden for perioden klippes af, og annullerede bookinger tælles
+  ikke med.
+- `from` og `to` er påkrævede, eller en default er dokumenteret.
+- Nævner 0 giver 0 med en advarsel.
+- Beregningen er tilgængelig som dokumenteret GET-endpoint i OpenAPI/Swagger og
+  returnerer JSON med de samme tal som dashboardet.
 
-## US-007 – Analysér hotelindtjening
+## US-004 – Analysér hotellets indtjening og gæster
 
-Som hoteladministrator ønsker jeg indtjening efter værelsestype, sæson og land, så jeg kan træffe beslutninger.
-
-Acceptkriterier:
-
-- Års- og valgt periodes total vises.
-- Faktisk price_total bruges; cancelled filtreres fra.
-- Tværsæson-bookinger fordeles pr. nat efter godkendt regel.
-- Mest indbringende værelsestype og land betyder størst samlet omsætning i perioden.
-- Ingen data håndteres eksplicit.
-
-## US-008 – Analysér cocktailbaren
-
-Som hoteladministrator ønsker jeg Helene Christines barsalg pr. produkt og kategori.
+Som hoteladministrator ønsker jeg at se indtjening og gæsteoprindelse opdelt
+efter værelsestype, sæson og land, så jeg ved, hvilke værelser og markeder
+hotellet tjener mest på.
 
 Acceptkriterier:
 
-- employee_name-filteret er Helene Christine i årsrapporten.
-- Omsætning pr. produkt = quantity * unit_price.
-- Cocktails og kaffe viser beløb og procent af samlet Helene-omsætning.
-- Nævner 0 giver 0 med warning.
+- Årets samlede indtjening og indtjening for en valgt periode vises.
+- Indtjening vises pr. værelsestype, pr. sæson og pr. land. Mest indbringende
+  type og land er tydeligt markeret.
+- Antal gæster pr. land vises.
+- Faktisk `price_total` bruges, annullerede filtreres fra, og bookinger på tværs
+  af sæsoner fordeles pr. nat efter den godkendte regel i Clarify.
+- Selvvalgt nøgletal: [VÆLGES] er defineret med formel og vises i API, frontend og
+  dashboard. (Åben beslutning, se Clarify.)
+- Tom periode giver tom respons, ikke fejl.
+- Beregningerne er tilgængelige som dokumenterede GET-endpoints i OpenAPI/Swagger
+  og returnerer JSON med de samme tal som dashboardet.
 
-## US-009 – Brug Tableau-dashboard
+## US-005 – Analysér cocktailbaren
 
-Som beslutningstager ønsker jeg et interaktivt Tableau-dashboard uden SQL.
-
-Acceptkriterier:
-
-- Dashboard viser alle godkendte hotel- og bar-KPI’er.
-- Relevante periode-, land-, værelsestype-, sæson- og medarbejderfiltre virker.
-- Refresh-procedure og datakilde er dokumenteret.
-- Dashboard-tal afstemmes mod API/MySQL på kendt datasæt.
-
-## US-010 – Brug dokumenteret dataimport
-
-Som dataansvarlig ønsker jeg at importere CSV/XSLT-eksempeldata til MySQL, så demoen kan genskabes.
+Som hoteladministrator ønsker jeg at se Helene Christines salg i baren, så jeg
+kan vurdere barens omsætning og produktmix.
 
 Acceptkriterier:
 
-- Import/seed er reproducerbar og dokumenterer mapping.
-- Importen ændrer ikke API-kontrakten.
-- Dubletter og genkørsel håndteres efter godkendt strategi.
+- Samlet årsomsætning for Helene Christine vises.
+- Omsætning pr. drink = `quantity × unit_price`.
+- Cocktails og kaffe vises med beløb og procent af Helenes samlede omsætning.
+- Nævner 0 giver 0 med en advarsel.
+- Beregningen er tilgængelig som dokumenteret GET-endpoint i OpenAPI/Swagger og
+  returnerer JSON med de samme tal som dashboardet.
 
-## US-011 – Vurder kundetilfredshed
+## US-006 – Vurder kundetilfredshed
 
-Som hoteladministrator ønsker jeg gæstebedømmelser og svarprocent, så jeg kan
-vurdere tilfredshed og hvor repræsentativt datagrundlaget er.
-
-Acceptkriterier:
-
-- En afsluttet, ikke-annulleret booking kan få præcis én rating 1–5 via PUT.
-- Gentagen PUT opdaterer samme rating; GET viser resultatet.
-- Ugyldig score afvises; fremtidige/annullerede bookinger kan ikke bedømmes.
-- Analyse viser gennemsnit, svarprocent, kohortestørrelse og fordeling.
-- Ingen ratings giver null gennemsnit og warning, ikke et opdigtet tal.
-
-## US-012 – Kontroller system og Converge
-
-Som projektgruppe ønsker jeg at sammenholde implementeringen med specs, så afleveringens mangler opdages.
+Som hoteladministrator ønsker jeg at se gæsternes bedømmelser og svarprocent, så
+jeg kan vurdere tilfredsheden og hvor pålidelig målingen er.
 
 Acceptkriterier:
 
-- Converge vurderer alle traceability-rækker.
-- Implementeret, delvist implementeret og mangler rapporteres.
-- README, CONTRIBUTING/CONTRIBUTE, arkitekturdiagram, Swagger og Docker-smoke-test er kontrolleret.
+- En afsluttet, ikke-annulleret booking kan få præcis én rating på 1–5. Gentagen
+  PUT opdaterer samme rating.
+- Ugyldig score, fremtidige og annullerede bookinger afvises.
+- Analysen viser gennemsnit, svarprocent, antal besvarelser og fordeling pr.
+  score.
+- Uden ratings er gennemsnittet null med en advarsel, ikke et opdigtet tal.
+- Beregningen er tilgængelig som dokumenteret GET-endpoint i OpenAPI/Swagger og
+  returnerer JSON med de samme tal som dashboardet.
 
-## Kvalitetstjek
+## US-007 – Brug et interaktivt dashboard
 
-- Er hver story entydig? Ja, hver story har én rolle, ét mål og en værdi.
-- Kan den implementeres? Ja, når Clarify-beslutningerne er godkendt.
-- Kan den testes? Ja, alle stories har konkrete, observerbare acceptkriterier.
-- Er den dækket af en task? Ja, mappingen findes i traceability.md og tasks.md.
-- Er der afhængigheder eller åbne beslutninger? Ja, de er markeret i Clarify og taskafhængighederne.
+Som beslutningstager ønsker jeg at se alle nøgletal i et interaktivt Tableau-
+dashboard uden at skrive SQL, så jeg hurtigt kan træffe beslutninger.
+
+Acceptkriterier:
+
+- Dashboardet viser belægning, indtjening pr. type/sæson/land, årsindtjening,
+  gæster pr. land, selvvalgt nøgletal, barsalg (total, pr. drink,
+  procentfordeling) og kundetilfredshed.
+- Filtre på periode, land, værelsestype og sæson virker.
+- Tallene er afstemt mod API-endpoints (ikke direkte mod databasen), så API'et
+  er den ene sandhedskilde.
+- Datakilde og refresh-procedure er dokumenteret, og en ændring i en booking
+  kan vises efter refresh.
+
+## US-008 – Se nøgletal i frontend
+
+Som hoteladministrator ønsker jeg at se belægning, indtjening, gæster pr. land,
+barsalg og kundetilfredshed direkte i hotellets webapplikation, så jeg kan følge
+driften uden at åbne Tableau.
+
+Acceptkriterier:
+
+- Frontend viser alle analyser fra US-003 til US-006.
+- Alle tal hentes fra REST API'et. Frontend har ingen egen beregning og læser
+  ikke direkte fra databasen.
+- Valg af periode (og eventuelt land/værelsestype) opdaterer visningen.
+- Tomme data og fejl vises tydeligt (tom tilstand, ikke et blankt skærmbillede).
+- Efter en ny booking vises de opdaterede tal ved næste opdatering/indlæsning.
+
+## Mapping fra tidligere stories
+
+| Tidligere id | Nyt id | Bemærkning |
+|---|---|---|
+| US-001–US-004 | US-001 | Booking-CRUD og browserflow samlet |
+| US-005 og US-010 | US-002 | Live-data og import samlet |
+| US-006 | US-003 | Belægningsanalyse |
+| US-007 | US-004 | Indtjening og gæster pr. land |
+| US-008 | US-005 | Baranalyse |
+| US-011 | US-006 | Kundetilfredshed |
+| US-009 | US-007 | Tableau-dashboard |
+| US-012 | — | Fjernet som brugerstory; Converge er projektleverance og spores i tasks/constitution |
+| — | US-008 | Ny story om analysevisninger i frontend |
+
+## Kvalitetstjek (INVEST)
+
+- **Uafhængige:** delvist vurderet; analyse- og databasedele har de afhængigheder,
+  der er beskrevet i Clarify og Tasks.
+- **Forhandlingsbare:** udkast; åbne valg og endpointdetaljer kræver gruppens
+  afklaring før implementering.
+- **Værdifulde:** formuleret ud fra receptionistens, administratorens og
+  beslutningstagerens mål; gruppen har endnu ikke reviewet tillægsopgave-udkastet.
+- **Estimerbare:** ikke vurderet; database- og endpointinventar er beskrevet i
+  Plan, men arbejdsestimat mangler.
+- **Små:** ikke verificeret; US-002 samler dataflow og seed, og US-004 samler flere
+  rapporter.
+- **Testbare:** kriterier er observerbare. US-004 kan ikke markeres testbar for
+  hele omfanget, før det selvvalgte nøgletal er valgt og defineret.

@@ -2,18 +2,26 @@
 
 ## Status
 
-Approved as working agreement – 2026-10-26. Beslutningerne følger den anbefalede MVP-retning og anvendes som gruppens implementeringsgrundlag.
+Beslutningerne fra 2026-10-26/28 er den godkendte v1-baseline. Uge 2-tillægget
+tilføjer C-012–C-017; de åbne punkter dér skal afklares før deres afhængige
+implementering.
 
-### C-001 – Live data og opdateringsmekanisme
+### C-001 – Live data og opdateringsmekanisme (opdateret for uge 2)
 
-- **Beslutning:** Live betyder aktuelle MySQL-data læst ved hvert API-request. POST, PUT og DELETE på booking-API’et er primær MVP-mekanisme.
+- **Beslutning:** Live betyder aktuelle data fra runtime-databasen læst ved hvert
+  API-request. Runtime-målet er nu PostgreSQL (C-012). POST, PUT og DELETE på
+  booking-API’et er primær MVP-mekanisme.
 - **Begrundelse:** PDF’en kræver løbende opdaterbare og live data, men ikke event streaming.
-- **Konsekvens:** Næste API-request ser ændringen. Frontend genindlæser efter mutation. Tableau opdateres ved manuel eller planlagt refresh. Ingen WebSockets eller push.
+- **Konsekvens:** Næste API-request ser ændringen. Frontend henter analysen igen
+  efter valgt opdateringsmåde (C-015). Hvis Tableau fortsat bruges, opdateres det
+  via API ved manuel/planlagt refresh. Ingen WebSockets eller push.
 - **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
 
-### C-002 – CSV/XSLT
+### C-002 – CSV/XLSX seed/import (opdateret for uge 2)
 
-- **Beslutning:** CSV/XSLT fra ITAKEA/hoteldata bruges til reproducerbar seed/import og historisk demo-data. Importen skriver til MySQL og er ikke runtime-kilde.
+- **Beslutning:** CSV/XLSX fra ITAKEA/hoteldata bruges til reproducerbar
+  seed/import og historisk demo-data. Importen skriver til PostgreSQL og er ikke
+  runtime-klient eller API-kontrakt.
 - **Begrundelse:** PDF’en beskriver filerne som statiske og historiske.
 - **Konsekvens:** Nye live-bookinger kommer via API’et. Importjob skal være idempotent eller have dokumenteret reset-strategi.
 - **Ejer:** Projektgruppen. **Dato:** 2026-10-26.
@@ -86,7 +94,7 @@ ophævet. Se den daterede beslutning nedenfor.
 | Beslutning | Status | Ejer | Dato |
 |---|---|---|---|
 | Live-dataflow | Approved | Projektgruppen | 2026-10-26 |
-| CSV/XSLT-import | Approved | Projektgruppen | 2026-10-26 |
+| CSV/XSLT-import til v1 | Historisk godkendt; ændret uge 2 | Projektgruppen | 2026-10-26 |
 | Standardår 2026 | Approved | Projektgruppen | 2026-10-26 |
 | Sæsonkalender | Approved | Projektgruppen | 2026-10-26 |
 | Belægningsgrad | Approved | Projektgruppen | 2026-10-26 |
@@ -96,13 +104,19 @@ ophævet. Se den daterede beslutning nedenfor.
 | Kundetilfredshed 1–5 pr. booking | Brugerbeslutning | Brugeren | 2026-10-28 |
 | Manglende data | Approved | Projektgruppen | 2026-10-26 |
 | Dobbeltbooking/kapacitet | Approved | Projektgruppen | 2026-10-26 |
+| PostgreSQL som måldatabase | Afklaret | Projektgruppen | Tillægsopgave uge 2 |
+| Selvvalgt nøgletal | Åben | Projektgruppen | Afventer |
+| Analysekontrakt og warnings | Åben | Projektgruppen | Afventer |
+| Frontend-opdatering | Åben | Projektgruppen | Afventer |
+| Tableau som forbruger/leverance | Åben | Projektgruppen | Afventer |
 
-## Kvalitetstjek
+## Kvalitetstjek — oprindelig v1-afklaring
 
 - Er kravene entydige? Ja; beslutningerne er godkendt som arbejdsgrundlag.
 - Kan de implementeres og testes? Ja, med de angivne konsekvenser og acceptance tests.
 - Er de dækket af stories/tasks? Ja, se traceability.md og tasks.md.
-- Åbne afhængigheder: ingen kravbeslutninger. Eventuelle ændringer skal opdatere denne fil og traceability-matrixen.
+- Denne kontrol beskriver kun den oprindelige v1-afklaring. Nye åbne punkter for
+  uge 2 står i C-013–C-016 nedenfor og i den aktuelle traceability-matrix.
 
 ## C-009 ændret ved brugerbeslutning — 2026-10-28
 
@@ -130,3 +144,74 @@ PDF-opgaven angiver sommer og juletid som højsæson. Tidligere lavsæson hele
 december erstattes af lavsæson til og med 19/12 og højsæson 20/12–31/12. De
 præcise juledatoer er en implementeringsantagelse, ikke en oplysning fra hotellet.
 Eksisterende prislinjer bevares som historiske snapshots.
+
+## Tillægsopgave uge 2 — afklaringer
+
+Disse punkter er et kravudkast for den kommende implementering. De ændrer ikke
+testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
+
+### C-012 — Databasetype
+
+- **Status: AFKLARET.** Databasen skiftes til PostgreSQL. Gruppen har afklaret, at
+  PostgreSQL tæller som en anden databasetype end MySQL i tillægsopgaven.
+- **Begrundelse:** Den relationelle model kan genbruges, SQLAlchemy er allerede i
+  brug, og API-kontrakten forbliver uændret.
+- **Konsekvens:** MySQL-versionen bevares historisk under tagget
+  `v1-mysql-tableau`. Data genindlæses fra CSV/XLSX seed/import; der planlægges
+  ikke datamigrering fra MySQL.
+
+### C-013 — Selvvalgt nøgletal
+
+- **Status: ÅBEN.** Der er endnu ikke valgt et nøgletal.
+- **RevPAR:** Omsætning / disponible værelsesnætter. Kræver omsætning og
+  disponible værelsesnætter for samme periode. Værelser, perioder, bookinger og
+  natpriser findes i den nuværende model; beregningen kan genbruge disse data,
+  men definitionen af omsætning i tælleren skal bekræftes.
+- **Gennemsnitlig opholdslængde:** Samlede opholdsnætter / antal bookinger i den
+  valgte kohorte. Kræver check-in, check-out og en afklaret kohorte/statusregel;
+  datoer og bookingstatus findes allerede.
+- **Annulleringsrate:** Annullerede bookinger / alle bookinger i en valgt
+  bookingkohorte × 100. Kræver kohorteperiode og entydig nævnerregel; status og
+  oprettelsestid findes i bookingdata, men valg af kohortens dato (oprettet,
+  check-in eller opholdsperiode) er ikke fastlagt.
+- **Datagrundlag:** Alle tre kandidater kan beregnes ud fra felter, der allerede
+  findes i v1-modellen; ingen kræver umiddelbart nye databasefelter. Gennemsnitlig
+  opholdslængde kræver færrest slags input (check-in, check-out og antal bookinger),
+  men kohorte/status skal stadig afklares. Dette er en vurdering af
+  datatilgængelighed, ikke en anbefaling af hvilket KPI gruppen skal vælge.
+- **Blokering:** Gruppen skal vælge KPI, kohorte, formel, periodefiltre og
+  nul-/tom-data-adfærd, før KPI-specifik API-, frontend- eller Tableau-arbejde
+  starter.
+
+### C-014 — Analysekontrakt
+
+- **Status: ÅBEN.** Den konkrete endpoint-struktur, parameterkrav, responsform,
+  fejlkoder og warning-format for analysesider skal gennemgås og godkendes.
+- **Åben formelafstemning:** US-003 nævner 214 værelser × alle periodens nætter,
+  mens tidligere C-005/T-020 bruger aktive værelser (og filtre på type/sæson) i
+  nævneren. Gruppen skal afklare, om 214 er fast eller alene det nuværende
+  referenceinventar, før kriterium/formel ændres eller implementeres.
+- **Eksisterende udgangspunkt:** Se endpointinventaret i `plan.md`. De eksisterende
+  analyse-endpoints bevares; nye eller ændrede endpoints beskrives først endeligt
+  efter gruppens kontraktreview.
+
+### C-015 — Frontend-opdatering
+
+- **Status: ÅBEN.** Gruppen skal vælge, om analyser hentes automatisk ved
+  sidevisning, via manuel opdateringsknap eller begge dele. Opdatering efter
+  bookingmutation skal stadig ske ved næste GET/indlæsning; push er ikke besluttet
+  eller krævet.
+
+### C-016 — Tableau som leverance
+
+- **Status: ÅBEN.** Gruppen skal afklare, om Tableau fortsat er en obligatorisk
+  forbruger i tillægsopgaven, når analyser også skal vises i frontend.
+- **Fast krav:** Hvis Tableau bruges, læser det beregninger fra REST API'et og
+  ikke direkte fra databasen.
+
+### C-017 — Seed ved databaseskift
+
+- **Status: AFKLARET.** Eksisterende data genskabes ved reproducerbar CSV/XLSX
+  seed/import i PostgreSQL; der udføres ingen datamigrering fra MySQL.
+- **Åben detalje:** Mapping af kildefelter, `synthetic_import`-markering,
+  skrivebeskyttelse og dubletstrategi skal verificeres i den kommende importtask.
