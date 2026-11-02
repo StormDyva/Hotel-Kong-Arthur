@@ -3,10 +3,13 @@
 ## Kravgrundlag og prioritering
 
 Grundlag: E26 Tværfaglig Opgave Hotel Kong Arthur og Tillægsspørgsmål_swa.
-MVP: trelags-backend, REST/JSON, OpenAPI/Swagger, MySQL, Docker Compose,
-booking-CRUD, hotel-/baranalyser, bookingfrontend, dokumentation og Tableau.
+Tillægsopgave uge 2: trelags-backend, REST/JSON, OpenAPI/Swagger, PostgreSQL,
+Docker Compose, booking-CRUD, hotel-/baranalyser via API, booking- og
+analysefrontend samt dokumentation. Tableau-status afventer C-016.
 Brugeren har prioriteret API og valgt 1–5-rating pr. afsluttet booking.
-Tableau bygges manuelt senere; den samlede dashboardleverance er ikke verificeret.
+Specifikationsarbejdet er i gang på `feature/tillaeg-uge2`; implementering må
+først starte efter gruppens review. MySQL + Tableau-versionen fra før ændringen
+er bevaret i tagget `v1-mysql-tableau` på GitHub.
 
 Den kanoniske funktionelle specifikation er specs/spec.md. Arbejdsflow:
 Constitution → Specify → Clarify → Plan → Tasks → Implement → Converge.
@@ -18,14 +21,15 @@ Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
 - api/main.py og schemas.py: HTTP, JSON, validering, statuskoder, Swagger.
 - services/: bookingregler, sæsonpriser, nøgletal og bedømmelser.
 - repositories/: parameteriseret SQL, persistence og låse; intet HTTP.
-- MySQL: autoritativ runtime-kilde; historiske kundefiler er kun import/staging.
-- Frontend: HTML/CSS/JavaScript; kalder API, aldrig MySQL direkte.
-- Tableau: bruger API-beregnede beløb. Flade /analytics/revenue-rækker er klar.
+- PostgreSQL: måldatabase; seed/import fra CSV/XLSX, ingen datamigrering fra v1.
+- Frontend: HTML/CSS/JavaScript; kalder API og viser API-beregnede analyser.
+- Tableau: hvis fortsat krævet, bruger kun API-beregnede værdier.
 
-Compose starter MySQL → migrations/seed → API-health → nginx/frontend.
-Swagger serveres i API-containeren med lokale JS/CSS-filer. MySQL-data bevares i
-projektets navngivne volume. Testprofilen har separat database og API-testcontainer.
-Se README for præcise porte, miljøvariabler, opstart og tests.
+Planlagt Compose starter PostgreSQL → migrations/seed → API-health → nginx/frontend.
+Swagger serveres i API-containeren med lokale JS/CSS-filer. PostgreSQL-data skal
+bevares i projektets navngivne volume. Testprofilen skal have separat
+PostgreSQL-database og API-testcontainer. Databaseændringen er endnu ikke
+implementeret. Se README for planlagte porte og fremtidige testkommandoer.
 
 ## Gældende domæneregler
 

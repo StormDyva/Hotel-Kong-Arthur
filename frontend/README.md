@@ -1,5 +1,13 @@
 # Bookingfrontend
 
+## Tillægsopgave uge 2
+
+De nye analysevisninger er endnu ikke implementeret. Kravet er at vise belægning,
+indtjening, gæster pr. land, barsalg og kundetilfredshed ved at hente de
+backendberegnede værdier fra REST API'et. Frontend må hverken beregne KPI'er selv
+eller læse direkte fra PostgreSQL. Se `../docs/analysis-api.md` for det nuværende
+API-inventar. Opdateringsmåde afventer beslutning C-015.
+
 Start hele applikationen fra repository-roden med `docker compose up --build -d`.
 Åbn http://localhost:5500. HTML/CSS/vanilla JavaScript serveres af nginx uden build.
 Frontend bruger den rigtige API som standard. nginx videresender `/api/`,

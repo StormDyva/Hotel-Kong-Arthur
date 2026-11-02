@@ -1,7 +1,23 @@
 # Hotel Kong Arthur
 
 Booking prototype and hotel/bar analytics for the E26 interdisciplinary assignment.
-Python/FastAPI, SQLAlchemy, MySQL 8, HTML/CSS/JavaScript and Tableau Public.
+Python/FastAPI, SQLAlchemy, PostgreSQL (måldatabase), HTML/CSS/JavaScript og
+Tableau Public (krav om fortsat dashboard afventer afklaring).
+
+## Præsentation: v1 (MySQL + Tableau)
+
+Den oprindelige version før tillægsopgave uge 2 er gemt i tagget
+`v1-mysql-tableau`. Check tagget ud og start præsentationsversionen sådan:
+
+```sh
+git checkout v1-mysql-tableau
+docker compose up --build -d
+```
+
+Dette er en specifikationsbranch for tillægsopgave uge 2. PostgreSQL-skiftet er
+planlagt, men ikke implementeret her; den eksisterende runtime/Compose og de
+historiske testkommandoer svarer fortsat til v1. Brug tagget ovenfor til en
+reproducerbar præsentation, indtil PostgreSQL-taskene er gennemført.
 
 ## Run
 
@@ -16,10 +32,12 @@ docker compose up --build -d
 - OpenAPI JSON: http://localhost:8000/openapi.json
 - Database health: http://localhost:8000/health
 - Analytics: http://localhost:8000/api/analytics/dashboard
-- MySQL: localhost:3307. Container-to-container address: db:3306.
+- PostgreSQL-mål: localhost:5433 (foreslået; skal kontrolleres for portkonflikt).
+  Internt mål: postgres:5432.
 
 Example development credentials are in `.env.example`. Copy to `.env` to override.
-Ports 5500, 8000 and 3307 are configurable. Services bind to localhost.
+Ports 5500, 8000 and the proposed PostgreSQL host port 5433 are configurable.
+Services bind to localhost.
 `docker compose down` stops services while retaining database data in a named volume.
 Migrations and demo seed run once; restarting does not overwrite edited bookings.
 Do not delete the volume if you need to retain data.
@@ -31,7 +49,7 @@ flowchart LR
     Browser[Booking browser] -->|REST JSON| API[FastAPI routes / Swagger]
     API --> Service[Business services]
     Service --> Repository[SQLAlchemy repositories]
-    Repository --> DB[(MySQL)]
+    Repository --> DB[(PostgreSQL)]
     Bridge[Tableau refresh bridge] -->|GET analytics JSON| API
     Bridge --> Extract[Hyper extracts]
     Extract --> Tableau[Tableau dashboard]
@@ -40,7 +58,7 @@ flowchart LR
 The API presentation layer is `backend/app/api`, business rules and calculations
 are in `backend/app/services`, and SQL is in `backend/app/repositories`.
 `frontend` is served by nginx and proxies `/api`, `/analytics`, health, Swagger and its static assets to the API service.
-`db-init` waits for MySQL health; the API waits for successful initialization;
+Planned `db-init` waits for PostgreSQL health; the API waits for successful initialization;
 nginx waits for the API health check and has its own healthcheck. Swagger runs inside the API container.
 
 ## Follow a booking request
@@ -52,7 +70,7 @@ nginx waits for the API health check and has its own healthcheck. Swagger runs i
 4. The service calculates each night's seasonal price and total. Submitted prices
    are never trusted. Repository SQL stores guest, booking and nightly snapshots.
 5. The transaction commits, then the browser receives HTTP 201 and the booking.
-6. Subsequent API reads query MySQL. Refresh Tableau extracts to show the change.
+6. Subsequent API reads query PostgreSQL. Refresh Tableau extracts to show the change.
 
 PUT uses a complete booking payload, preserves prices for an unchanged stay and
 recalculates them when dates change. DELETE returns 204 and soft-cancels the stay;
@@ -70,9 +88,17 @@ Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 ## Tableau
 
 Se [API-handoff til Tableau](docs/tableau-api-handoff.md) for endpoints, felter og refresh.
-Dashboardet bygges manuelt senere efter brugerens prioritering. API'et leverer
-JSON-analyser som datagrundlag. Eksisterende Tableau-artefakter fra den tidligere
-iteration er ikke ændret eller genvalideret som del af API-opgaven.
+Tableau er kun en forbruger af API-beregnede analyser. Om dashboardet fortsat er
+obligatorisk, afventer C-016. Eksisterende Tableau-artefakter er ikke genvalideret
+som del af denne specifikationsopgave.
+
+## Analysevisninger i frontend
+
+Frontendens nye analysevisninger er et krav, men er endnu ikke implementeret.
+De skal hente belægning, indtjening, gæster pr. land, barsalg og
+kundetilfredshed fra REST API'et; browseren må ikke beregne KPI'er eller tilgå
+databasen. Se [analyse-API-vejledningen](docs/analysis-api.md) for eksisterende
+paths og curl-eksempler.
 
 ## API examples
 
@@ -88,14 +114,15 @@ FastAPI's served schema. Existing resources use `/api`. The flat Tableau revenue
 
 ## Verification
 
-Containeriserede API-/kontrakttests på separat testdatabase (ingen lokal Python kræves):
+Efter PostgreSQL-implementeringen skal API-/kontrakttests køre på separat
+PostgreSQL-testdatabase (ingen lokal Python kræves):
 
 ```sh
 docker compose --profile test run --build --rm api-tests
 ```
 
-Testprofilen starter test-db → test-runner (migrations/seed) → api-tests (26 tests).
-Den berører ikke appens MySQL-volume. Runtime-imaget indeholder ikke pytest eller
+Testprofilen skal starte test-db → test-runner (migrations/seed) → api-tests.
+Den må ikke berøre appens PostgreSQL-volume. Runtime-imaget indeholder ikke pytest eller
 testværktøjer; Dockerfile har et separat test-target. API-testene omfatter også
 OpenAPI-validering og regressionstest af Tableau-gæsteeksportens rækker.
 
@@ -104,7 +131,7 @@ Alternativt på værtsmaskinen, med den lokale appdatabase kørende:
 ```sh
 uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
-PYTHONPATH=backend MYSQL_PORT=3307 backend/.venv/bin/pytest -q backend/tests
+PYTHONPATH=backend DATABASE_URL=postgresql+psycopg://... backend/.venv/bin/pytest -q backend/tests
 node backend/tests/swagger-smoke.mjs
 npm --prefix frontend run smoke:live
 npm --prefix frontend test
@@ -113,10 +140,11 @@ docker compose --profile test run --rm test-runner
 git diff --check
 ```
 
-API tests need the initialized local MySQL instance. Most tests roll back their
-transactions. The concurrency test commits and removes only its own test records.
-The browser smoke command uses explicit mock mode; real MySQL behavior is tested
-separately. Import verification needs the external customer files; see
+Efter databaseimplementeringen skal API-tests bruge den initialiserede lokale
+PostgreSQL-instans. De fleste tests ruller deres transaktioner tilbage.
+Concurrency-testen committer og fjerner kun sine egne testdata. Browserens
+smoke-kommando bruger mock mode; PostgreSQL-adfærd verificeres separat.
+Importverifikation kræver de eksterne kundefiler; se
 [docs/customer-data-import.md](docs/customer-data-import.md).
 
 ## Datagrundlag og begrænsninger
@@ -125,6 +153,9 @@ Det syntetiske referenceinventar har 214 værelser, otte kategorier fra opgaven 
 428 kapacitetspladser. Typefordelingen og numrene er ikke hotellets faktiske.
 Referencekataloget har 20 cocktails og 10 kaffeprodukter. Eksisterende fire
 barsalg og historiske bookinger er fortsat tydeligt demodata.
+Historiske rækker genindlæses ved CSV/XLSX-seed i PostgreSQL; MySQL-data fra v1
+migreres ikke. Importerede rækker skal mærkes `synthetic_import` og være
+skrivebeskyttede. Prisfordeling og værelsesnumre påstår ikke hotellets faktiske drift.
 
 Kundetilfredshed er implementeret med brugerens valgte 1–5-skala, gennemsnit og
 svarprocent. Ingen ratings seedes. Historiske kundefiler mangler datoer og
