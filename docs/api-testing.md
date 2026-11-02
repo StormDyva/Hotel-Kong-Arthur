@@ -1,5 +1,13 @@
 # Test API'et gennem Swagger
 
+## Status for tillægsopgave uge 2
+
+Analyse-endpoints nedenfor findes allerede i v1-API'et. PostgreSQL-skiftet og
+frontendens analysevisninger er endnu ikke implementeret; de historiske
+MySQL-baserede testresultater må ikke bruges som PostgreSQL-bevis. Når T-029 til
+T-035 er udført, gentages API-, OpenAPI- og concurrency-testene mod PostgreSQL.
+Brug [analyse-API-vejledningen](analysis-api.md) til en samlet endpointoversigt.
+
 Start fra repository-roden:
 
 ```sh
@@ -82,8 +90,9 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 
 ## Reproducerbar verifikation
 
-Uden lokal Python: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 26 tests i et separat test-image mod den isolerede testdatabase.
+I den nuværende v1-kodebase: kør `docker compose --profile test run --build --rm api-tests`
+fra roden. Det historiske flow kører 26 tests i et separat test-image mod v1-
+testdatabasen. Det er ikke PostgreSQL-testbevis.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
 ```sh
@@ -94,11 +103,14 @@ node backend/tests/swagger-smoke.mjs
 ```
 
 Swagger-smoke kræver Node 22+ og Chrome på macOS; den åbner en isoleret headless
-browser, tæller operationerne og udfører et rigtigt Swagger GET mod MySQL.
-MySQL-tests bruger det syntetiske reference-seed; mutationer rulles tilbage.
+browser, tæller operationerne og udfører et rigtigt Swagger GET mod v1-databasen.
+De historiske tests bruger det syntetiske reference-seed; mutationer rulles tilbage.
 Samtidighedstesten opretter og rydder sine egne testdata.
 
 ## Færdige indtjeningsrækker til Tableau (T-022)
+
+Dette afsnit dokumenterer den nuværende v1-kontrakt. Fremtidig Tableau- og
+frontendforbrug skal fortsat ske via disse API-værdier, ikke via databaseadgang.
 
 Under Swagger-gruppen **Tableau revenue** findes:
 
