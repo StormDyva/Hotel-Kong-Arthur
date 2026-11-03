@@ -88,6 +88,8 @@ Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 
 ## Tableau
 
+[Endpoint URLs and exact JSONPath settings for the REST connector](docs/tableau-rest-endpoints.md).
+
 Se [API-handoff til Tableau](docs/tableau-api-handoff.md) for endpoints, felter og refresh.
 Tableau bruger REST API Connector direkte mod API-beregnede analyser. CSV-/Hyper-
 broen er historisk og skal ikke porteres. Connectoren bruger extracts; opdatér med

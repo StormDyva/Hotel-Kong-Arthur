@@ -1,5 +1,8 @@
 # Tableau — REST API Connector
 
+[Endpoint- og JSONPath-guide](../docs/tableau-rest-endpoints.md): kopierbare URLs,
+JSONPath, felter, pagination og forklaring af tre lande i et nyt 2026-seed.
+
 Brugeren har 2026-11-03 bekræftet REST API Connector som den aktive forbindelse.
 Tableau læser JSON fra API'et; backend beregner priser, summer og KPI'er.
 Ingen direkte databaseforbindelse, CSV-bro eller workbook-generator bruges.
