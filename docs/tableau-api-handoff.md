@@ -1,7 +1,3 @@
-> PostgreSQL migration: the legacy `tableau/refresh.py` bridge still uses MySQL
-> for staging exports and is not supported on this branch. Use the REST API
-> connector for API data. See [migration status](postgres-migration.md).
-
 # API-handoff til manuelt Tableau-dashboard
 
 ## Tillægsopgave uge 2 — status
@@ -62,20 +58,20 @@ distinct_bookers er gæsteprofiler/snapshots, ikke identificerede tilbagevendend
 
 ## Praktisk lokal indlæsning og refresh
 
-API'et leverer JSON over HTTP. Den eksisterende valgfrie eksportbro kan hente ét
-aktuelt API-snapshot og skrive CSV/Hyper til den manuelt byggede Tableau-fil:
+Tableau bruger REST API Connector direkte mod `http://localhost:8000` (brugerens
+valg 2026-11-03). Tilføj de nødvendige endpoints som tabeller. Flade root-arrays
+bruger JSONPath `$[*]`; arrays i `data` bruger `$.data[*]`. Nested arrays som
+barens products bruger `$.data.products[*]`. Kontrollér felter og datatyper i
+connector-preview. Decimalstrenge vælges som numeriske felter i Tableau.
 
-```sh
-uv venv backend/.venv
-uv pip install --python backend/.venv/bin/python -r tableau/requirements.txt
-backend/.venv/bin/python tableau/refresh.py --from 2026-01-01 --to 2027-01-01
-```
+Connectoren er extract-only. Efter bookingændringer: Data → Refresh All Extracts.
+Der loves ingen automatisk live-opdatering. Relatér kun fælles nøgler og kompatible
+perioder/detaljeringsniveauer. Dashboardets separate worksheets kan godt bruge
+separate datakilder uden joins.
 
-Brug de genererede datafiler under tableau/data i Tableau. Efter bookingændringer:
-kør eksporten igen og genindlæs filerne/åbn workbook på ny for at undgå cachede
-extracts. Det er manuel snapshot-refresh, ikke kontinuerligt push til Tableau Public.
-Gruppen kan også bygge sin egen API-import ud fra ovenstående endpoints og Swagger.
-De tidligere TWB/TWBX-prototyper er ikke et færdigverificeret dashboard.
+`tableau/refresh.py`, CSV-/Hyper-broen og workbook-generatoren er historiske v1-
+værktøjer. De indgår ikke i den aktive løsning og skal ikke PostgreSQL-porteres.
+REST-connectorens konkrete opsætning og end-to-end-dashboard afventer manuel test.
 
 ## Afstemning før den senere dashboardaflevering
 

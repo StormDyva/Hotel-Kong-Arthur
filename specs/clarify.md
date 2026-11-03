@@ -207,6 +207,10 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 
 ### C-016 — Tableau som leverance
 
+- **Forbindelse afklaret 2026-11-03:** Brugeren anvender kun REST API Connector.
+  CSV-/Hyper-bro og workbook-generator er ude af aktivt scope og skal ikke porteres.
+  Connectoren bruger extracts; end-to-end refresh er endnu ikke verificeret.
+
 - **Status: ÅBEN.** Gruppen skal afklare, om Tableau fortsat er en obligatorisk
   forbruger i tillægsopgaven, når analyser også skal vises i frontend.
 - **Fast krav:** Hvis Tableau bruges, læser det beregninger fra REST API'et og

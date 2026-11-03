@@ -148,3 +148,5 @@ bookingconcurrency, import-idempotens, database-resetspærrer, frontendens rigti
 API-flow, Swagger og Compose-health. Main indeholder aktuelt 29 MySQL-baserede
 API-tests; de er ikke PostgreSQL-testbevis. Historisk Converge fra 2026-10-28
 omskrives ikke.
+
+2026-11-03: Tableau-forbindelsen er REST API Connector. Portering af den historiske CSV/Hyper-bro er ikke del af PostgreSQL-migrationen.

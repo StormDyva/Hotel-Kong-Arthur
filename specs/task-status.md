@@ -2,6 +2,7 @@
 
 PostgreSQL 17-runtime, schema, anonymiserede fixtures, repositories og CSV-loader
 implementeret. 33 tests mod PostgreSQL består. Legacy XLSX/SQL-generatorer udestår.
+Tableau bruger kun REST API Connector; legacyeksport skal ikke porteres.
 Se [migrationsstatus](../docs/postgres-migration.md). Tidligere T-028-testresultater
 nedenfor vedrører MySQL og er historiske.
 

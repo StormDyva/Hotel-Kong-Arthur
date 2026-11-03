@@ -74,9 +74,11 @@ characters are preserved, not guessed or repaired.
   produce MySQL SQL. Their parsing helpers remain used by the working CSV loader.
   Do not run their generated SQL against PostgreSQL. The committed PostgreSQL
   fixtures already contain the anonymized XLSX-derived stays and drinks aggregates.
-- `tableau/refresh.py` still contains a direct MySQL CLI path for staging exports;
-  it is not supported on this branch. API-based REST connector consumers remain
-  compatible. Porting that bridge to API-only access is a separate task.
+- Tableau uses the REST API Connector (confirmed by the user 2026-11-03).
+  `tableau/refresh.py` and workbook generators are retired from the active workflow;
+  they remain historical MySQL tools. Porting them is not a migration requirement
+  or acceptance blocker. Tableau reads the existing API, not PostgreSQL directly.
+  End-to-end connector/dashboard refresh still needs manual verification.
 - Frontend analysis views and the pending C-013–C-016 decisions remain separate.
 - This is a local school prototype, not a verified production backup/restore setup.
 
@@ -95,4 +97,5 @@ CREATE permission. A booking transaction under that role succeeded and was
 rolled back, leaving the dataset unchanged. No confirmed room/date overlaps.
 Both wrong-host and wrong-database reset combinations were rejected.
 `git diff --check` passed. The branch is a first phase, not ready for full
-migration acceptance until remaining legacy tools are resolved.
+migration acceptance until the remaining XLSX/SQL import-generator work is resolved. The retired
+Tableau export bridge is excluded from that work.

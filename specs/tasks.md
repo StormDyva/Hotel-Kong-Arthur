@@ -366,7 +366,8 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-036 — Tableau kobles til API og afstemmes
 
-- **Status:** Ikke startet; C-016 afklarer om dashboard fortsat kræves.
+- **Status:** REST API Connector valgt af brugeren 2026-11-03; manuel dashboard-/refresh-verifikation udestår.
+- **Afgrænsning:** Ingen portering af legacy CSV/Hyper-eksport eller workbook-generator.
 - **Stories/accept:** US-007; API som eneste beregningskilde, filtre, refresh og
   afstemning på kendt datasæt.
 - **Afhængighed:** C-016, T-033 og T-030 for valgt KPI.

@@ -51,8 +51,8 @@ flowchart LR
     API --> Service[Business services]
     Service --> Repository[SQLAlchemy repositories]
     Repository --> DB[(PostgreSQL)]
-    Bridge[Tableau refresh bridge] -->|GET analytics JSON| API
-    Bridge --> Extract[Hyper extracts]
+    Connector[Tableau REST API Connector] -->|GET analytics JSON| API
+    Connector --> Extract[Tableau extracts]
     Extract --> Tableau[Tableau dashboard]
 ```
 
@@ -89,7 +89,9 @@ Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 ## Tableau
 
 Se [API-handoff til Tableau](docs/tableau-api-handoff.md) for endpoints, felter og refresh.
-Tableau er kun en forbruger af API-beregnede analyser. Om dashboardet fortsat er
+Tableau bruger REST API Connector direkte mod API-beregnede analyser. CSV-/Hyper-
+broen er historisk og skal ikke porteres. Connectoren bruger extracts; opdatér med
+Data → Refresh All Extracts. Om dashboardet fortsat er
 obligatorisk, afventer C-016. Eksisterende Tableau-artefakter er ikke genvalideret
 som del af denne specifikationsopgave.
 
