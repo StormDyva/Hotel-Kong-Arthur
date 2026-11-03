@@ -1,10 +1,12 @@
 # API-handoff til manuelt Tableau-dashboard
 
+Se [REST endpoint-/JSONPath-guiden](tableau-rest-endpoints.md) for konkrete forbindelser.
+
 ## Tillægsopgave uge 2 — status
 
-Den nye målarkitektur bruger PostgreSQL, og Tableau samt frontend skal alene
-forbruge backendens beregninger via REST/JSON. Databaseskift, frontendens
-analysevisninger og genvalidering af dashboardet er ikke implementeret endnu.
+PostgreSQL er runtime, og Tableau samt frontend skal alene forbruge backendens
+beregninger via REST/JSON. Databaseskiftet er implementeret; frontendens nye
+analysevisninger og genvalidering af dashboardet udestår.
 Om Tableau fortsat er et obligatorisk afleveringskrav afventer C-016. Dette
 handoff beskriver de eksisterende v1-paths som udgangspunkt; v1 er gemt i
 `v1-mysql-tableau`.

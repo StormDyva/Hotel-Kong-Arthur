@@ -383,6 +383,8 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-038 — Dokumentation for PostgreSQL og analyseforbrug
 
+- **Dokumentationstilføjelse 2026-11-03:** docs/tableau-rest-endpoints.md giver URLs, JSONPath, felter og dataset-/paginationbegrænsninger. API-responsers paths kontrolleres; Tableau-UI er fortsat manuel verifikation.
+
 - **Status:** Ikke startet; ændret i tillægsopgave uge 2.
 - **Stories/accept:** US-002, US-007, US-008 og projektleverance.
 - **Afhængighed:** T-031–T-036.
