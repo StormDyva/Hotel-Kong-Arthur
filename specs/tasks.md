@@ -321,7 +321,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-031 — PostgreSQL Compose og miljø
 
-- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Status:** Runtime implementeret og testet 2026-11-03; se docs/postgres-migration.md.
 - **Story/accept:** US-002; PostgreSQL, persistence, `pg_isready`, testservice og
   én `docker compose up --build`.
 - **Afhængighed:** T-029; C-012 afklaret. Lokal port kontrolleres før valg.
@@ -329,7 +329,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-032 — PostgreSQL schema, repositories, seed og import
 
-- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Status:** Schema, repositories, fixtures og CSV-loader implementeret; gamle XLSX/SQL-generatorer udestår.
 - **Stories/accept:** US-001 og US-002; PostgreSQL schema/seed/import, samme
   forretningsregler og idempotent genkørsel; importerede rækker bevares som
   `synthetic_import` og skrivebeskyttede.

@@ -76,3 +76,5 @@ main. Main dokumenterer 29 MySQL-baserede API-tests, herunder RevPAR og import-
 regressioner. Dette er ikke PostgreSQL-bevis. Converge-rapporterne fra
 2026-10-28 er historiske; ny vurdering efter uge 2 tilføjes i
 `specs/converge-tillaeg-uge2.md`.
+
+T-031/T-032 → US-001/US-002 → database/postgres, repositories/database.py, load_school_csv.py → 33 PostgreSQL-tests; øvrige importgeneratorer udestår. Se docs/postgres-migration.md.

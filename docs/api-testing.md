@@ -2,11 +2,9 @@
 
 ## Status for tillægsopgave uge 2
 
-Analyse-endpoints nedenfor findes allerede i v1-API'et. PostgreSQL-skiftet og
-frontendens analysevisninger er endnu ikke implementeret; de historiske
-MySQL-baserede testresultater må ikke bruges som PostgreSQL-bevis. Når T-029 til
-T-035 er udført, gentages API-, OpenAPI- og concurrency-testene mod PostgreSQL.
-Brug [analyse-API-vejledningen](analysis-api.md) til en samlet endpointoversigt.
+PostgreSQL-runtime er implementeret på migrationsbranchen. 33 API-/database-
+og kontrakttests består mod PostgreSQL 17; frontendens nye analysevisninger mangler.
+Se [migrationsstatus](postgres-migration.md) og [analyse-API](analysis-api.md).
 
 Start fra repository-roden:
 
@@ -97,19 +95,20 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 ## Reproducerbar verifikation
 
 I den nuværende kodebase: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 29 tests i et separat test-image mod v1's isolerede
-MySQL-testdatabase. Det er ikke PostgreSQL-testbevis.
+fra roden. Det kører 33 tests i et separat test-image mod en isoleret
+PostgreSQL-testdatabase.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
 ```sh
 uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
-PYTHONPATH=backend MYSQL_PORT=3307 backend/.venv/bin/pytest -q backend/tests
 node backend/tests/swagger-smoke.mjs
 ```
 
+Python-tests køres via Compose ovenfor; peg ikke tests på den importerede arbejdsdatabase.
+
 Swagger-smoke kræver Node 22+ og Chrome på macOS; den åbner en isoleret headless
-browser, tæller operationerne og udfører et rigtigt Swagger GET mod v1-databasen.
+browser, tæller operationerne og udfører et rigtigt Swagger GET mod PostgreSQL-databasen.
 Testene bruger syntetisk reference- og CSV-demodata; mutationer rulles tilbage.
 Samtidighedstesten opretter og rydder sine egne testdata.
 

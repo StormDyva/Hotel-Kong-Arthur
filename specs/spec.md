@@ -235,3 +235,11 @@ med matchende kilde-sæson og uden overlap. Kategori, land, nætter og total fra
 bevares. En særskilt mock-batch tilføjer 100 tydeligt markerede bookinger.
 Loaderen er transaktionel og idempotent; rå CSV og navne committes ikke. Se
 `docs/customer-data-import.md`.
+
+## PostgreSQL-implementeringsstatus — 2026-11-03
+
+T-031/T-032 bruger PostgreSQL 17, psycopg 3, separat postgres_data-volume,
+IDENTITY/CHECK og PostgreSQL-triggers. CSV genindlæses fra kildefilen, ikke fra
+MySQL. API-kontrakten er uændret og kontrolleres mod OpenAPI. Se
+[implementeringsbevis](../docs/postgres-migration.md). Legacygeneratorer er endnu
+ikke PostgreSQL-porteret; øvrige uge 2-opgaver er ikke afsluttet af denne migration.

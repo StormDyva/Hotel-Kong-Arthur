@@ -22,7 +22,7 @@ from import_customer_data import read_csv, validate_guest_row, file_sha256
 def batch(db, name, digest, count):
     db.execute(text("""INSERT INTO import_batches(source_system,file_name,file_sha256,row_count,accepted_count,rejected_count,status)
         VALUES('school-project',:name,:digest,:count,:count,0,'completed')
-        ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)"""),dict(name=name,digest=digest,count=count))
+        ON CONFLICT(source_system,file_name,file_sha256) DO NOTHING"""),dict(name=name,digest=digest,count=count))
     return db.execute(text("SELECT id FROM import_batches WHERE source_system='school-project' AND file_name=:name AND file_sha256=:digest"),dict(name=name,digest=digest)).scalar_one()
 
 
@@ -60,9 +60,9 @@ def load(path):
                 raise ValueError(f'Source line {i} has a shared guest; refusing to overwrite another booking')
             repo.execute('UPDATE guests SET first_name=:first,last_name=:last,country_name=:country WHERE id=:id',
                 first=row['First Name'],last=row['Family Name'],country=row['Country'],id=source_booking['guest_id'])
-            repo.execute("""UPDATE customer_stay_records c JOIN bookings b
-                ON b.import_batch_id=c.import_batch_id AND b.source_record_id=c.source_record_id
-                SET c.first_name=:first,c.family_name=:last WHERE b.id=:id""",
+            repo.execute("""UPDATE customer_stay_records c SET first_name=:first,family_name=:last
+                FROM bookings b WHERE b.import_batch_id=c.import_batch_id
+                AND b.source_record_id=c.source_record_id AND b.id=:id""",
                 first=row['First Name'],last=row['Family Name'],id=booking_id)
             already_recorded=repo.one('SELECT booking_id FROM csv_source_rows WHERE import_batch_id=:batch AND source_row_number=:row',batch=bid,row=i)
             if not already_recorded or source_booking['check_in'].year != 2026 or source_booking['check_out']>date(2027,1,1):
@@ -87,7 +87,7 @@ def load(path):
                     amount=Decimal(base+(1 if n<remainder else 0))/100
                     repo.add_price_line(booking_id,dict(night_date=start+timedelta(days=n),season_id=season_ids[value['season']],price_per_night=amount,line_total=amount))
             repo.execute("""INSERT INTO csv_source_rows(import_batch_id,source_row_number,raw_record,booking_id)
-                VALUES(:batch,:row,:raw,:booking) ON DUPLICATE KEY UPDATE source_row_number=VALUES(source_row_number)""",
+                VALUES(:batch,:row,CAST(:raw AS JSON),:booking) ON CONFLICT(import_batch_id,source_row_number) DO NOTHING""",
                 batch=bid,row=i,raw=json.dumps(row,ensure_ascii=False),booking=matches[0]['id'])
         mock_batch=batch(db,'extra_mock_bookings_v1',hashlib.sha256(b'extra_mock_bookings_v1:100:2026').hexdigest(),100)
         rooms=[r for r in repo.rooms() if r['active'] and r['type_active'] and r['status']=='available']
@@ -118,7 +118,7 @@ def load(path):
         assert [json.loads(r['raw_record']) if isinstance(r['raw_record'],str) else r['raw_record'] for r in saved]==rows
         # Verify that synthetic nightly snapshots still sum exactly to source prices.
         mismatches=repo.one("""SELECT COUNT(*) n FROM csv_source_rows x JOIN bookings b ON b.id=x.booking_id
-            WHERE x.import_batch_id=:id AND (b.price_total<>CAST(JSON_UNQUOTE(JSON_EXTRACT(x.raw_record,'$.Price')) AS DECIMAL(12,2))
+            WHERE x.import_batch_id=:id AND (b.price_total<>CAST((x.raw_record->>'Price') AS DECIMAL(12,2))
               OR b.price_total<>(SELECT SUM(l.line_total) FROM booking_price_lines l WHERE l.booking_id=b.id))""",id=bid)['n']
         assert mismatches==0
         mock_count=repo.one('SELECT COUNT(*) n FROM bookings WHERE import_batch_id=:id',id=mock_batch)['n']

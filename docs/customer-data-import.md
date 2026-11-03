@@ -1,3 +1,8 @@
+> PostgreSQL-status (2026-11-03): brug den aktive CSV-loader i T-028-afsnittet
+> nederst og schema/seed under `database/postgres/`. De ældre SQL-generatorer
+> og MySQL-kommandoer nedenfor er v1-historik og er ikke portet endnu.
+> Se [postgres-migration.md](postgres-migration.md).
+
 # Kundeimport fra ITAKEA/hoteldata
 
 ## Kilde
@@ -114,10 +119,10 @@ causes the loader to abort rather than overwrite another booking.
 The CSV already has 54 Unicode replacement characters; they are preserved, not guessed.
 
 After normal Compose startup, run from the repository root (Python dependencies:
-backend/requirements-dev.txt; MYSQL_PORT is your host database port):
+backend/requirements-dev.txt; POSTGRES_PORT is your host database port):
 
 ```sh
-MYSQL_PORT=3307 backend/.venv/bin/python database/import/load_school_csv.py \
+POSTGRES_PORT=5433 backend/.venv/bin/python database/import/load_school_csv.py \
   --csv ../hoteldata-master/international_names_with_rooms_1000.csv
 ```
 

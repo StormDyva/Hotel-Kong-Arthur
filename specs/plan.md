@@ -1,6 +1,8 @@
 # Teknisk plan — tillægsopgave uge 2
 
-Status: planudkast. PostgreSQL og analysevisninger i frontend er ikke implementeret.
+Status 2026-11-03: PostgreSQL-runtime implementeret på migrationsbranchen; analysefrontend udestår.
+T-031/T-032-testbevis og konkrete valg: docs/postgres-migration.md.
+Nedenstående planpunkter bevares som planens baggrund.
 Nyere RevPAR- og CSV-demodatafunktioner fra main er med i denne branch, fortsat
 mod MySQL. Databasevalget PostgreSQL er afklaret i C-012.
 Specifikationen og åbne beslutninger findes i `spec.md` og `clarify.md`.

@@ -1,3 +1,7 @@
+> PostgreSQL migration: the legacy `tableau/refresh.py` bridge still uses MySQL
+> for staging exports and is not supported on this branch. Use the REST API
+> connector for API data. See [migration status](postgres-migration.md).
+
 # API-handoff til manuelt Tableau-dashboard
 
 ## Tillægsopgave uge 2 — status

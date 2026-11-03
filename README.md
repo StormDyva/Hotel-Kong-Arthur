@@ -1,7 +1,7 @@
 # Hotel Kong Arthur
 
 Booking prototype and hotel/bar analytics for the E26 interdisciplinary assignment.
-Python/FastAPI, SQLAlchemy, PostgreSQL (måldatabase), HTML/CSS/JavaScript og
+Python/FastAPI, SQLAlchemy, PostgreSQL 17, HTML/CSS/JavaScript og
 Tableau Public (krav om fortsat dashboard afventer afklaring).
 
 ## Præsentation: v1 (MySQL + Tableau)
@@ -14,10 +14,10 @@ git checkout v1-mysql-tableau
 docker compose up --build -d
 ```
 
-PostgreSQL-skiftet er planlagt, men ikke implementeret. Koden på denne branch
-indeholder nyere API-/CSV-funktioner fra main, men runtime-databasen og Compose
-bruger fortsat MySQL. Brug v1-tagget ovenfor til den oprindelige præsentation,
-indtil PostgreSQL-taskene er gennemført.
+Denne branch kører PostgreSQL 17 via psycopg 3. Compose bruger en ny
+`postgres_data` volume; den tidligere MySQL-volume bevares, men læses ikke.
+Schema og anonymiserede skolefixtures genindlæses fra filer, ikke fra MySQL.
+Se [migrationsstatus og verifikation](docs/postgres-migration.md).
 
 ## Run
 
@@ -32,11 +32,10 @@ docker compose up --build -d
 - OpenAPI JSON: http://localhost:8000/openapi.json
 - Database health: http://localhost:8000/health
 - Analytics: http://localhost:8000/api/analytics/dashboard
-- PostgreSQL-mål: localhost:5433 (foreslået; skal kontrolleres for portkonflikt).
-  Internt mål: postgres:5432.
+- PostgreSQL: localhost:5433. Internt: db:5432.
 
 Example development credentials are in `.env.example`. Copy to `.env` to override.
-Ports 5500, 8000 and the proposed PostgreSQL host port 5433 are configurable.
+Ports 5500, 8000 and PostgreSQL host port 5433 are configurable.
 Services bind to localhost.
 `docker compose down` stops services while retaining database data in a named volume.
 Migrations and seeds run once per database volume; the anonymized customer and
@@ -60,7 +59,7 @@ flowchart LR
 The API presentation layer is `backend/app/api`, business rules and calculations
 are in `backend/app/services`, and SQL is in `backend/app/repositories`.
 `frontend` is served by nginx and proxies `/api`, `/analytics`, health, Swagger and its static assets to the API service.
-Planned `db-init` waits for PostgreSQL health; the API waits for successful initialization;
+`db-init` waits for PostgreSQL health; the API waits for successful initialization;
 nginx waits for the API health check and has its own healthcheck. Swagger runs inside the API container.
 
 ## Follow a booking request
@@ -116,20 +115,18 @@ FastAPI's served schema. Existing resources use `/api`. The flat Tableau revenue
 
 ## Verification
 
-Efter PostgreSQL-implementeringen skal API-/kontrakttests køre på separat
+API-/kontrakttests kører på separat
 PostgreSQL-testdatabase (ingen lokal Python kræves):
 
 ```sh
 docker compose --profile test run --build --rm api-tests
 ```
 
-Den aktuelle v1-testprofil starter test-db → test-runner (migrations/seed) →
-api-tests (29 tests) mod en isoleret MySQL-testdatabase. Den berører ikke appens
-database-volume. Dette er ikke PostgreSQL-testbevis. Runtime-imaget indeholder ikke pytest eller
-testværktøjer; Dockerfile har et separat test-target. API-testene omfatter også
-OpenAPI-validering og regressionstest af Tableau-gæsteeksportens rækker.
+Testprofilen starter test-db → test-runner (schema/seed/checks) → api-tests.
+33 tests består mod isoleret PostgreSQL, inklusive OpenAPI-lighed og samtidige
+bookinger. Appens database-volume berøres ikke. Runtime-imaget indeholder ikke pytest.
 
-Når PostgreSQL-implementeringen er udført, kør tests på værtsmaskinen med en
+Alternativt kan tests køres på værtsmaskinen med en
 initialiseret PostgreSQL-testdatabase:
 
 ```sh
@@ -144,8 +141,8 @@ docker compose --profile test run --rm test-runner
 git diff --check
 ```
 
-Efter databaseimplementeringen skal API-tests bruge den initialiserede lokale
-PostgreSQL-instans. De fleste tests ruller deres transaktioner tilbage.
+Lokale API-tests kræver en separat, initialiseret PostgreSQL-testdatabase; brug
+Compose-testprofilen ovenfor som standard, ikke den importerede arbejdsdatabase. De fleste tests ruller deres transaktioner tilbage.
 Concurrency-testen committer og fjerner kun sine egne testdata. Browserens
 smoke-kommando bruger mock mode; PostgreSQL-adfærd verificeres separat.
 Importverifikation kræver de eksterne kundefiler; se

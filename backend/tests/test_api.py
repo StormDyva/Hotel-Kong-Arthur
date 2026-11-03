@@ -1,4 +1,4 @@
-"""Integration checks against a real MySQL database; transaction rolled back per test."""
+"""Integration checks against a real PostgreSQL database; transaction rolled back per test."""
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from decimal import Decimal
