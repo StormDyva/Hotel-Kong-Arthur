@@ -1,5 +1,13 @@
 # Test API'et gennem Swagger
 
+## Status for tillægsopgave uge 2
+
+Analyse-endpoints nedenfor findes allerede i v1-API'et. PostgreSQL-skiftet og
+frontendens analysevisninger er endnu ikke implementeret; de historiske
+MySQL-baserede testresultater må ikke bruges som PostgreSQL-bevis. Når T-029 til
+T-035 er udført, gentages API-, OpenAPI- og concurrency-testene mod PostgreSQL.
+Brug [analyse-API-vejledningen](analysis-api.md) til en samlet endpointoversigt.
+
 Start fra repository-roden:
 
 ```sh
@@ -35,6 +43,9 @@ og i repositoryets openapi/openapi.yaml.
 
 Svaret skal være 201 og indeholde ID og serverberegnet pris. Gentag samme POST
 for at se 409 ved overlap. GET /api/bookings/{id} viser den gemte booking.
+GET /api/bookings indeholder også anonymiserede kildeophold med
+`data_origin: synthetic_import`; deres datoer, værelser og gæsteantal er
+syntetiske, og rækkerne kan ikke redigeres eller annulleres.
 GET /api/bookings returnerer også importerede ophold markeret med
 `data_origin: synthetic_import`. De har opfundne datoer/værelser og kan ikke
 redigeres eller annulleres; deres gæstenavne er anonymiserede.
@@ -85,8 +96,9 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 
 ## Reproducerbar verifikation
 
-Uden lokal Python: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 29 tests i et separat test-image mod den isolerede testdatabase.
+I den nuværende kodebase: kør `docker compose --profile test run --build --rm api-tests`
+fra roden. Det kører 29 tests i et separat test-image mod v1's isolerede
+MySQL-testdatabase. Det er ikke PostgreSQL-testbevis.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
 ```sh
@@ -97,11 +109,14 @@ node backend/tests/swagger-smoke.mjs
 ```
 
 Swagger-smoke kræver Node 22+ og Chrome på macOS; den åbner en isoleret headless
-browser, tæller operationerne og udfører et rigtigt Swagger GET mod MySQL.
-MySQL-tests bruger det syntetiske reference-seed; mutationer rulles tilbage.
+browser, tæller operationerne og udfører et rigtigt Swagger GET mod v1-databasen.
+Testene bruger syntetisk reference- og CSV-demodata; mutationer rulles tilbage.
 Samtidighedstesten opretter og rydder sine egne testdata.
 
 ## Færdige indtjeningsrækker til Tableau (T-022)
+
+Dette afsnit dokumenterer den nuværende v1-kontrakt. Fremtidig Tableau- og
+frontendforbrug skal fortsat ske via disse API-værdier, ikke via databaseadgang.
 
 Under Swagger-gruppen **Tableau revenue** findes:
 
@@ -113,6 +128,11 @@ Under Swagger-gruppen **Tableau revenue** findes:
 Begge understøtter også from/to i stedet for year. Backenden beregner og summerer
 natpris × antal nætter i logiklaget ud fra historiske prislinjer. Tableau bruger
 revenue direkte som et numerisk mål; valutaen er DKK.
+
+RevPAR beregnes i backend via `/api/analytics/revpar` som værelsesomsætning /
+disponible værelsesnætter. Svaret indeholder periode- og månedsrækker.
+RevPAR er implementeret, men gruppen har ikke afklaret, om det er det selvvalgte
+nøgletal i tillægsopgaven (C-013).
 
 RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
 månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.

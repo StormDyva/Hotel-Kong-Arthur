@@ -2,7 +2,8 @@
 
 ## Status
 
-Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumentationsbeslutning; implementation-tasks kan starte i rækkefølge.
+Historiske tasks fra 2026-10-26/28 bevares som udført eller tidligere planlagt
+arbejde. Tillægsopgave uge 2 er et nyt, endnu ikke implementeret taskforløb.
 
 ## Dokumentation og beslutninger
 
@@ -28,7 +29,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 
 ## Database, import og drift
 
-### T-003 – MySQL-schema og datadictionary
+### T-003 – MySQL-schema og datadictionary (ændret i tillægsopgave uge 2)
 
 - Stories: US-001–US-010.
 - Afhængighed: T-002.
@@ -36,7 +37,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: relationer, kardinaliteter, obligatoriske/valgfrie felter, status, DKK, UTC/Europe-Copenhagen, 214 værelser, 8 typer, capacity constraint og indeks er implementerbare.
 - Test: migration på ren MySQL, constraint-tests og schema-review.
 
-### T-004 – Seed og CSV/XSLT-import
+### T-004 – Seed og CSV/XSLT-import (ændret i tillægsopgave uge 2)
 
 - Stories: US-005, US-010.
 - Afhængighed: T-003.
@@ -44,7 +45,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: eksempeldata mappes til MySQL, import er reproducerbar, genkørsel/dubletter er dokumenteret, live-flow er adskilt.
 - Test: seed/import smoke test og kontrol af antal/relationsfejl.
 
-### T-005 – Import af kundedata fra ITAKEA/hoteldata
+### T-005 – Import af kundedata fra ITAKEA/hoteldata (ændret i tillægsopgave uge 2)
 
 - Stories: US-005, US-008, US-010.
 - Afhængighed: T-003 og T-004.
@@ -52,7 +53,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: kundens filer profileres, mapping dokumenteres, importen er reproducerbar og idempotent, ufuldstændige rækker afvises, og bookingmodellen ændres ikke utilsigtet.
 - Test: ren MySQL, import to gange, relationstjek, afvisningsrapport og eksisterende booking-/prislinjetjek.
 
-### T-005-Docker – Docker Compose og miljø
+### T-005-Docker – Docker Compose og miljø (ændret i tillægsopgave uge 2)
 
 - Stories: US-005, US-012.
 - Afhængighed: T-003.
@@ -86,7 +87,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: POST 201, GET/404, fuld idempotent PUT, idempotent soft-cancel DELETE, kapacitet og overlap virker.
 - Test: pytest booking, concurrency/transaction-test og API-fejltest.
 
-### T-009 – Live API-flow
+### T-009 – Live API-flow (ændret i tillægsopgave uge 2)
 
 - Stories: US-005.
 - Afhængighed: T-008.
@@ -154,7 +155,7 @@ Approved as working agreement – 2026-10-26. T-002 er gennemført som dokumenta
 - Accept: README har arkitekturdiagram, setup, API/Swagger, seed, tests og demo; PDF-kravets filnavn er afklaret.
 - Test: ny udvikler følger README fra ren checkout.
 
-### T-017 – Samlet test og CI
+### T-017 – Samlet test og CI (ændret i tillægsopgave uge 2)
 
 - Stories: alle.
 - Afhængighed: T-006–T-016.
@@ -188,7 +189,7 @@ T-015 generates API-backed Hyper extracts and a native workbook; T-016 supplies
 startup and SWA explanations. These are implementation results, not assertions of
 team approval or full task completion. See `converge-2026-10-28.md` for evidence/gaps.
 
-## T-020 — API op til opgavekrav (2026-10-28)
+## T-020 — API op til opgavekrav (2026-10-28; ændret i tillægsopgave uge 2)
 
 Brugeren har prioriteret API og Swagger; Tableau bygges manuelt senere.
 Stories: US-001–US-008, US-011–US-012. Afhængigheder: eksisterende API/MySQL.
@@ -213,7 +214,7 @@ Testbevis og formler: converge-api-2026-10-28.md. T-019 dækkes af eksplicit syn
 referenceinventar. T-021 kundetilfredshed er aktiveret efter brugerens beslutning.
 Tableau-delene af tidligere T-020 er udskudt til brugerens manuelle arbejde.
 
-## T-022 — Flade indtjeningsrækker til Tableau
+## T-022 — Flade indtjeningsrækker til Tableau (ændret i tillægsopgave uge 2)
 
 Brugerkrav: GET /analytics/revenue/by-room-type-season og
 GET /analytics/revenue/by-country returnerer arrays med færdigberegnet indtjening.
@@ -223,7 +224,7 @@ Beløb returneres som JSON-tal i DKK. Filtre: year eller from/to, samme periodev
 som øvrige analyser. Annullerede bookinger udelades, checkout er eksklusiv.
 Test: 24 kombinationer, nulperiode, sæson-/periodegrænse, landegruppering og kontrakt.
 
-## T-023 — Gæstesnapshots, bedømmelsesintegritet og eksport
+## T-023 — Gæstesnapshots, bedømmelsesintegritet og eksport (ændret i tillægsopgave uge 2)
 
 Ret de reproducerede reviewfund. API-oprettelse får selvstændig gæsterække pr.
 booking; kontaktændringer bruger copy-on-write, uændret PUT genbruger samme række.
@@ -234,7 +235,7 @@ Accept: regressionstests mod MySQL, idempotent import og eksportdata med fire g�
 Tableau-dashboardets samlede opdateringsdemo er fortsat ikke godkendt.
 
 
-## T-024 — Compose og dokumentationsafstemning før PR-accept
+## T-024 — Compose og dokumentationsafstemning før PR-accept (ændret i tillægsopgave uge 2)
 
 Accept: ren Compose-opstart og containeriserede API-/kontrakttests i separat
 projekt; proxy, custom porte/CORS, persistens og OpenAPI kontrolleret. README,
@@ -242,14 +243,14 @@ startguide, projektguide, datadictionary, frontend, Tableau, import, SWA og spec
 skal beskrive nuværende adfærd; gamle rapporter markeres historiske. Samlet
 Tableau-accept må ikke hævdes. Testbevis: docs/release-checklist.md.
 
-## T-025 — enkel bookingprototype mod rigtig API
+## T-025 — enkel bookingprototype mod rigtig API (ændret i tillægsopgave uge 2)
 
 US-001/002/005. Bevar enkelt søg → værelse → gæst → bekræft-flow. Vis ét ledigt
 forslag pr. type som standard med mulighed for typefilter/alle rum. Brug API-priser,
 send ikke klientberegnet pris, vis feltfejl og genvej til oversigten. Accept: browser
 opretter en booking mod MySQL, genfinder den efter reload, og testbookingen annulleres.
 
-## T-026 — API-PR klar til manuel Tableau-integration
+## T-026 — API-PR klar til manuel Tableau-integration (ændret i tillægsopgave uge 2)
 
 Acceptomfang: API, bookingprototype og dokumenteret Tableau-datakontrakt/refresh.
 
@@ -265,18 +266,141 @@ tests, numeriske 24-rækkers exports og KPI-endpoints genkontrolleres, PR-beskri
 samles om den færdige implementering og PR markeres ready for review, uden merge.
 Se docs/tableau-api-handoff.md.
 
-## T-028 — exact CSV data plus extra school-project mock bookings
+## Tillægsopgave uge 2 — nye tasks
 
-User authorizes all 1,000 CSV stays to appear as demo bookings with synthetic
-room assignments/dates. Reuse main's existing anonymized source bookings, preserve
-every exact CSV row in local database, verify all seven source fields and link each
-row to its existing booking. Add 100 clearly marked extra mock bookings for 2026.
-Raw names/files are not committed. Import must be idempotent and preserve existing
-bookings. Encoding defects already present in the CSV remain visible in raw JSON.
+Main indeholder allerede T-027 for importerede ophold og T-028 for CSV-demodata.
+To indgående branches brugte også T-027 til henholdsvis importerede ophold og
+RevPAR; de historiske betegnelser bevares med emneangivelse for at undgå at
+overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
-## T-027 — RevPAR i backend og Tableau-datagrundlag
+### T-027 (importerede ophold) — Eksponér syntetiske API-bookinger (ændret i tillægsopgave uge 2)
 
-US-007: beregn værelsesomsætning / tilgængelige værelsesnætter i service-laget.
-Tilføj revpar i summary og et selvstændigt GET /api/analytics/revpar med samlet tal
-og månedsrækker til Tableau-kurven. Samme periode/type/land/sæson-regler; nulnævner
-returnerer 0 med warning. OpenAPI, Swagger og handoff opdateres; tests mod MySQL.
+- **Status:** Gennemført i main; historisk task.
+- **Stories:** tillægsopgave, nu sporet i US-002.
+- **Accept:** de 1.000 ophold kan hentes via `/api/bookings`, har deterministiske
+  datoer/værelser og én gæst pr. ophold, bevarer kildefelter, angiver
+  `data_origin`, anonymiserer og er skrivebeskyttede.
+- **Verifikation:** API-/Compose-runtimekontrol dokumenteret i main.
+
+### T-027 (RevPAR) — Beregn RevPAR i backend (ændret i tillægsopgave uge 2)
+
+- **Status:** Gennemført i main; historisk task.
+- **Stories:** US-004/US-007 som analysefunktion; RevPAR er fortsat kun kandidat
+  til det selvvalgte nøgletal i US-004.
+- **Accept:** `GET /api/analytics/revpar` leverer RevPAR og månedsrækker med
+  periode/type/land/sæsonregler, nulnævner og API/OpenAPI-dokumentation.
+- **Verifikation:** `test_revpar.py` og MySQL-testbevis i main.
+
+### T-028 — CSV-kildedata og ekstra skoleprojekt-bookinger (ændret i tillægsopgave uge 2)
+
+- **Status:** Gennemført i main; historisk task.
+- **Stories:** US-002.
+- **Accept:** bevar 1.000 rækker og deres syv kildefelter i lokal JSON, forbind til
+  kildebookinger, tilføj 100 særskilte mock-bookinger; genkørsel er idempotent,
+  rå CSV/navne committes ikke.
+- **Verifikation:** importerens runtimekontrol og gentagen indlæsning i main.
+
+### T-029 — Sikr og bevar v1 i Git
+
+- **Status:** Gennemført.
+- **Stories:** ingen; Git-sikring er projektleverance under constitution.
+- **Accept:** annoteret `v1-mysql-tableau` tag og branch på commit `366534b` er
+  pushet; `feature/tillaeg-uge2` er oprettet; README beskriver checkout og start.
+- **Verifikation:** Git remote/tag/branch-status kontrolleret.
+
+### T-030 — Vælg og definér selvvalgt nøgletal
+
+- **Status:** Blokerende, afventer gruppens valg (C-013).
+- **Stories/accept:** US-004, US-007 og US-008.
+- **Afhængighed:** gruppens beslutning dokumenteret i Clarify.
+- **Omfang:** vælg blandt RevPAR, gennemsnitlig opholdslængde, annulleringsrate
+  eller andet godkendt tal; fastlæg formel, kohorte, filtre og tom-/nul-data.
+- **Verifikation:** beslutningsreview og sporbarhed. Blokerer kun valgte KPI's
+  eventuelle API-, frontend- og Tableau-arbejde; eksisterende RevPAR endpoint
+  forbliver som det er, indtil gruppen vælger.
+
+### T-031 — PostgreSQL Compose og miljø
+
+- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Story/accept:** US-002; PostgreSQL, persistence, `pg_isready`, testservice og
+  én `docker compose up --build`.
+- **Afhængighed:** T-029; C-012 afklaret. Lokal port kontrolleres før valg.
+- **Verifikation:** Compose config, start/healthcheck og volume-persistens.
+
+### T-032 — PostgreSQL schema, repositories, seed og import
+
+- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Stories/accept:** US-001 og US-002; PostgreSQL schema/seed/import, samme
+  forretningsregler og idempotent genkørsel; importerede rækker bevares som
+  `synthetic_import` og skrivebeskyttede.
+- **Afhængighed:** T-031. Genindlæs fra CSV/XLSX; ingen MySQL-datamigrering.
+- **Omfang:** psycopg 3 / `DATABASE_URL`, SQL-dialekt, constraints,
+  casesensitiv filtrering, låsning og PostgreSQL-sikkert testreset.
+- **Verifikation:** migration, import, persistence, reset-sikkerhed,
+  bookingconcurrency og regressions/API-tests.
+
+### T-033 — Analysekontrakt og endpoint-dækning
+
+- **Status:** Analyseinventar udført; kontraktafklaring afventer C-014.
+- **Stories/accept:** US-003–US-006.
+- **Afhængighed:** review af eksisterende paths i `plan.md`, derefter Clarify.
+- **Accept:** afgør om eksisterende analyser dækker kravene og eventuelle præcise
+  path-, parameter-, respons-, fejl- og warning-ændringer.
+- **Verifikation:** endpoint-/acceptkriteriemapping og kontraktreview.
+
+### T-034 — OpenAPI og Swagger for godkendte analysekontrakter
+
+- **Status:** Ikke startet.
+- **Stories/accept:** US-003–US-006; dokumenter godkendte analyseparametre og
+  responser uden utilsigtet kontraktændring.
+- **Afhængighed:** T-033 og T-030 for KPI-specifik kontrakt.
+- **Verifikation:** OpenAPI-validering, runtime-schema-lighed og Swagger-review.
+
+### T-035 — Analysevisninger i frontend
+
+- **Status:** Ikke startet; ny frontendfunktion.
+- **Stories/accept:** US-008; vis US-003–US-006-analyser fra API med filtre,
+  loading/tom-/fejltilstand og bookingopdatering.
+- **Afhængighed:** T-033; T-030 for valgt KPI; C-015 for opdateringsmåde.
+- **Verifikation:** browser-/frontendtests mod REST API og manuel UI-review.
+
+### T-036 — Tableau kobles til API og afstemmes
+
+- **Status:** Ikke startet; C-016 afklarer om dashboard fortsat kræves.
+- **Stories/accept:** US-007; API som eneste beregningskilde, filtre, refresh og
+  afstemning på kendt datasæt.
+- **Afhængighed:** C-016, T-033 og T-030 for valgt KPI.
+- **Verifikation:** Tableau-demo/refresh og manuel afstemning mod API-tal.
+
+### T-037 — Regression- og PostgreSQL-testdækning
+
+- **Status:** Ikke startet.
+- **Stories/accept:** US-001–US-006; de nuværende 29 API-tests (inklusive de
+  oprindelige 26) og bookingconcurrency skal bestå mod PostgreSQL.
+- **Afhængighed:** T-031–T-035.
+- **Verifikation:** API-/kontrakt-/frontendtests og testreset-spærre.
+
+### T-038 — Dokumentation for PostgreSQL og analyseforbrug
+
+- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Stories/accept:** US-002, US-007, US-008 og projektleverance.
+- **Afhængighed:** T-031–T-036.
+- **Omfang:** README, guides, bidragsvejledninger, datagrundlag, API-testing,
+  Tableau-handoff og analyse-API-vejledning.
+- **Verifikation:** dokumentationsreview og clean-checkout walkthrough.
+
+### T-039 — Converge efter tillægsopgave uge 2
+
+- **Status:** Ikke startet; kommende leverance, ikke en brugerstory.
+- **Afhængighed:** T-037 samt relevante dele af T-036/T-038.
+- **Accept:** vurder alle aktuelle sporbarhedsrækker med testbevis, ejere og gaps.
+  Historisk Converge fra 2026-10-28 må ikke omskrives.
+- **Verifikation:** ny Converge-fil og matrixreview.
+
+## Kvalitetstjek — tillægsopgave uge 2
+
+- Dækning: målrettet mod de otte nye stories; status er planlagt, ikke verificeret.
+- Afhængigheder: C-013 blokerer selvvalgt KPI; C-014–C-016 afklarer kontrakt,
+  frontendopdatering og Tableau-omfang.
+- Testbarhed: PostgreSQL-, API-, concurrency-, frontend- og manuel Tableau-
+  verifikation er planlagt, men ikke udført i specifikationsopgaven.

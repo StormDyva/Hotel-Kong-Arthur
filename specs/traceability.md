@@ -1,101 +1,78 @@
-# Traceability matrix
+# Sporbarhed — tillægsopgave uge 2
 
 ## Status
 
-Approved as working agreement – 2026-10-26. Status viser specifikationsdækning, ikke implementeringsstatus. Implementeringsstatus fastlægges først i T-018 Converge.
+Denne matrix skelner mellem nuværende MySQL-baseret kode fra main og manglende
+PostgreSQL-/frontendarbejde. De seneste ændringer er flettet fra main, men tests
+er ikke genkørt som del af konfliktløsningen. PostgreSQL-bevis findes ikke endnu.
+Converge-rapporten fra 2026-10-28 er historisk og må ikke omskrives.
 
-| PDF-krav | Spec | User story | Task | Test/verifikation | Status |
+Main indeholder task-id-kollisioner: T-027 blev brugt både til importerede ophold
+og RevPAR. De omtales nedenfor med opgavenavn. T-028 er CSV-demodata.
+
+## Story-acceptkriterier
+
+| Krav / acceptkriterie | Spec | Story | Task | Test/verifikationstype | Status |
 |---|---|---|---|---|---|
-| 3-lagsarkitektur | constitution, plan | US-012 | T-006 | lag-review, pytest | Dækket |
-| REST/JSON API | specify, plan | US-001–US-005 | T-007–T-009 | OpenAPI/API-tests | Dækket |
-| OpenAPI-kontrakt og Swagger UI | constitution, specify | US-012 | T-007 | validator, Swagger smoke | Dækket |
-| MySQL | constitution, specify, plan | US-005 | T-003–T-006 | migration/integration | Dækket |
-| Docker Compose | constitution, plan | US-012 | T-005-Docker | compose config/smoke | Dækket |
-| Live/opdaterbare data | specify, clarify | US-005 | T-009 | POST/PUT/DELETE → GET | Dækket |
-| CSV/XSLT seed/import | specify, clarify | US-010 | T-004 | import smoke/re-run | Dækket |
-| ITAKEA kundedata-import | specify, clarify | US-005, US-008, US-010 | T-005 | mapping/import/idempotency tests | Dækket |
-| Importerede ophold i booking-API | spec | US-005 | T-027 | Compose seed + API runtime-verifikation | Dækket |
-| Booking CRUD frontend | specify | US-001–US-004 | T-014 | browser smoke | Dækket |
-| Belægningsgrad | clarify, plan | US-006 | T-010–T-011 | formel/golden tests | Dækket |
-| Hotelindtjening | specify, plan | US-007 | T-011 | golden dataset | Dækket |
-| Indtjening pr. room type/sæson/land | specify, clarify | US-007 | T-010–T-011 | filter/period tests | Dækket |
-| Mest indbringende room type/land | specify | US-007 | T-011 | ranking test | Dækket |
-| Cocktailbar-analyse | specify | US-008 | T-012 | bar golden dataset | Dækket |
-| Helene Christine-filter | specify, clarify | US-008 | T-012 | employee filter test | Dækket |
-| Omsætning pr. produkt | specify, plan | US-008 | T-012 | quantity × price test | Dækket |
-| Cocktail/kaffe-procent | specify, clarify | US-008 | T-012 | percentage/zero test | Dækket |
-| Tableau-dashboard | specify, plan | US-009 | T-015 | KPI/refresh review | Dækket |
-| Live Tableau-refresh | clarify, plan | US-009 | T-015 | refresh verification | Dækket |
-| README.md | constitution, tasks | US-012 | T-016 | clean-checkout walkthrough | Dækket |
-| CONTRIBUTING.md / PDF-navn CONTRIBUTE.md | specify, tasks | US-012 | T-016 | file-name review | Dækket |
-| Arkitekturdiagram | constitution, tasks | US-012 | T-016 | README review | Dækket |
-| User stories med acceptkriterier | constitution, user-stories | alle | T-001/T-002 | story review | Dækket |
-| Afsluttende Converge-vurdering | constitution, tasks | US-012 | T-018 | Converge report | Dækket |
-| Kundetilfredshed | constitution, clarify, specify | US-011 | T-013 | scope decision or activation tests | Delvist dækket |
+| Bookingformular opretter/redigerer og viser resultat | spec Booking | US-001 | T-025, T-037 | Frontendtest + manuel browserkontrol | Implementeret i main; ikke genverificeret her |
+| POST 201; komplet idempotent PUT | spec Booking | US-001 | T-008, T-037 | API-test | Eksisterende v1-testdækning; PostgreSQL mangler |
+| ISO-dato, kapacitet, overlap 409 | spec Booking | US-001 | T-008, T-037 | API-/concurrency-test | Eksisterende v1-testdækning; PostgreSQL mangler |
+| DELETE soft-cancel/idempotent; genbooking mulig | spec Booking | US-001 | T-008, T-037 | API-test | Eksisterende v1-testdækning; PostgreSQL mangler |
+| GET-filter/paginering/404 | spec Booking | US-001 | T-008, T-037 | API-test | Eksisterende v1-testdækning; PostgreSQL mangler |
+| Mutation ses i næste GET/analyse uden genimport | spec Live | US-002 | T-009, T-037 | Integrationstest | Implementeret mod nuværende DB; PostgreSQL mangler |
+| CSV/XLSX seed/import reproducerbar og idempotent | spec Data | US-002 | T-028, T-032, T-037 | Import-/integrationstest | T-028 dokumenterer gennemført import; PostgreSQL-genimport mangler |
+| Importerede rækker har `synthetic_import` og er skrivebeskyttede | spec Data | US-002 | T-027 (importerede ophold), T-037 | API-/runtime-test | Implementeret i main; ikke genverificeret her |
+| Live-definition og ingen push dokumenteret | clarify C-001 | US-002 | T-009, T-038 | Dokumentationsreview | Dækket i specifikation; implementation følger næste GET |
+| PostgreSQL uden API-kontraktændring | constitution, plan | US-002 | T-031, T-032, T-034, T-037 | API-/kontrakttest | Mangler |
+| Eksisterende 29 API-tests samt concurrency består mod PostgreSQL | tasks | US-002 | T-037 | API-/concurrency-test | Mangler; aktuelle tests er MySQL-baserede |
+| Belægningsformel og eksklusiv checkout | clarify C-005/C-014 | US-003 | T-033, T-037 | Formel-/API-test | API findes; fast 214 vs aktiv inventarnævner er åben |
+| Periodeklip og annulleringer | clarify C-005/C-006 | US-003 | T-033, T-037 | Golden dataset/API-test | Eksisterende v1-dækning; ny formelafstemning mangler |
+| Periodeparametre/default | clarify C-003/C-014 | US-003 | T-033, T-034 | OpenAPI-/API-test | API findes; godkendt kontraktreview mangler |
+| Nævner nul = 0 med advarsel | clarify C-005/C-010 | US-003 | T-033, T-034, T-037 | Formel-/API-test | Eksisterende endpoint; formelafstemning mangler |
+| Occupancy-GET og dashboardtal afstemt | spec Analyser | US-003, US-007 | T-033, T-034, T-036 | OpenAPI, API og manuel afstemning | API findes; samlet dashboardafstemning mangler |
+| Års- og periodesomsætning | spec Analyser | US-004 | T-033, T-037 | API-test | Eksisterende MySQL-baseret endpoint |
+| Omsætning pr. type/sæson/land og topresultater | spec Analyser | US-004 | T-033, T-034, T-037 | API-/golden dataset-test | Eksisterende MySQL-baserede endpoints |
+| Gæster pr. land | spec Analyser | US-004 | T-033, T-034, T-037 | API-test | Eksisterende endpoint; PostgreSQL mangler |
+| Prislinjer, annullering og sæsonfordeling | clarify C-004/C-007 | US-004 | T-033, T-037 | Formel-/API-test | Eksisterende v1-dækning; PostgreSQL mangler |
+| RevPAR = værelsesomsætning / disponible værelsesnætter | spec T-027 (RevPAR) | US-004 | T-027 (RevPAR), T-037 | `test_revpar.py` + API-test | Implementeret i main; ikke genverificeret her |
+| Selvvalgt KPI med formel i API/frontend/dashboard | clarify C-013 | US-004, US-007, US-008 | T-030, T-034–T-036 | API-, frontend- og manuel dashboardtest | **Mangler; valg åbent. RevPAR findes som kandidat** |
+| Tom periode giver tomt resultat | clarify C-010 | US-004 | T-033, T-037 | API-test | Eksisterende v1-endpoints; PostgreSQL mangler |
+| Analyse-GET dokumenteret i OpenAPI | clarify C-014 | US-004 | T-033, T-034 | OpenAPI-/kontrakttest | Nuværende paths findes; ændringer afventer kontraktbeslutning |
+| Bar-total for Helene Christine | clarify C-008 | US-005 | T-012, T-037 | API-/golden dataset-test | Eksisterende MySQL-baseret endpoint |
+| Omsætning pr. drink = quantity × unit_price | spec Analyser | US-005 | T-012, T-037 | Formel-/API-test | Eksisterende v1-dækning |
+| Cocktail/kaffe beløb og andele | spec Analyser | US-005 | T-012, T-037 | API-test | Eksisterende v1-dækning |
+| Nævner nul = 0 med advarsel | clarify C-010 | US-005 | T-012, T-034, T-037 | API-test | Eksisterende endpoint; PostgreSQL mangler |
+| Baranalyse dokumenteret som GET/JSON | clarify C-014 | US-005 | T-033, T-034 | OpenAPI-/kontrakttest | Findes i nuværende OpenAPI; review mangler |
+| Én rating 1–5; gentagen PUT opdaterer | clarify C-009 | US-006 | T-013, T-032, T-037 | API-/integrationstest | Eksisterende v1-dækning |
+| Ugyldig/fremtidig/annulleret bedømmelse afvises | clarify C-009 | US-006 | T-013, T-032, T-037 | API-test | Eksisterende v1-dækning |
+| Gennemsnit, svarprocent, antal og fordeling | spec Kundetilfredshed | US-006 | T-013, T-033, T-037 | Formel-/API-test | Eksisterende endpoint; PostgreSQL mangler |
+| Ingen ratings giver null og advarsel | clarify C-010 | US-006 | T-013, T-033, T-037 | API-test | Eksisterende v1-dækning |
+| Tilfredshed-GET dokumenteret og afstemt | clarify C-014 | US-006, US-007, US-008 | T-033, T-034, T-036 | OpenAPI, API og manuel afstemning | API findes; UI-/dashboardafstemning mangler |
+| Tableau viser besluttede KPI'er | clarify C-016 | US-007 | T-030, T-036 | Manuel dashboardreview | Mangler; Tableau-krav åbent |
+| Dashboardfiltre virker | clarify C-016 | US-007 | T-036 | Manuel dashboardtest | Mangler; Tableau-krav åbent |
+| Dashboardtal hentes fra API, ikke DB | constitution Analysebarhed | US-007 | T-036 | Kildereview + manuel afstemning | API-handoff findes; dashboardreview mangler |
+| Refresh-procedure og bookingændring demonstreret | clarify C-001/C-016 | US-007 | T-036 | Manuel refresh-demonstration | Mangler; Tableau-krav åbent |
+| Frontend viser analyser fra US-003–US-006 | spec Frontend | US-008 | T-035 | Frontend-/browsertest | Mangler |
+| Frontend bruger API uden egne formler/DB-adgang | constitution Analysebarhed | US-008 | T-035 | Kildereview + browsertest | Mangler |
+| Periode/filtre opdaterer frontend | clarify C-015 | US-008 | T-035 | Frontend-/browsertest | Mangler; opdateringsmåde åben |
+| Tomme data og API-fejl vises tydeligt | spec Frontend | US-008 | T-035 | Frontend-/browsertest | Mangler |
+| Ny booking ses efter genindlæsning/opdatering | clarify C-001/C-015 | US-008 | T-035, T-037 | Integration-/browsertest | Mangler |
 
-## Kendte afklaringspunkter
+## Tværgående leverancer
 
-- PDF’en bruger filnavnet CONTRIBUTE.md, mens repositoryets eksisterende projektguide bruger CONTRIBUTING.md. Projektet bruger den eksisterende CONTRIBUTING.md som bidragsguide; README skal nævne denne navneafvigelse.
-- Kundetilfredshed er et PDF-nævnt KPI-område uden specifikation eller datagrundlag. Det er ikke implementeringsklart og er derfor ikke et aktivt MVP-krav endnu.
-- Standardår, sæsonkalender, DELETE-semantik og Helene-filter er godkendt i Clarify som arbejdsgrundlag.
+| Krav | Spec | Stories | Task | Test/verifikationstype | Status |
+|---|---|---|---|---|---|
+| PostgreSQL runtime og SQL-dialektskift | constitution, plan | US-002 | T-031, T-032 | Compose-, migrations- og integrationstest | Mangler |
+| Samme API-kontrakt efter databaseskift | constitution, spec | US-002 | T-033, T-034, T-037 | OpenAPI-lighed + API-regression | Mangler |
+| Compose healthcheck, start og persistence | constitution, plan | US-002 | T-031 | Manuel Compose-smoke | Mangler |
+| Sikkert PostgreSQL-testreset | plan | US-002 | T-032, T-037 | Negativ sikkerheds-/integrationstest | Mangler |
+| README, guides og analysevejledning | tasks | US-002, US-007, US-008 | T-038 | Dokumentationsreview/clean checkout | Dokumenteret; runtimevejledninger afventer PostgreSQL |
+| Afsluttende Converge | constitution | — (leverance) | T-039 | Converge-review | Mangler |
 
-## Kvalitetstjek
+## Historik og eksisterende bevis
 
-- Er hvert PDF-krav mappet? Ja, med to markerede delvise krav.
-- Kan matrixen testes? Ja, gennem task-verifikationerne.
-- Er implementeringsstatus blandet sammen med spec-status? Nej; implementation vurderes først i Converge.
-- Er der mangler? Kun de eksplicit markerede PDF-navne- og kundetilfredshedspunkter.
-
-## Integration evidence — 2026-10-28
-
-The canonical requirement document is [spec.md](spec.md). Current implementation,
-test evidence and remaining requirements are recorded in
-[converge-2026-10-28.md](converge-2026-10-28.md). This dated audit supersedes older
-completion assumptions, including direct MySQL-to-Tableau access and API paths
-without the `/api` prefix. Remaining work is tracked as T-019, T-020 and T-021.
-
-## T-020 — API-fokus, 2026-10-28
-
-| Krav/story | Implementering | Testbevis |
-|---|---|---|
-| US-001–005 booking CRUD, filtre og live | services/bookings, repositories, api/main | test_api.py og test_spec_completion.py |
-| US-006 belægning/periode | services/analytics | test_analytics_filters_and_denominators |
-| US-007 indtjening, sæson, land, top og ADR | særskilte analytics endpoints | test_revenue_rankings_and_country_guests |
-| US-008 barsalg og Helene | services/feedback, analytics | test_bars_total_category_shares_and_live_input, test_bar_calendar_boundaries_use_copenhagen |
-| US-011 kundetilfredshed | booking_reviews, review endpoints | test_guest_feedback_and_response_rate |
-| US-012 OpenAPI/Swagger/Docker | schemas, lokal Swagger, Compose | test_openapi_contract, swagger-smoke.mjs |
-| 214 værelser, otte kategorier, 20/10 produkter | syntetisk reference-seed | test_reference_inventory |
-| US-009 Tableau | bygges senere manuelt efter brugerens prioritering | Uden for T-020 |
-
-## T-022 — flade indtjeningsrækker
-
-US-007 → services/revenue_rows.py → de to /analytics/revenue endpoints.
-Testbevis: test_revenue_rows.py kontrollerer 24 unikke kombinationer (også ved 0 og
-inaktiv historisk type), numeriske beløb, sæson-/periodeklip, dansk landelabel,
-annulleringer og ugyldige perioder. Ingen prisberegning flyttes til Tableau.
-
-T-023: Reviewfund 1–3 → migration 007, bookings.save, Repository.save_guest,
-importørens import_key og refresh.guest_rows → test_review_regressions.py.
-Samlet dashboard/refresh-accept er stadig udestående; eksporttest er ikke et
-færdigt Tableau-dashboardbevis.
-
-
-T-024: Compose-opstart/testtargets/proxy/persistens og aktuelle dokumenter →
-docs/release-checklist.md med konkrete friske testresultater. Samlet Tableau-
-opdatering og menneskeligt PR-review er fortsat åbne acceptpunkter.
-
-T-025 / US-001/002/005: frontend booking-form/rooms-view/main →
-frontend/tests/live-booking-smoke.mjs. Rigtigt API-flow, serverfeltfejl, sæsonpris
-og genfinding efter reload; 59 unit-tests og 19 mock-browserchecks.
-
-T-026: Tableau-klar API → docs/tableau-api-handoff.md, aktuelle numeriske exports
-og KPI-kald → runtimekontrol, OpenAPI-lighed, 26 containeriserede tests og 59 frontendtests.
-Testprofilens reset er afgrænset til hotel_kong_arthur_test på test-db.
-
-T-028: exact CSV + 100 mock bookings → csv_source_rows migration and
-load_school_csv.py. Runtime checks compare every raw/source guest field, source
-price and nightly totals, 2026 dates and zero overlaps. Repeat loader adds zero rows.
-API source bookings remain anonymized; no raw names are committed.
-
-T-027 / US-007 → analytics.monthly_revpar + report + RevPARReport → test_revpar.py.
-Periode/type/sæson/land samt tomme perioder og annullering dækkes af MySQL-tests.
+T-027 importerede ophold, T-027 RevPAR og T-028 CSV-demodata er implementeret i
+main. Main dokumenterer 29 MySQL-baserede API-tests, herunder RevPAR og import-
+regressioner. Dette er ikke PostgreSQL-bevis. Converge-rapporterne fra
+2026-10-28 er historiske; ny vurdering efter uge 2 tilføjes i
+`specs/converge-tillaeg-uge2.md`.

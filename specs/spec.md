@@ -1,19 +1,23 @@
 # Funktionel specifikation — Hotel Kong Arthur API
 
-Revision: 2026-10-28, T-020. Kilder: E26 Tværfaglig Opgave Hotel Kong Arthur og
-Tillægsspørgsmål_swa. Brugeren har prioriteret API og Swagger; Tableau-dashboard
-bygges manuelt senere. Kundetilfredshed 1–5 pr. booking er valgt af brugeren.
+Revision: tillægsopgave uge 2, specifikationsudkast. Kilder: E26 Tværfaglig
+Opgave Hotel Kong Arthur, Tillægsspørgsmål_swa og tillægsopgave uge 2. Dette
+kravudkast er ikke implementeret eller godkendt endnu. MySQL nævnes kun som den
+historiske v1, bevaret i tagget `v1-mysql-tableau`.
 
 ## Principper og roller
 
 Receptionisten opretter, læser, ændrer og annullerer bookinger. Hotellets egne
 klienter kan bruge samme REST/JSON-kontrakt som browserprototypen. Administratoren
-henter aktuelle hotel-, bar- og tilfredshedsanalyser fra MySQL via API'et.
+henter aktuelle hotel-, bar- og tilfredshedsanalyser fra PostgreSQL via API'et.
+Frontend og et eventuelt Tableau-dashboard henter beregninger fra API'et; de
+beregner ikke selv og læser ikke direkte fra databasen.
 
 Backend har tre lag: HTTP/schemas i api, regler/beregninger i services og SQL i
-repositories. MySQL er runtime-datakilden. OpenAPI i openapi/openapi.yaml skal
+repositories. PostgreSQL er måldatakilden. Databaseskiftet må ikke ændre
+API-kontrakten. OpenAPI i openapi/openapi.yaml skal
 stemme med /openapi.json og kunne testes gennem Swagger på /docs. Applikationen,
-MySQL og Swagger startes med docker compose up --build.
+PostgreSQL og Swagger startes med `docker compose up --build`.
 
 ## Booking
 
@@ -63,8 +67,8 @@ GET /api/bar-products viser aktive produkter og priser. Referencekataloget indeh
 20 cocktails og 10 kaffeprodukter; det er demodata, ikke hotellets faktiske menu.
 POST /api/bar-sales → 201 registrerer product_id, sold_at med tidszone, positivt
 quantity, employee_name og evt. faktisk unit_price >= 0. Udeladt unit_price bruger
-produktprisen som snapshot. sold_at skal passe i MySQL TIMESTAMP-intervallet
-1970-01-01T00:00:01Z til 2038-01-19T03:14:07Z; øvrige afvises med 422. Salg lagres UTC; ingen syntetiske salg opfindes.
+produktprisen som snapshot. `sold_at` er et tidszonebevidst tidspunkt, der lagres
+i UTC. Salg lagres UTC; ingen syntetiske salg opfindes.
 
 ## Analyser
 
@@ -83,7 +87,11 @@ Alle nedenstående GET-endpoints har selvstændige schemas og beskrivelser i Swa
 | top-performers | mest indbringende værelse, type og land |
 | bar-sales | medarbejdertotal, salg pr. drink og kategoriandele |
 | customer-satisfaction | gennemsnit, svarprocent og ratingfordeling |
-| dashboard | samlet JSON til senere dashboardarbejde |
+| dashboard | samlet JSON til API-forbrugere |
+
+Disse beregninger leveres af backend og er datakilde for frontendens
+analysevisninger og et eventuelt Tableau-dashboard. Endpoint- og warning-detaljer
+for nye/ændrede operationer kræver afklaring; eksisterende endpoints bevares.
 
 Filtre: enten year (1900–9998) eller from/to; de må ikke kombineres. Default er
 [2026-01-01,2027-01-01). Perioden er 1–3660 dage. Land (country_code), type
@@ -96,7 +104,8 @@ bookingrelation har; dette fremgår af hotel_filters_apply_to_bar=false.
 - Belægning = solgte nætter / (aktive værelser i valgt type × valgte sæsonnætter) × 100.
   Landefilter ændrer kun tælleren. Inventarets aktuelle aktive status bruges, da der
   ikke findes historiske inventar-snapshots. Over 100 % giver datakvalitets-warning.
-- ADR = indtjening / solgte nætter; dette er projektets ekstra nøgletal.
+- ADR = indtjening / solgte nætter findes allerede som API-beregning. Det er ikke
+  valgt som tillægsopgavens selvvalgte nøgletal; C-013 er fortsat åben.
 - Gæster pr. land: booking_guests tæller selskabet én gang pr. matchende booking;
   distinct_bookers tæller gæsteprofiler; guest_nights tæller antal × opholdsnætter.
   Hele selskabets land antages at være bookinggæstens land, fordi øvrige nationaliteter
@@ -127,11 +136,31 @@ Ingen kundetilfredshedstal indlæses som opdigtede demoresultater.
 Fejl har error, message og details. Ugyldige input giver 422, ukendt resource 404,
 overlap/ikke-tilladt operation 409, databasefejl 503 og uventet fejl 500. SQL og
 serverdetaljer udleveres ikke. Request-/response-validering dokumenteres i OpenAPI.
-Transaktionen committes før svaret sendes. Senere GET/analyse læser aktuelle MySQL-data.
+Transaktionen committes før svaret sendes. Senere GET/analyse læser aktuelle
+PostgreSQL-data. Live betyder REST-opdatering og friske værdier ved næste GET; push
+er ikke et krav.
 
-Acceptbevis: MySQL-integrationstests, samtidighedstest, grænse-/formeltests,
+Acceptbevis: PostgreSQL-integrationstests, samtidighedstest, grænse-/formeltests,
 OpenAPI 3.1-validering, kontraktlighed, Compose-smoke og Swagger Try it out i browser.
-Tableau-rendering er uden for denne API-task.
+Frontend-analysevisninger og eventuel Tableau-rendering afstemmes mod API-tal.
+
+## Ikke-funktionelle krav — tillægsopgave uge 2
+
+- Runtime-databasen er PostgreSQL. CSV/XLSX seed/import genskaber demodata; der
+  migreres ikke eksisterende rækker fra MySQL v1.
+- Databaseskiftet bevarer API-kontrakten: samme eksisterende endpoints, felter,
+  statuskoder og fejlkoder. SQL-dialekt og driver er repositorydetaljer.
+- Backend beregner alle KPI'er og eksponerer dem via REST/JSON. Frontend og
+  Tableau forbruger API'et; frontend beregner ikke KPI'er og bruger ikke SQL.
+- Løsningen startes med én `docker compose up --build`.
+- Det selvvalgte KPI er åbent og må ikke implementeres før C-013 er afklaret.
+
+## Frontendens analysevisninger
+
+Frontendprototypen skal vise belægning, hotelindtjening, gæster pr. land,
+barsalg og kundetilfredshed med data hentet fra analyse-endpoints. Periodevalg og
+eventuelle godkendte land-/værelsesfiltre opdaterer API-kald. Tomme data og fejl
+vises tydeligt. Hentemåde ved sidevisning eller manuel opdatering afventer C-015.
 
 ## Artefakter
 
@@ -176,26 +205,33 @@ Browserprototypen på localhost:5500 søger ledighed, viser et forslag pr. type
 (mulighed for typefilter/alle rum), modtager gæstekontakt og opretter via API'et.
 Tilbuds- og bekræftelsesprisen kommer fra backend. Serverfeltfejl vises i formularen.
 Efter bekræftelse kan man gå direkte til oversigten. Et rigtigt browserflow
-verificerer MySQL-persistens efter reload; testbookingen annulleres til sidst.
+verificerede MySQL-persistens i den nuværende runtime efter reload; testbookingen
+annulleres til sidst. Det er ikke PostgreSQL-acceptbevis.
 
-## T-028 — school-project CSV dataset
+## T-027 — importerede ophold og RevPAR (ændringer fra main)
 
-All 1,000 exact CSV records are preserved locally in csv_source_rows JSON with
-batch hash, line number and booking link. Existing anonymized source bookings are
-reused, not duplicated. Generated rooms/dates place the stays in 2026 with matching
-source season and no overlaps. CSV category/country/nights/total remain unchanged.
-100 extra clearly marked synthetic bookings are added in a separate mock batch.
-Operational bookings are preserved. The loader is idempotent and transactional;
-raw names are not committed. API source-guest names stay anonymized. See import docs.
+### Importerede ophold
 
-## T-027 — RevPAR
+De 1.000 kundestays vises i `/api/bookings` som anonymiserede, skrivebeskyttede
+bookinger med `data_origin=synthetic_import`. Datoer, værelser og gæsteantal er
+genereret; relevante kildefelter for kategori, land, sæson, opholdslængde og beløb
+bevares. Ingen importerede gæstenavne eller kontaktdata vises i API'et.
 
-RevPAR = værelsesomsætning / tilgængelige værelsesnætter (DKK). Det er omsætning,
-ikke overskud; barsalg indgår ikke. Beregnes i services/analytics med historiske
-prislinjer og samme kapacitetsnævner som belægningsgraden. revpar indgår i summary.
-GET /api/analytics/revpar har de eksisterende filtre og returnerer data.revpar,
-revenue, available_room_nights samt monthly-rækker med month (YYYY-MM), revenue,
-available_room_nights og revpar. Første/sidste måned klippes til valgt periode.
-Alle periodens måneder medtages, også uden salg. Nulkapacitet giver 0 og warning.
-Land filtrerer kun omsætningen; type/sæson filtrerer også kapaciteten. Brug afrundede
-månedstal til visning, ikke til at genberegne periodens samlede RevPAR i Tableau.
+### RevPAR
+
+RevPAR = værelsesomsætning / tilgængelige værelsesnætter (DKK). Barsalg indgår
+ikke. Endpointet `GET /api/analytics/revpar` returnerer samlet tal og månedlige
+rækker med periodens klipning; alle periodens måneder medtages, også uden salg.
+Nulkapacitet giver 0 med warning. Land filtrerer kun omsætningen; type/sæson
+filtrerer også kapaciteten. RevPAR findes nu i backend, men er ikke valgt som
+tillægsopgavens selvvalgte KPI (C-013).
+
+## T-028 — CSV-demodata
+
+Loaderen bevarer de 1.000 CSV-rækker i lokal `csv_source_rows`-JSON med batchhash,
+rækkenummer og bookingrelation. Eksisterende anonymiserede kildebookinger genbruges;
+der oprettes ikke dubletter. Genererede værelser/datoer placerer opholdene i 2026
+med matchende kilde-sæson og uden overlap. Kategori, land, nætter og total fra CSV
+bevares. En særskilt mock-batch tilføjer 100 tydeligt markerede bookinger.
+Loaderen er transaktionel og idempotent; rå CSV og navne committes ikke. Se
+`docs/customer-data-import.md`.

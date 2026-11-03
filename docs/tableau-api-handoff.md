@@ -1,10 +1,19 @@
 # API-handoff til manuelt Tableau-dashboard
 
+## Tillægsopgave uge 2 — status
+
+Den nye målarkitektur bruger PostgreSQL, og Tableau samt frontend skal alene
+forbruge backendens beregninger via REST/JSON. Databaseskift, frontendens
+analysevisninger og genvalidering af dashboardet er ikke implementeret endnu.
+Om Tableau fortsat er et obligatorisk afleveringskrav afventer C-016. Dette
+handoff beskriver de eksisterende v1-paths som udgangspunkt; v1 er gemt i
+`v1-mysql-tableau`.
+
 ## PR-omfang
 
-Denne PR leverer den MySQL-baserede API, bookingprototypen og datagrundlaget til
-Tableau. Dashboardet opbygges manuelt af gruppen senere. Et færdigt Tableau-dashboard
-er derfor ikke en acceptbetingelse for denne API-PR, men er stadig et afleveringskrav.
+Den historiske API-PR leverede v1-API'et, bookingprototypen og datagrundlaget til
+Tableau. Dashboardet opbygges manuelt af gruppen. Acceptstatus for dashboardet i
+tillægsopgave uge 2 afventer C-016.
 Menneskeligt API-/database-/Dockerreview kræves før merge.
 
 Start: `docker compose up --build -d --wait`.
@@ -29,7 +38,7 @@ lokale prototype. Adressen er lokal og kan ikke læses af en ekstern Tableau-ser
 | Kundetilfredshed | /api/analytics/customer-satisfaction | data.average_rating, response_percent, rated_bookings, eligible_bookings, distribution |
 
 Pris × nætter, summer, sæsonfordeling, belægning, ADR, ratinggennemsnit og procenter
-beregnes af backenden. Tableau skal vise beløbene og andelene og ikke implementere
+beregnes af backenden. Tableau og frontend skal vise beløbene og andelene og ikke implementere
 reglerne igen. De to root-arrays har numerisk revenue. Decimalfelter i øvrige JSON-
 svar er strenge af præcisionshensyn; eksportbroen konverterer dem til numeriske felter.
 Penge er DKK. Null ratinggennemsnit betyder ingen bedømmelser, ikke nul tilfredshed.

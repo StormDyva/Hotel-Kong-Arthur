@@ -12,6 +12,12 @@ docs/project-documentation
 
 ## Arbejdsgang
 
+Tillægsopgave uge 2 udvikles først efter godkendelse af specifikationerne.
+PostgreSQL er måldatabase; MySQL + Tableau er historisk v1 i
+`v1-mysql-tableau`. Analyser skal beregnes i backend og læses af frontend og et
+eventuelt Tableau-dashboard via REST/JSON. Databaseskift må ikke ændre
+API-kontrakten.
+
 ~~~bash
 git switch main
 git pull --rebase origin main
@@ -51,3 +57,8 @@ Start med README.md og docs/release-checklist.md. Kør containeriserede tests me
 `npm --prefix frontend test`. Kontraktændringer kræver opdateret OpenAPI og specs.
 API-, database- og Dockerændringer kræver mindst to reviewers før merge. Samlet
 Tableau-accept kræver en konkret dashboard-demo; en bestået API-test er ikke nok.
+
+Når PostgreSQL-taskene er implementeret, skal de 26 eksisterende API-tests og
+bookingconcurrency-testen også bestå mod PostgreSQL. Indtil da dokumenterer de
+historiske Converge-resultater alene v1. `CONTRIBUTE.md` viderestiller fortsat
+til denne fil; de to filnavne beholdes, indtil gruppen beslutter andet.
