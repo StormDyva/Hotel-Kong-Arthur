@@ -22,8 +22,21 @@ from .schemas import (
 ERRORS = {code: dict(model=ErrorResponse, description=description) for code, description in {
     404:'Resource not found', 409:'Booking conflict or operation not eligible',
     422:'Invalid request', 503:'Database unavailable', 500:'Unexpected server error'}.items()}
+OPENAPI_TAGS = [
+    {'name': 'System'},
+    {'name': 'Inventory'},
+    {'name': 'Bookings'},
+    {'name': 'Guest feedback'},
+    {'name': 'Bar'},
+    {'name': 'US-003 – Belægning'},
+    {'name': 'US-004 – Hotelindtjening og gæster'},
+    {'name': 'US-005 – Cocktailbar'},
+    {'name': 'US-006 – Kundetilfredshed'},
+    {'name': 'US-007/US-008 – Dashboard og frontend'},
+    {'name': 'Tableau revenue'},
+]
 app = FastAPI(title='Hotel Kong Arthur API', version='1.1.0', docs_url=None, redoc_url=None,
-    responses=ERRORS, description=(
+    openapi_tags=OPENAPI_TAGS, responses=ERRORS, description=(
         'Three-layer REST API backed by MySQL. Dates use [from,to), checkout is exclusive. '
         'Money is DKK. Existing /api responses use decimal strings; flat /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026. '
         'Hotel filters do not filter bar sales. Demo inventory is synthetic.'))
@@ -172,34 +185,140 @@ def get_report(query=Depends(ReportQuery),repo=Depends(repository,scope='functio
     return analytics.report(repo,query.start,query.end,query.employee,query.country,query.room_type,query.season)
 
 
-@app.get('/api/analytics/dashboard',response_model=DashboardReport,tags=['Analytics'])
+@app.get('/api/analytics/dashboard',response_model=DashboardReport,tags=['US-007/US-008 – Dashboard og frontend'],
+         summary='Samlet dashboard for hotel, bar og kundetilfredshed',
+         description='''User story: US-007/US-008 – Dashboard og frontend.
+
+KPI’er: Belægningsgrad, hotelomsætning, ADR, RevPAR, gæster pr. land, barsalg og kundetilfredshed.
+
+Acceptkriterier: Endpointet samler alle analyseområder i ét JSON-svar. Tableau og frontend bruger API’et som datakilde og må ikke beregne egne KPI’er. Samme periodefiltre skal kunne bruges på analyserne.
+
+Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id`, `season` og `employee_name`.
+
+Datakilde: Backendens analyse-service over bekræftede bookinger, historiske natpris-snapshots, aktivt værelsesinventar, barsalg og bookingratings.''')
 def dashboard(data=Depends(get_report)):
     return data
 
 
-def register_metric(path,model,summary,description):
+def register_metric(path,model,tag,summary,description):
     def endpoint(data=Depends(get_report)):
         return analytics.metric_result(data,path)
     endpoint.__name__='analytics_'+path.replace('-','_')
-    app.get('/api/analytics/'+path,response_model=AnalyticsResponse[model],tags=['Analytics'],
+    app.get('/api/analytics/'+path,response_model=AnalyticsResponse[model],tags=[tag],
             summary=summary,description=description)(endpoint)
 
 
-for path,model,summary,description in [
-    ('revpar',RevPARReport,'Revenue per available room night (RevPAR)', 'Room revenue divided by available room nights in DKK. Includes monthly rows, with clipped period and season capacity. Country filters revenue only; room type/season also filter capacity. Zero denominator returns zero with warnings.'),
-    ('occupancy',Summary,'Occupancy and average daily rate','Sold nights / active inventory nights × 100. Country filters only the numerator; season/type also filter inventory.'),
-    ('revenue',Summary,'Hotel revenue for a year or period','Sum of nightly historical price snapshots for confirmed bookings. Checkout is exclusive.'),
-    ('revenue-by-room',list[Group],'Revenue by physical room','Sorted by revenue descending. Room number identifies the physical room.'),
-    ('revenue-by-room-type',list[Group],'Revenue by room type','Sorted by revenue descending.'),
-    ('revenue-by-country',list[Group],'Revenue by country','Country is the booking guest country.'),
-    ('revenue-by-season',list[Group],'Revenue by season','Season is determined per occupied night.'),
-    ('revenue-by-room-type-season',list[Group],'Revenue by room type and season','Cross-season stays are split by nightly snapshots.'),
-    ('guests-by-country',list[Group],'Guests by country','booking_guests counts party sizes once per matching booking; distinct_bookers counts booking guest snapshots, not identified repeat visitors. All party members are attributed to the booker country.'),
-    ('top-performers',TopPerformers,'Most profitable room, type and country','Highest total revenue in the selected period. Empty groups return null.'),
-    ('bar-sales',BarReport,'Bar revenue, drinks and category shares','Default employee is Helene Christine. Includes total_revenue, products and categories with percentage of total revenue. Hotel filters do not affect bar sales.'),
-    ('customer-satisfaction',Satisfaction,'Guest ratings and response rate','Checkout cohort in [from,to). Only completed confirmed bookings qualify. Average is null without ratings; no synthetic scores.'),
+for path,model,tag,summary,description in [
+    ('revpar',RevPARReport,'US-004 – Hotelindtjening og gæster','RevPAR – omsætning pr. tilgængelig værelsesnat', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: RevPAR, samlet værelsesomsætning og tilgængelige værelsesnætter.
+
+Acceptkriterier: RevPAR beregnes som værelsesomsætning divideret med tilgængelige værelsesnætter. Checkout-datoen er eksklusiv, annullerede bookinger filtreres fra, og nul-kapacitet giver 0 med warning.
+
+Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger med historiske natpris-snapshots og aktivt værelsesinventar.'''),
+    ('occupancy',Summary,'US-003 – Belægning','Belægning og gennemsnitlig dagspris', '''User story: US-003 – Belægning.
+
+KPI’er: `occupancy_percent`, `room_nights`, `available_room_nights` og `adr`.
+
+Acceptkriterier: Belægning kan filtreres på periode. Checkout-datoen er eksklusiv, annullerede bookinger tælles ikke, og nul-kapacitet returnerer 0 og en warning.
+
+Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger, historiske natpris-snapshots og aktivt værelsesinventar.'''),
+    ('revenue',Summary,'US-004 – Hotelindtjening og gæster','Samlet hotelomsætning for periode eller år', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Samlet omsætning, room nights, available room nights, belægningsgrad, ADR og RevPAR.
+
+Acceptkriterier: Samlet omsætning summerer historiske natpris-snapshots for bekræftede bookinger. Checkout-datoen er eksklusiv, og annullerede bookinger filtreres fra.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger og gemte natpris-snapshots i hotellets database.'''),
+    ('revenue-by-room',list[Group],'US-004 – Hotelindtjening og gæster','Omsætning pr. fysisk værelse', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Omsætning pr. fysisk værelse og tilhørende room nights og gæstenætter.
+
+Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter fysisk værelsesnummer. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt hotellets land-, værelsestype- og sæsonfiltre.
+
+Datakilde: Bekræftede bookinger med værelses- og natpris-snapshots.'''),
+    ('revenue-by-room-type',list[Group],'US-004 – Hotelindtjening og gæster','Omsætning pr. værelsestype', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Omsætning pr. værelsestype, room nights og gæstenætter.
+
+Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter værelsestype og sorterer efter omsætning. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger og værelsestype fra hotellets database.'''),
+    ('revenue-by-country',list[Group],'US-004 – Hotelindtjening og gæster','Omsætning pr. land', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Omsætning pr. bookinggæsts land, room nights og gæstenætter.
+
+Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter gæstens land. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger og bookingens gæstesnapshot.'''),
+    ('revenue-by-season',list[Group],'US-004 – Hotelindtjening og gæster','Omsætning pr. sæson', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Omsætning pr. sæson, room nights og gæstenætter.
+
+Acceptkriterier: Sæsonen bestemmes pr. optaget nat, så ophold på tværs af sæsoner fordeles korrekt. Annullerede bookinger filtreres fra.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger med historiske natpris-snapshots og sæsonkalender.'''),
+    ('revenue-by-room-type-season',list[Group],'US-004 – Hotelindtjening og gæster','Omsætning pr. værelsestype og sæson', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Omsætning pr. værelsestype og sæson, room nights og gæstenætter.
+
+Acceptkriterier: Krydstabellen fordeler ophold på tværs af sæsoner efter de enkelte natpris-snapshots. Annullerede bookinger filtreres fra.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger, værelsestyper og sæsonbestemte natpris-snapshots.'''),
+    ('guests-by-country',list[Group],'US-004 – Hotelindtjening og gæster','Gæster og gæstenætter pr. land', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Gæster pr. land, gæstenætter pr. land, booking guests og distinct bookers.
+
+Acceptkriterier: Party size tælles én gang pr. matchende booking, og alle partimedlemmer tilskrives bookingens gæsteland. Annullerede bookinger filtreres fra.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bekræftede bookinger og bookingens gæstesnapshot.'''),
+    ('top-performers',TopPerformers,'US-004 – Hotelindtjening og gæster','Mest indbringende værelse, værelsestype og land', '''User story: US-004 – Hotelindtjening og gæster.
+
+KPI’er: Mest indbringende værelse, mest indbringende værelsestype og mest indbringende land.
+
+Acceptkriterier: Topresultaterne baseres på højest samlet omsætning i den valgte periode. Tomme grupper returnerer null, og annullerede bookinger filtreres fra.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Grupperet omsætning fra bekræftede bookinger og natpris-snapshots.'''),
+    ('bar-sales',BarReport,'US-005 – Cocktailbar','Barsalg, drinks og kategoriandele', '''User story: US-005 – Cocktailbar.
+
+KPI’er: `total_revenue`, omsætning pr. drink, antal solgte drinks, cocktailomsætning, kaffeomsætning og procentfordeling mellem kategorier.
+
+Acceptkriterier: Omsætning pr. drink beregnes som `quantity × unit_price`. `employee_name` kan filtrere salget; standardmedarbejderen er Helene Christine. Nul-omsætning returnerer 0 og en warning.
+
+Filtre: `from` og `to` som eksklusivt interval, `year` og `employee_name`. Hotel-filtre påvirker ikke barsalget.
+
+Datakilde: Bar-salgsrækker med produkt, kategori, quantity og unit_price.'''),
+    ('customer-satisfaction',Satisfaction,'US-006 – Kundetilfredshed','Gæsteratings og svarprocent', '''User story: US-006 – Kundetilfredshed.
+
+KPI’er: `average_rating`, `response_percent`, `rated_bookings`, `eligible_bookings` og ratingfordeling fra 1 til 5.
+
+Acceptkriterier: Ratinger går fra 1 til 5. Kun afsluttede og ikke-annullerede bookinger kan rates, én rating gemmes pr. booking, og ingen ratings giver `average_rating=null` og en warning.
+
+Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+Datakilde: Bookingratings og kohorten af afsluttede, bekræftede bookinger.'''),
 ]:
-    register_metric(path,model,summary,description)
+    register_metric(path,model,tag,summary,description)
 
 
 class RevenuePeriodQuery:
