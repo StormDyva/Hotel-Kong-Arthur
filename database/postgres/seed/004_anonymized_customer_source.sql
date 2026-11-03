@@ -7226,7 +7226,7 @@ VALUES (v_import_batch_id, 'Sheet1:31', v_product_id, 'Affogato', 'coffee', 63.6
 ON CONFLICT (import_batch_id,source_record_id) DO UPDATE SET  product_id = EXCLUDED.product_id, drink_name = EXCLUDED.drink_name, category = EXCLUDED.category, unit_price = EXCLUDED.unit_price, units_sold = EXCLUDED.units_sold, row_status = EXCLUDED.row_status, rejection_reason = NULL;
 END $seed$;
 DO $reset$ DECLARE r record; n bigint; BEGIN
- FOR r IN SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' AND is_identity='YES' LOOP
+ FOR r IN SELECT table_name,column_name FROM information_schema.columns WHERE table_schema=current_schema() AND is_identity='YES' LOOP
   EXECUTE format('SELECT max(%I) FROM %I',r.column_name,r.table_name) INTO n;
   IF n IS NOT NULL THEN PERFORM setval(pg_get_serial_sequence(r.table_name,r.column_name),n,true); END IF;
  END LOOP;

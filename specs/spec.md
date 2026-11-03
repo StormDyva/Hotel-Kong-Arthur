@@ -2,7 +2,7 @@
 
 Revision: tillægsopgave uge 2, specifikationsudkast. Kilder: E26 Tværfaglig
 Opgave Hotel Kong Arthur, Tillægsspørgsmål_swa og tillægsopgave uge 2. Dette
-kravudkast er ikke implementeret eller godkendt endnu. MySQL nævnes kun som den
+kravudkast er delvist implementeret: PostgreSQL-runtime/import er reviewklar, mens analysefrontend og åbne afklaringer udestår. MySQL nævnes kun som den
 historiske v1, bevaret i tagget `v1-mysql-tableau`.
 
 ## Principper og roller
@@ -241,5 +241,4 @@ Loaderen er transaktionel og idempotent; rå CSV og navne committes ikke. Se
 T-031/T-032 bruger PostgreSQL 17, psycopg 3, separat postgres_data-volume,
 IDENTITY/CHECK og PostgreSQL-triggers. CSV genindlæses fra kildefilen, ikke fra
 MySQL. API-kontrakten er uændret og kontrolleres mod OpenAPI. Se
-[implementeringsbevis](../docs/postgres-migration.md). Legacygeneratorer er endnu
-ikke PostgreSQL-porteret; øvrige uge 2-opgaver er ikke afsluttet af denne migration.
+[implementeringsbevis](../docs/postgres-migration.md). XLSX-/SQL-generatorer er PostgreSQL-porteret og testet; øvrige uge 2-opgaver er ikke afsluttet af denne migration.

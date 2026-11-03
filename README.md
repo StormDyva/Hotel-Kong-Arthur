@@ -125,7 +125,7 @@ docker compose --profile test run --build --rm api-tests
 ```
 
 Testprofilen starter test-db → test-runner (schema/seed/checks) → api-tests.
-33 tests består mod isoleret PostgreSQL, inklusive OpenAPI-lighed og samtidige
+35 tests består mod isoleret PostgreSQL, inklusive OpenAPI-lighed og samtidige
 bookinger. Appens database-volume berøres ikke. Runtime-imaget indeholder ikke pytest.
 
 Alternativt kan tests køres på værtsmaskinen med en

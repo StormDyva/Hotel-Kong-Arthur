@@ -240,7 +240,7 @@ INSERT INTO bar_products(id,name,category,price,active) VALUES
 ON CONFLICT (id) DO UPDATE SET  name=EXCLUDED.name;
 END $seed$;
 DO $reset$ DECLARE r record; n bigint; BEGIN
- FOR r IN SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' AND is_identity='YES' LOOP
+ FOR r IN SELECT table_name,column_name FROM information_schema.columns WHERE table_schema=current_schema() AND is_identity='YES' LOOP
   EXECUTE format('SELECT max(%I) FROM %I',r.column_name,r.table_name) INTO n;
   IF n IS NOT NULL THEN PERFORM setval(pg_get_serial_sequence(r.table_name,r.column_name),n,true); END IF;
  END LOOP;

@@ -1,6 +1,6 @@
 # PostgreSQL migration — T-031/T-032
 
-Status 2026-11-03: first implementation phase on `feature/T-031-postgres-migration`.
+Status 2026-11-03: ready for migration review on `feature/T-031-postgres-migration`.
 The user explicitly requested implementation; this is not a claim that all week-2
 requirements or the pending analysis/frontend decisions are complete.
 
@@ -53,9 +53,9 @@ characters are preserved, not guessed or repaired.
 ## Verification
 
 - `docker compose config --quiet`: passed.
-- `docker compose --profile test run --build --rm api-tests`: **33 passed**,
+- `docker compose --profile test run --build --rm api-tests`: **35 passed**,
   one existing Starlette test-client deprecation warning. Includes the original
-  29 API/contract tests plus four PostgreSQL regressions. Concurrent competing
+  29 API/contract tests plus six PostgreSQL/import regressions. Concurrent competing
   reservations still produce one 201 and one 409.
 - PostgreSQL SQL foundation checks: inventory, source count and no overlapping
   confirmed fixture bookings passed as part of test initialization.
@@ -67,13 +67,14 @@ characters are preserved, not guessed or repaired.
 - Runtime recreation/persistence and HTTP smoke results are recorded in the
   final branch verification below.
 
-## Remaining work
+## Scope and limitations
 
-- The old XLSX-to-MySQL SQL generators (`import_customer_data.py`,
-  `build_anonymized_customer_seed.py`, `build_synthetic_bookings_seed.py`) still
-  produce MySQL SQL. Their parsing helpers remain used by the working CSV loader.
-  Do not run their generated SQL against PostgreSQL. The committed PostgreSQL
-  fixtures already contain the anonymized XLSX-derived stays and drinks aggregates.
+- XLSX/SQL generators are now PostgreSQL-native. Tests execute raw imports
+  (including rejected rows and apostrophes/backslashes/dollar delimiters) and
+  anonymized fixture + synthetic booking generation twice in isolated schemas.
+  Source batch hashes are read from the selected seed, not hardcoded. Rejected
+  source rows are recorded by the raw importer; anonymized fixture generation
+  refuses invalid inputs instead of silently omitting them.
 - Tableau uses the REST API Connector (confirmed by the user 2026-11-03).
   `tableau/refresh.py` and workbook generators are retired from the active workflow;
   they remain historical MySQL tools. Porting them is not a migration requirement
@@ -96,6 +97,19 @@ The runtime DML role `hotel_app` was verified with `rolsuper=false` and no schem
 CREATE permission. A booking transaction under that role succeeded and was
 rolled back, leaving the dataset unchanged. No confirmed room/date overlaps.
 Both wrong-host and wrong-database reset combinations were rejected.
-`git diff --check` passed. The branch is a first phase, not ready for full
-migration acceptance until the remaining XLSX/SQL import-generator work is resolved. The retired
-Tableau export bridge is excluded from that work.
+`git diff --check` passed. The runtime, seed and import migration is ready for
+human review. This does not accept the separate analysis frontend, pending
+business decisions or end-to-end Tableau dashboard. The retired Tableau export
+bridge is excluded from scope.
+
+## Review completion
+
+- All three source generators output PostgreSQL SQL and use the same quoting and
+  safe block wrapper. The anonymized generator never emits source guest names.
+- 35 PostgreSQL tests pass, 59 frontend unit tests pass, and the Swagger browser
+  smoke found 28 endpoints and successfully executed Try it out (HTTP 200).
+- A new Compose project on ports 15433/18000/15500 initialized without raw files;
+  API/proxy/Swagger/OpenAPI and all 24 revenue combinations worked. A booking
+  created through HTTP survived full container recreation with its price intact.
+- Original API schemas remain unchanged and match the served OpenAPI document.
+- Reviewers still need to approve the API/database/Docker changes before merge.

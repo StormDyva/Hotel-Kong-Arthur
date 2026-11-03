@@ -130,6 +130,7 @@ services:
     volumes:
       - ./openapi:/openapi:ro
       - ./tableau:/tableau:ro
+      - ./database:/project/database:ro
 
 volumes:
   postgres_data:

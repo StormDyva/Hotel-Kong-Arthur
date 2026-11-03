@@ -3,7 +3,7 @@
 ## Status
 
 Historiske tasks fra 2026-10-26/28 bevares som udført eller tidligere planlagt
-arbejde. Tillægsopgave uge 2 er et nyt, endnu ikke implementeret taskforløb.
+arbejde. T-031/T-032 er klar til review med PostgreSQL-testbevis; øvrige uge 2-tasks har separat status.
 
 ## Dokumentation og beslutninger
 
@@ -321,7 +321,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-031 — PostgreSQL Compose og miljø
 
-- **Status:** Runtime implementeret og testet 2026-11-03; se docs/postgres-migration.md.
+- **Status:** Klar til review; Compose, persistence og ren installation verificeret 2026-11-03.
 - **Story/accept:** US-002; PostgreSQL, persistence, `pg_isready`, testservice og
   én `docker compose up --build`.
 - **Afhængighed:** T-029; C-012 afklaret. Lokal port kontrolleres før valg.
@@ -329,7 +329,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-032 — PostgreSQL schema, repositories, seed og import
 
-- **Status:** Schema, repositories, fixtures og CSV-loader implementeret; gamle XLSX/SQL-generatorer udestår.
+- **Status:** Klar til review; schema, repositories, fixtures, CSV-/XLSX-import og generatorer verificeret med 35 PostgreSQL-tests.
 - **Stories/accept:** US-001 og US-002; PostgreSQL schema/seed/import, samme
   forretningsregler og idempotent genkørsel; importerede rækker bevares som
   `synthetic_import` og skrivebeskyttede.

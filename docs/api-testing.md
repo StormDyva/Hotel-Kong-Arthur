@@ -2,7 +2,7 @@
 
 ## Status for tillægsopgave uge 2
 
-PostgreSQL-runtime er implementeret på migrationsbranchen. 33 API-/database-
+PostgreSQL-runtime er implementeret på migrationsbranchen. 35 API-/database-
 og kontrakttests består mod PostgreSQL 17; frontendens nye analysevisninger mangler.
 Se [migrationsstatus](postgres-migration.md) og [analyse-API](analysis-api.md).
 
@@ -95,7 +95,7 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 ## Reproducerbar verifikation
 
 I den nuværende kodebase: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 33 tests i et separat test-image mod en isoleret
+fra roden. Det kører 35 tests i et separat test-image mod en isoleret
 PostgreSQL-testdatabase.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 

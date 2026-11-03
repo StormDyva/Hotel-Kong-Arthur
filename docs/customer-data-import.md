@@ -1,8 +1,3 @@
-> PostgreSQL-status (2026-11-03): brug den aktive CSV-loader i T-028-afsnittet
-> nederst og schema/seed under `database/postgres/`. De ældre SQL-generatorer
-> og MySQL-kommandoer nedenfor er v1-historik og er ikke portet endnu.
-> Se [postgres-migration.md](postgres-migration.md).
-
 # Kundeimport fra ITAKEA/hoteldata
 
 ## Kilde
@@ -19,7 +14,7 @@ ikke skal pushes til det offentlige projektrepository.
 
 ## Automatisk seed ved databaseoprettelse
 
-`database/seed/004_anonymized_customer_source.sql` indlæses automatisk af
+`database/postgres/seed/004_anonymized_customer_source.sql` indlæses automatisk af
 `db-init`, når en database initialiseres. Seedet indeholder de 1.000 opholdsrækker
 og 30 drinksrækker, men gæstenavne er erstattet med generiske labels. De øvrige
 felter og drinksdata er bevaret. Rå XLSX-filerne behøver derfor ikke at ligge hos
@@ -48,16 +43,35 @@ python3 database/import/import_customer_data.py \
   > /tmp/hotel-kong-arthur-customer-import.sql
 ```
 
-Kør den genererede SQL mod den lokale MySQL-database, eksempelvis med Docker:
+Kør den genererede PostgreSQL SQL med bootstrap-kontoen i Docker (rå navne forbliver lokale):
 
 ```bash
 docker compose exec -T db \
-  sh -c 'exec mysql --default-character-set=utf8mb4 -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' \
+  sh -c 'exec psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
   < /tmp/hotel-kong-arthur-customer-import.sql
 ```
 
 Importscriptet skriver en profil og afviste rækker til stderr. SQL går til
 stdout, så rapporten og importen kan kontrolleres separat.
+
+## Genopbyg anonymiserede fixtures
+
+Generér til midlertidige filer, gennemgå output, og tilføj en ny seedversion ved
+ændringer i en eksisterende database. Overskriv ikke allerede anvendte seeds.
+
+```sh
+python3 database/import/build_anonymized_customer_seed.py \
+  --customer-dir data/raw > /tmp/hka-anonymized.sql
+python3 database/import/build_synthetic_bookings_seed.py \
+  --source /tmp/hka-anonymized.sql --output /tmp/hka-bookings.sql
+```
+
+Begge producerer PostgreSQL SQL. Syntetisk bookinggenerering forventer 1.000
+accepterede anonymiserede ophold og læser batchhash fra den valgte seedfil.
+Anonymiseret seedgenerering afviser ugyldige rækker; ret kilden eller gennemgå
+råimportens afvisningsrapport, før en ny anonymiseret fixture genereres. Råfiler
+og SQL med originale navne må ikke committes. Importgeneratorerne er testet med
+fiktive XLSX-filer, PostgreSQL og gentagen indlæsning, inklusive afviste rækker.
 
 ## Mapping
 

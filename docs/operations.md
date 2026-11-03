@@ -53,7 +53,9 @@ Ved portkonflikt: vælg ledige porte i .env; intern PostgreSQL-port forbliver 54
 Ved migrationsfejl: inspicér db-init-loggen og databasens migrationstabel, ret med en
 fremadrettet migration. Slet ikke arbejdsdata for at få en grøn healthcheck.
 
-Tableau Public og den valgfrie Hyper-bro kører på værtsmaskinen, ikke i Compose.
+Tableau Desktop bruger REST API Connector mod localhost:8000. Connectoren
+bruger extracts; opdatér med Data → Refresh All Extracts. Den gamle Hyper-bro
+er historisk og bruges ikke.
 Det manuelle dashboard og dets opdatering er fortsat en udestående leverance.
 
 Testprofilen nulstiller altid hotel_kong_arthur_test på test-db før fixtures indlæses,

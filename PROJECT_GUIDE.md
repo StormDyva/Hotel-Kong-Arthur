@@ -12,8 +12,8 @@ er bevaret i tagget `v1-mysql-tableau` på GitHub.
 
 Den kanoniske funktionelle specifikation er specs/spec.md. Arbejdsflow:
 Constitution → Specify → Clarify → Plan → Tasks → Implement → Converge.
-Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. Aktuel
-Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
+Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. PostgreSQL-
+Converge: specs/converge-postgres-2026-11-03.md; ældre rapporter er historik.
 
 ## Teknisk struktur
 
@@ -25,7 +25,7 @@ Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
   database/postgres; MySQL-filer bevares som historiske v1-kilder.
 - Importerede skoleophold er anonymiserede, skrivebeskyttede `synthetic_import`-rækker.
 - Frontend: HTML/CSS/JavaScript; kalder API og skal vise API-beregnede analyser.
-- Tableau: hvis fortsat krævet, bruger kun API-beregnede værdier.
+- Tableau: REST API Connector bruger API-beregnede værdier og extracts; legacyeksport er ude af scope.
 
 Compose starter PostgreSQL → db-init → API-health → nginx/frontend.
 Data ligger i postgres_data; mysql_data bevares urørt. Testprofilen har separat
