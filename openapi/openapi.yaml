@@ -1,3 +1,4 @@
+---
 openapi: 3.1.0
 info:
   title: Hotel Kong Arthur API
@@ -7,7 +8,7 @@ info:
     Hotel filters do not filter bar sales. Demo inventory is synthetic.
   version: 1.1.0
 paths:
-  /health:
+  "/health":
     get:
       tags:
       - System
@@ -19,38 +20,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Health'
+                "$ref": "#/components/schemas/Health"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/rooms:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/rooms":
     get:
       tags:
       - Inventory
@@ -74,39 +75,39 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Room'
+                  "$ref": "#/components/schemas/Room"
                 title: Response Rooms Api Rooms Get
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/rooms/availability:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/rooms/availability":
     get:
       tags:
       - Inventory
@@ -143,39 +144,39 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Availability'
+                  "$ref": "#/components/schemas/Availability"
                 title: Response Availability Api Rooms Availability Get
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/room-types:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/room-types":
     get:
       tags:
       - Inventory
@@ -188,7 +189,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/RoomType'
+                  "$ref": "#/components/schemas/RoomType"
                 type: array
                 title: Response Room Types Api Room Types Get
         '404':
@@ -196,32 +197,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/bookings:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/bookings":
     get:
       tags:
       - Bookings
@@ -298,37 +299,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookingPage'
+                "$ref": "#/components/schemas/BookingPage"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
     post:
       tags:
       - Bookings
@@ -339,45 +340,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookingWrite'
+              "$ref": "#/components/schemas/BookingWrite"
       responses:
         '201':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Booking'
+                "$ref": "#/components/schemas/Booking"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/bookings/{booking_id}:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/bookings/{booking_id}":
     get:
       tags:
       - Bookings
@@ -396,37 +397,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Booking'
+                "$ref": "#/components/schemas/Booking"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
     put:
       tags:
       - Bookings
@@ -444,44 +445,44 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookingUpdate'
+              "$ref": "#/components/schemas/BookingUpdate"
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Booking'
+                "$ref": "#/components/schemas/Booking"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
     delete:
       tags:
       - Bookings
@@ -502,32 +503,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/bookings/{booking_id}/review:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/bookings/{booking_id}/review":
     put:
       tags:
       - Guest feedback
@@ -545,44 +546,44 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReviewWrite'
+              "$ref": "#/components/schemas/ReviewWrite"
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Review'
+                "$ref": "#/components/schemas/Review"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
     get:
       tags:
       - Guest feedback
@@ -601,38 +602,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Review'
+                "$ref": "#/components/schemas/Review"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/bar-products:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/bar-products":
     get:
       tags:
       - Bar
@@ -645,7 +646,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/BarProduct'
+                  "$ref": "#/components/schemas/BarProduct"
                 type: array
                 title: Response Bar Products Api Bar Products Get
         '404':
@@ -653,32 +654,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/bar-sales:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/bar-sales":
     post:
       tags:
       - Bar
@@ -688,7 +689,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaleWrite'
+              "$ref": "#/components/schemas/SaleWrite"
         required: true
       responses:
         '201':
@@ -696,42 +697,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sale'
+                "$ref": "#/components/schemas/Sale"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/dashboard:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/dashboard":
     get:
       tags:
-      - Analytics
-      summary: Dashboard
+      - US-007/US-008 – Dashboard og frontend
+      summary: Samlet dashboard for hotel, bar og kundetilfredshed
+      description: |-
+        User story: US-007/US-008 – Dashboard og frontend.
+
+        KPI’er: Belægningsgrad, hotelomsætning, ADR, RevPAR, gæster pr. land, barsalg og kundetilfredshed.
+
+        Acceptkriterier: Endpointet samler alle analyseområder i ét JSON-svar. Tableau og frontend bruger API’et som datakilde og må ikke beregne egne KPI’er. Samme periodefiltre skal kunne bruges på analyserne.
+
+        Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id`, `season` og `employee_name`.
+
+        Datakilde: Backendens analyse-service over bekræftede bookinger, historiske natpris-snapshots, aktivt værelsesinventar, barsalg og bookingratings.
       operationId: dashboard_api_analytics_dashboard_get
       parameters:
       - name: from
@@ -768,7 +779,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -807,46 +818,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DashboardReport'
+                "$ref": "#/components/schemas/DashboardReport"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revpar:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revpar":
     get:
       tags:
-      - Analytics
-      summary: Revenue per available room night (RevPAR)
-      description: Room revenue divided by available room nights in DKK. Includes
-        monthly rows, with clipped period and season capacity. Country filters revenue
-        only; room type/season also filter capacity. Zero denominator returns zero
-        with warnings.
+      - US-004 – Hotelindtjening og gæster
+      summary: RevPAR – omsætning pr. tilgængelig værelsesnat
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: RevPAR, samlet værelsesomsætning og tilgængelige værelsesnætter.
+
+        Acceptkriterier: RevPAR beregnes som værelsesomsætning divideret med tilgængelige værelsesnætter. Checkout-datoen er eksklusiv, annullerede bookinger filtreres fra, og nul-kapacitet giver 0 med warning.
+
+        Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger med historiske natpris-snapshots og aktivt værelsesinventar.
       operationId: analytics_revpar_api_analytics_revpar_get
       parameters:
       - name: from
@@ -883,7 +900,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -922,44 +939,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_RevPARReport_'
+                "$ref": "#/components/schemas/AnalyticsResponse_RevPARReport_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/occupancy:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/occupancy":
     get:
       tags:
-      - Analytics
-      summary: Occupancy and average daily rate
-      description: Sold nights / active inventory nights × 100. Country filters only
-        the numerator; season/type also filter inventory.
+      - US-003 – Belægning
+      summary: Belægning og gennemsnitlig dagspris
+      description: |-
+        User story: US-003 – Belægning.
+
+        KPI’er: `occupancy_percent`, `room_nights`, `available_room_nights` og `adr`.
+
+        Acceptkriterier: Belægning kan filtreres på periode. Checkout-datoen er eksklusiv, annullerede bookinger tælles ikke, og nul-kapacitet returnerer 0 og en warning.
+
+        Filtre: `from` og `to` som eksklusivt interval, `year`, `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger, historiske natpris-snapshots og aktivt værelsesinventar.
       operationId: analytics_occupancy_api_analytics_occupancy_get
       parameters:
       - name: from
@@ -996,7 +1021,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1035,44 +1060,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_Summary_'
+                "$ref": "#/components/schemas/AnalyticsResponse_Summary_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue":
     get:
       tags:
-      - Analytics
-      summary: Hotel revenue for a year or period
-      description: Sum of nightly historical price snapshots for confirmed bookings.
-        Checkout is exclusive.
+      - US-004 – Hotelindtjening og gæster
+      summary: Samlet hotelomsætning for periode eller år
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Samlet omsætning, room nights, available room nights, belægningsgrad, ADR og RevPAR.
+
+        Acceptkriterier: Samlet omsætning summerer historiske natpris-snapshots for bekræftede bookinger. Checkout-datoen er eksklusiv, og annullerede bookinger filtreres fra.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger og gemte natpris-snapshots i hotellets database.
       operationId: analytics_revenue_api_analytics_revenue_get
       parameters:
       - name: from
@@ -1109,7 +1142,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1148,44 +1181,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_Summary_'
+                "$ref": "#/components/schemas/AnalyticsResponse_Summary_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue-by-room:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue-by-room":
     get:
       tags:
-      - Analytics
-      summary: Revenue by physical room
-      description: Sorted by revenue descending. Room number identifies the physical
-        room.
+      - US-004 – Hotelindtjening og gæster
+      summary: Omsætning pr. fysisk værelse
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Omsætning pr. fysisk værelse og tilhørende room nights og gæstenætter.
+
+        Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter fysisk værelsesnummer. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt hotellets land-, værelsestype- og sæsonfiltre.
+
+        Datakilde: Bekræftede bookinger med værelses- og natpris-snapshots.
       operationId: analytics_revenue_by_room_api_analytics_revenue_by_room_get
       parameters:
       - name: from
@@ -1222,7 +1263,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1261,43 +1302,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue-by-room-type:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue-by-room-type":
     get:
       tags:
-      - Analytics
-      summary: Revenue by room type
-      description: Sorted by revenue descending.
+      - US-004 – Hotelindtjening og gæster
+      summary: Omsætning pr. værelsestype
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Omsætning pr. værelsestype, room nights og gæstenætter.
+
+        Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter værelsestype og sorterer efter omsætning. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger og værelsestype fra hotellets database.
       operationId: analytics_revenue_by_room_type_api_analytics_revenue_by_room_type_get
       parameters:
       - name: from
@@ -1334,7 +1384,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1373,43 +1423,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue-by-country:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue-by-country":
     get:
       tags:
-      - Analytics
-      summary: Revenue by country
-      description: Country is the booking guest country.
+      - US-004 – Hotelindtjening og gæster
+      summary: Omsætning pr. land
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Omsætning pr. bookinggæsts land, room nights og gæstenætter.
+
+        Acceptkriterier: Resultatet grupperer backend-beregnet omsætning efter gæstens land. Annullerede bookinger filtreres fra, og tomme perioder returnerer en tom liste.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger og bookingens gæstesnapshot.
       operationId: analytics_revenue_by_country_api_analytics_revenue_by_country_get
       parameters:
       - name: from
@@ -1446,7 +1505,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1485,43 +1544,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue-by-season:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue-by-season":
     get:
       tags:
-      - Analytics
-      summary: Revenue by season
-      description: Season is determined per occupied night.
+      - US-004 – Hotelindtjening og gæster
+      summary: Omsætning pr. sæson
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Omsætning pr. sæson, room nights og gæstenætter.
+
+        Acceptkriterier: Sæsonen bestemmes pr. optaget nat, så ophold på tværs af sæsoner fordeles korrekt. Annullerede bookinger filtreres fra.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger med historiske natpris-snapshots og sæsonkalender.
       operationId: analytics_revenue_by_season_api_analytics_revenue_by_season_get
       parameters:
       - name: from
@@ -1558,7 +1626,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1597,43 +1665,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/revenue-by-room-type-season:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/revenue-by-room-type-season":
     get:
       tags:
-      - Analytics
-      summary: Revenue by room type and season
-      description: Cross-season stays are split by nightly snapshots.
+      - US-004 – Hotelindtjening og gæster
+      summary: Omsætning pr. værelsestype og sæson
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Omsætning pr. værelsestype og sæson, room nights og gæstenætter.
+
+        Acceptkriterier: Krydstabellen fordeler ophold på tværs af sæsoner efter de enkelte natpris-snapshots. Annullerede bookinger filtreres fra.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger, værelsestyper og sæsonbestemte natpris-snapshots.
       operationId: analytics_revenue_by_room_type_season_api_analytics_revenue_by_room_type_season_get
       parameters:
       - name: from
@@ -1670,7 +1747,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1709,45 +1786,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/guests-by-country:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/guests-by-country":
     get:
       tags:
-      - Analytics
-      summary: Guests by country
-      description: booking_guests counts party sizes once per matching booking; distinct_bookers
-        counts booking guest snapshots, not identified repeat visitors. All party
-        members are attributed to the booker country.
+      - US-004 – Hotelindtjening og gæster
+      summary: Gæster og gæstenætter pr. land
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Gæster pr. land, gæstenætter pr. land, booking guests og distinct bookers.
+
+        Acceptkriterier: Party size tælles én gang pr. matchende booking, og alle partimedlemmer tilskrives bookingens gæsteland. Annullerede bookinger filtreres fra.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bekræftede bookinger og bookingens gæstesnapshot.
       operationId: analytics_guests_by_country_api_analytics_guests_by_country_get
       parameters:
       - name: from
@@ -1784,7 +1868,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1823,44 +1907,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_list_Group__'
+                "$ref": "#/components/schemas/AnalyticsResponse_list_Group__"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/top-performers:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/top-performers":
     get:
       tags:
-      - Analytics
-      summary: Most profitable room, type and country
-      description: Highest total revenue in the selected period. Empty groups return
-        null.
+      - US-004 – Hotelindtjening og gæster
+      summary: Mest indbringende værelse, værelsestype og land
+      description: |-
+        User story: US-004 – Hotelindtjening og gæster.
+
+        KPI’er: Mest indbringende værelse, mest indbringende værelsestype og mest indbringende land.
+
+        Acceptkriterier: Topresultaterne baseres på højest samlet omsætning i den valgte periode. Tomme grupper returnerer null, og annullerede bookinger filtreres fra.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Grupperet omsætning fra bekræftede bookinger og natpris-snapshots.
       operationId: analytics_top_performers_api_analytics_top_performers_get
       parameters:
       - name: from
@@ -1897,7 +1989,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -1936,45 +2028,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_TopPerformers_'
+                "$ref": "#/components/schemas/AnalyticsResponse_TopPerformers_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/bar-sales:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/bar-sales":
     get:
       tags:
-      - Analytics
-      summary: Bar revenue, drinks and category shares
-      description: Default employee is Helene Christine. Includes total_revenue, products
-        and categories with percentage of total revenue. Hotel filters do not affect
-        bar sales.
+      - US-005 – Cocktailbar
+      summary: Barsalg, drinks og kategoriandele
+      description: |-
+        User story: US-005 – Cocktailbar.
+
+        KPI’er: `total_revenue`, omsætning pr. drink, antal solgte drinks, cocktailomsætning, kaffeomsætning og procentfordeling mellem kategorier.
+
+        Acceptkriterier: Omsætning pr. drink beregnes som `quantity × unit_price`. `employee_name` kan filtrere salget; standardmedarbejderen er Helene Christine. Nul-omsætning returnerer 0 og en warning.
+
+        Filtre: `from` og `to` som eksklusivt interval, `year` og `employee_name`. Hotel-filtre påvirker ikke barsalget.
+
+        Datakilde: Bar-salgsrækker med produkt, kategori, quantity og unit_price.
       operationId: analytics_bar_sales_api_analytics_bar_sales_get
       parameters:
       - name: from
@@ -2011,7 +2110,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -2050,44 +2149,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_BarReport_'
+                "$ref": "#/components/schemas/AnalyticsResponse_BarReport_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/analytics/customer-satisfaction:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/api/analytics/customer-satisfaction":
     get:
       tags:
-      - Analytics
-      summary: Guest ratings and response rate
-      description: Checkout cohort in [from,to). Only completed confirmed bookings
-        qualify. Average is null without ratings; no synthetic scores.
+      - US-006 – Kundetilfredshed
+      summary: Gæsteratings og svarprocent
+      description: |-
+        User story: US-006 – Kundetilfredshed.
+
+        KPI’er: `average_rating`, `response_percent`, `rated_bookings`, `eligible_bookings` og ratingfordeling fra 1 til 5.
+
+        Acceptkriterier: Ratinger går fra 1 til 5. Kun afsluttede og ikke-annullerede bookinger kan rates, én rating gemmes pr. booking, og ingen ratings giver `average_rating=null` og en warning.
+
+        Filtre: `from` og `to` som eksklusivt interval eller `year`, samt `country_code`, `room_type_id` og `season`.
+
+        Datakilde: Bookingratings og kohorten af afsluttede, bekræftede bookinger.
       operationId: analytics_customer_satisfaction_api_analytics_customer_satisfaction_get
       parameters:
       - name: from
@@ -2124,7 +2231,7 @@ paths:
         schema:
           anyOf:
           - type: string
-            pattern: ^[A-Z]{2}$
+            pattern: "^[A-Z]{2}$"
           - type: 'null'
           title: Country Code
       - name: room_type_id
@@ -2163,38 +2270,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalyticsResponse_Satisfaction_'
+                "$ref": "#/components/schemas/AnalyticsResponse_Satisfaction_"
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /analytics/revenue/by-room-type-season:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/revenue/by-room-type-season":
     get:
       tags:
       - Tableau revenue
@@ -2240,7 +2347,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RoomTypeSeasonRevenueRow'
+                  "$ref": "#/components/schemas/RoomTypeSeasonRevenueRow"
                 title: Response Room Type Season Rows Analytics Revenue By Room Type
                   Season Get
         '404':
@@ -2248,32 +2355,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /analytics/revenue/by-country:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/revenue/by-country":
     get:
       tags:
       - Tableau revenue
@@ -2320,7 +2427,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CountryRevenueRow'
+                  "$ref": "#/components/schemas/CountryRevenueRow"
                 title: Response Country Revenue Rows Analytics Revenue By Country
                   Get
         '404':
@@ -2328,39 +2435,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                "$ref": "#/components/schemas/ErrorResponse"
 components:
   schemas:
     AnalyticsResponse_BarReport_:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2374,7 +2481,7 @@ components:
           type: array
           title: Warnings
         data:
-          $ref: '#/components/schemas/BarReport'
+          "$ref": "#/components/schemas/BarReport"
         hotel_filters_apply_to_bar:
           type: boolean
           title: Hotel Filters Apply To Bar
@@ -2391,9 +2498,9 @@ components:
     AnalyticsResponse_RevPARReport_:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2407,7 +2514,7 @@ components:
           type: array
           title: Warnings
         data:
-          $ref: '#/components/schemas/RevPARReport'
+          "$ref": "#/components/schemas/RevPARReport"
         hotel_filters_apply_to_bar:
           type: boolean
           title: Hotel Filters Apply To Bar
@@ -2424,9 +2531,9 @@ components:
     AnalyticsResponse_Satisfaction_:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2440,7 +2547,7 @@ components:
           type: array
           title: Warnings
         data:
-          $ref: '#/components/schemas/Satisfaction'
+          "$ref": "#/components/schemas/Satisfaction"
         hotel_filters_apply_to_bar:
           type: boolean
           title: Hotel Filters Apply To Bar
@@ -2457,9 +2564,9 @@ components:
     AnalyticsResponse_Summary_:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2473,7 +2580,7 @@ components:
           type: array
           title: Warnings
         data:
-          $ref: '#/components/schemas/Summary'
+          "$ref": "#/components/schemas/Summary"
         hotel_filters_apply_to_bar:
           type: boolean
           title: Hotel Filters Apply To Bar
@@ -2490,9 +2597,9 @@ components:
     AnalyticsResponse_TopPerformers_:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2506,7 +2613,7 @@ components:
           type: array
           title: Warnings
         data:
-          $ref: '#/components/schemas/TopPerformers'
+          "$ref": "#/components/schemas/TopPerformers"
         hotel_filters_apply_to_bar:
           type: boolean
           title: Hotel Filters Apply To Bar
@@ -2523,9 +2630,9 @@ components:
     AnalyticsResponse_list_Group__:
       properties:
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -2540,7 +2647,7 @@ components:
           title: Warnings
         data:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: Data
         hotel_filters_apply_to_bar:
@@ -2599,11 +2706,11 @@ components:
           title: Capacity
         total_price:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Total Price
         price_per_night:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Price Per Night
         currency:
           type: string
@@ -2631,7 +2738,7 @@ components:
           title: Category
         price:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Price
         currency:
           type: string
@@ -2648,19 +2755,19 @@ components:
       properties:
         total_revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Total Revenue
         employee_name:
           type: string
           title: Employee Name
         products:
           items:
-            $ref: '#/components/schemas/Product'
+            "$ref": "#/components/schemas/Product"
           type: array
           title: Products
         categories:
           items:
-            $ref: '#/components/schemas/Category'
+            "$ref": "#/components/schemas/Category"
           type: array
           title: Categories
       type: object
@@ -2699,7 +2806,7 @@ components:
           type: integer
           title: Guests Count
         guest:
-          $ref: '#/components/schemas/GuestView'
+          "$ref": "#/components/schemas/GuestView"
         guest_id:
           type: integer
           title: Guest Id
@@ -2713,11 +2820,11 @@ components:
           title: Updated At
         price_total:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Price Total
         price_per_night:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Price Per Night
         currency:
           type: string
@@ -2757,7 +2864,7 @@ components:
       properties:
         items:
           items:
-            $ref: '#/components/schemas/Booking'
+            "$ref": "#/components/schemas/Booking"
           type: array
           title: Items
         total:
@@ -2801,7 +2908,7 @@ components:
           minimum: 1.0
           title: Guests Count
         guest:
-          $ref: '#/components/schemas/Guest'
+          "$ref": "#/components/schemas/Guest"
         currency:
           type: string
           const: DKK
@@ -2812,7 +2919,7 @@ components:
           - type: number
             minimum: 0.0
           - type: string
-            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           - type: 'null'
           title: Price Total
         status:
@@ -2837,7 +2944,7 @@ components:
           country_code: DK
           email: test@example.com
           name: Test Gæst
-          phone: +45 12345678
+          phone: "+45 12345678"
         guests_count: 1
         room_id: 101
         status: confirmed
@@ -2861,7 +2968,7 @@ components:
           minimum: 1.0
           title: Guests Count
         guest:
-          $ref: '#/components/schemas/Guest'
+          "$ref": "#/components/schemas/Guest"
         currency:
           type: string
           const: DKK
@@ -2872,7 +2979,7 @@ components:
           - type: number
             minimum: 0.0
           - type: string
-            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           - type: 'null'
           title: Price Total
         status:
@@ -2897,7 +3004,7 @@ components:
           country_code: DK
           email: test@example.com
           name: Test Gæst
-          phone: +45 12345678
+          phone: "+45 12345678"
         guests_count: 1
         room_id: 101
         status: confirmed
@@ -2908,11 +3015,11 @@ components:
           title: Category
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
         percent:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Percent
       type: object
       required:
@@ -2961,46 +3068,46 @@ components:
           type: array
           title: Warnings
         summary:
-          $ref: '#/components/schemas/Summary'
+          "$ref": "#/components/schemas/Summary"
         by_room_type:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: By Room Type
         by_country:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: By Country
         by_season:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: By Season
         by_room_type_season:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: By Room Type Season
         daily:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: Daily
         bar_products:
           items:
-            $ref: '#/components/schemas/Product'
+            "$ref": "#/components/schemas/Product"
           type: array
           title: Bar Products
         bar_categories:
           items:
-            $ref: '#/components/schemas/Category'
+            "$ref": "#/components/schemas/Category"
           type: array
           title: Bar Categories
         period:
-          $ref: '#/components/schemas/Period'
+          "$ref": "#/components/schemas/Period"
         applied_filters:
-          $ref: '#/components/schemas/AppliedFilters'
+          "$ref": "#/components/schemas/AppliedFilters"
         generated_at:
           type: string
           format: date-time
@@ -3010,23 +3117,23 @@ components:
           title: Hotel Filters Apply To Bar
         by_room:
           items:
-            $ref: '#/components/schemas/Group'
+            "$ref": "#/components/schemas/Group"
           type: array
           title: By Room
         top_room:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
         top_room_type:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
         top_country:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
         satisfaction:
-          $ref: '#/components/schemas/Satisfaction'
+          "$ref": "#/components/schemas/Satisfaction"
       type: object
       required:
       - from_date
@@ -3089,7 +3196,7 @@ components:
           title: Message
         details:
           items:
-            $ref: '#/components/schemas/ErrorDetail'
+            "$ref": "#/components/schemas/ErrorDetail"
           type: array
           title: Details
           default: []
@@ -3105,7 +3212,7 @@ components:
           title: Label
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
         room_nights:
           type: integer
@@ -3142,17 +3249,17 @@ components:
         email:
           type: string
           maxLength: 254
-          pattern: ^[^\s@]+@[^\s@]+\.[^\s@]+$
+          pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
           title: Email
         phone:
           type: string
           maxLength: 40
           minLength: 5
-          pattern: ^\+?[0-9 ()-]+$
+          pattern: "^\\+?[0-9 ()-]+$"
           title: Phone
         country_code:
           type: string
-          pattern: ^[A-Z]{2}$
+          pattern: "^[A-Z]{2}$"
           title: Country Code
       additionalProperties: false
       type: object
@@ -3207,14 +3314,14 @@ components:
           title: Month
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
         available_room_nights:
           type: integer
           title: Available Room Nights
         revpar:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revpar
       type: object
       required:
@@ -3259,7 +3366,7 @@ components:
           title: Quantity
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
       type: object
       required:
@@ -3272,18 +3379,18 @@ components:
       properties:
         revpar:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revpar
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
         available_room_nights:
           type: integer
           title: Available Room Nights
         monthly:
           items:
-            $ref: '#/components/schemas/MonthlyRevPAR'
+            "$ref": "#/components/schemas/MonthlyRevPAR"
           type: array
           title: Monthly
       type: object
@@ -3434,7 +3541,7 @@ components:
           title: Quantity
         unit_price:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Unit Price
         employee_name:
           type: string
@@ -3480,7 +3587,7 @@ components:
           - type: number
             minimum: 0.0
           - type: string
-            pattern: ^(?!^[-+.]*$)[+-]?0*(?:\d{0,8}|(?=[\d.]{1,11}0*$)\d{0,8}\.\d{0,2}0*$)
+            pattern: "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,8}|(?=[\\d.]{1,11}0*$)\\d{0,8}\\.\\d{0,2}0*$)"
           - type: 'null'
           title: Unit Price
           description: Optional actual unit price in DKK; defaults to the product
@@ -3505,7 +3612,7 @@ components:
         average_rating:
           anyOf:
           - type: string
-            pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           - type: 'null'
           title: Average Rating
         rated_bookings:
@@ -3516,11 +3623,11 @@ components:
           title: Eligible Bookings
         response_percent:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Response Percent
         distribution:
           items:
-            $ref: '#/components/schemas/Distribution'
+            "$ref": "#/components/schemas/Distribution"
           type: array
           title: Distribution
         scale_min:
@@ -3543,7 +3650,7 @@ components:
       properties:
         revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revenue
         room_nights:
           type: integer
@@ -3556,17 +3663,17 @@ components:
           title: Occupancy Percent
         adr:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Adr
         revpar:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Revpar
           description: Room revenue / available room nights, in DKK. Zero for zero
             capacity.
         bar_revenue:
           type: string
-          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          pattern: "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
           title: Bar Revenue
         inventory_rooms:
           type: integer
@@ -3586,15 +3693,15 @@ components:
       properties:
         top_room:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
         top_room_type:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
         top_country:
           anyOf:
-          - $ref: '#/components/schemas/Group'
+          - "$ref": "#/components/schemas/Group"
           - type: 'null'
       type: object
       required:
@@ -3602,3 +3709,15 @@ components:
       - top_room_type
       - top_country
       title: TopPerformers
+tags:
+- name: System
+- name: Inventory
+- name: Bookings
+- name: Guest feedback
+- name: Bar
+- name: US-003 – Belægning
+- name: US-004 – Hotelindtjening og gæster
+- name: US-005 – Cocktailbar
+- name: US-006 – Kundetilfredshed
+- name: US-007/US-008 – Dashboard og frontend
+- name: Tableau revenue
