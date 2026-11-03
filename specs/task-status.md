@@ -1,3 +1,13 @@
+# Aktuel status — T-031/T-032 (2026-11-03)
+
+T-031/T-032 klar til review: PostgreSQL 17-runtime, schema, anonymiserede fixtures,
+repositories, CSV-loader og XLSX-generatorer implementeret. 35 tests mod PostgreSQL består. XLSX-/SQL-generatorer er PostgreSQL-porteret og integrationstestet.
+Tableau bruger kun REST API Connector; legacyeksport skal ikke porteres.
+Se [migrationsstatus](../docs/postgres-migration.md). Tidligere T-028-testresultater
+nedenfor vedrører MySQL og er historiske.
+
+---
+
 # Aktuel status — T-028
 
 T-028: 1000 exact CSV rows and source bookings plus 100 extra mocks are loaded

@@ -13,12 +13,13 @@ from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 from pathlib import Path
+from import_customer_data import SQL_BEGIN, SQL_END, sql_script
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "database/seed/004_anonymized_customer_source.sql"
-INVENTORY = ROOT / "database/seed/002_assignment_reference_inventory.sql"
-DEFAULT_OUTPUT = ROOT / "database/seed/005_synthetic_customer_bookings.sql"
-BATCH_HASH = "e829206c8c697074a7d9621ec3fc1d6d4a329bc2309270b49f63630e8fa9eee8"
+SOURCE = ROOT / "database/postgres/seed/004_anonymized_customer_source.sql"
+INVENTORY = ROOT / "database/postgres/seed/002_assignment_reference_inventory.sql"
+DEFAULT_OUTPUT = ROOT / "database/postgres/seed/005_synthetic_customer_bookings.sql"
+
 ROOM_TYPES = {
     "Standard Single": 1,
     "Grand Lit": 2,
@@ -36,14 +37,21 @@ WINDOWS = {
 }
 
 
-def read_records() -> list[dict]:
+def batch_hash(source: Path = SOURCE) -> str:
+    match = re.search(r"VALUES \('ITAKEA/hoteldata', 'international_names_with_rooms_1000.xlsx', '([a-f0-9]{64})'", source.read_text())
+    if not match:
+        raise ValueError('Missing source batch fingerprint in anonymized seed')
+    return match.group(1)
+
+
+def read_records(source: Path = SOURCE) -> list[dict]:
     row_pattern = re.compile(
-        r"VALUES \(@import_batch_id, 'Sheet1:(\d+)', @guest_id, 'Guest', "
+        r"VALUES \(v_import_batch_id, 'Sheet1:(\d+)', v_guest_id, 'Guest', "
         r"'Imported Record \d{4}', '[^']*', '[A-Z]{2}', '([^']+)', "
         r"(\d+), '(low|mid|high)', ([0-9]+(?:\.[0-9]+)?), 'accepted'\)"
     )
     records = []
-    for match in row_pattern.finditer(SOURCE.read_text()):
+    for match in row_pattern.finditer(source.read_text()):
         source_row, source_type, nights, season, total = match.groups()
         if source_type not in ROOM_TYPES:
             raise ValueError(f"Unknown source room type: {source_type}")
@@ -91,12 +99,11 @@ def money(value: Decimal) -> str:
     return f"{value:.2f}"
 
 
-def render(records: list[dict]) -> str:
+def render(records: list[dict], source: Path = SOURCE) -> str:
     lines = [
-        "SET NAMES utf8mb4;",
-        "START TRANSACTION;",
+        SQL_BEGIN,
         "-- Invented booking dates, room assignment, and party size; source values retained.",
-        f"SET @import_batch_id = (SELECT id FROM import_batches WHERE file_sha256 = '{BATCH_HASH}');",
+        f"SELECT id INTO STRICT v_import_batch_id FROM import_batches WHERE source_system='ITAKEA/hoteldata' AND file_name='international_names_with_rooms_1000.xlsx' AND file_sha256='{batch_hash(source)}';",
         "",
     ]
     for row in records:
@@ -104,10 +111,10 @@ def render(records: list[dict]) -> str:
         lines.extend([
             "INSERT INTO bookings",
             "    (guest_id, room_id, check_in, check_out, guests_count, price_total, currency, status, data_origin, import_batch_id, source_record_id)",
-            f"SELECT c.guest_id, (SELECT r.id FROM rooms r WHERE r.room_type_id={row['type_id']} AND r.active=TRUE AND r.status='available' ORDER BY r.id LIMIT 1 OFFSET {row['room_offset']}), '{start:%Y-%m-%d}', '{end:%Y-%m-%d}', 1, {money(row['total'])}, 'DKK', 'confirmed', 'synthetic_import', @import_batch_id, '{row['source']}'",
+            f"SELECT c.guest_id, (SELECT r.id FROM rooms r WHERE r.room_type_id={row['type_id']} AND r.active=TRUE AND r.status='available' ORDER BY r.id LIMIT 1 OFFSET {row['room_offset']}), DATE '{start:%Y-%m-%d}', DATE '{end:%Y-%m-%d}', 1, {money(row['total'])}, 'DKK', 'confirmed', 'synthetic_import', v_import_batch_id, '{row['source']}'",
             "FROM customer_stay_records c",
-            f"WHERE c.import_batch_id=@import_batch_id AND c.source_record_id='{row['source']}' AND c.row_status='accepted'",
-            "ON DUPLICATE KEY UPDATE guest_id=VALUES(guest_id), room_id=VALUES(room_id), check_in=VALUES(check_in), check_out=VALUES(check_out), guests_count=VALUES(guests_count), price_total=VALUES(price_total), data_origin=VALUES(data_origin);",
+            f"WHERE c.import_batch_id=v_import_batch_id AND c.source_record_id='{row['source']}' AND c.row_status='accepted'",
+            "ON CONFLICT (import_batch_id,source_record_id) DO UPDATE SET guest_id=EXCLUDED.guest_id, room_id=EXCLUDED.room_id, check_in=EXCLUDED.check_in, check_out=EXCLUDED.check_out, guests_count=EXCLUDED.guests_count, price_total=EXCLUDED.price_total, data_origin=EXCLUDED.data_origin;",
         ])
 
     line_rows = []
@@ -117,7 +124,7 @@ def render(records: list[dict]) -> str:
         for index in range(row["nights"]):
             amount = Decimal(base + (1 if index < remainder else 0)) / 100
             night = row["start"] + timedelta(days=index)
-            line_rows.append((row["source"], f"'{night:%Y-%m-%d}'", row["season"], money(amount)))
+            line_rows.append((row["source"], f"DATE '{night:%Y-%m-%d}'", row["season"], money(amount)))
     for offset in range(0, len(line_rows), 250):
         chunk = line_rows[offset:offset + 250]
         lines.extend([
@@ -131,20 +138,21 @@ def render(records: list[dict]) -> str:
         ))
         lines.extend([
             ") generated_lines) x",
-            "JOIN bookings b ON b.import_batch_id=@import_batch_id AND b.source_record_id=x.source_record_id",
+            "JOIN bookings b ON b.import_batch_id=v_import_batch_id AND b.source_record_id=x.source_record_id",
             "JOIN seasons s ON s.code=x.season_code",
-            "ON DUPLICATE KEY UPDATE season_id=VALUES(season_id), price_per_night=VALUES(price_per_night), line_total=VALUES(line_total);",
+            "ON CONFLICT (booking_id,night_date) DO UPDATE SET season_id=EXCLUDED.season_id, price_per_night=EXCLUDED.price_per_night, line_total=EXCLUDED.line_total;",
         ])
-    lines.extend(["COMMIT;", ""])
-    return "\n".join(lines)
+    lines.extend([SQL_END, ""])
+    return sql_script(lines)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--source", type=Path, default=SOURCE)
     args = parser.parse_args()
-    records = schedule(read_records(), room_counts())
-    args.output.write_text(render(records))
+    records = schedule(read_records(args.source), room_counts())
+    args.output.write_text(render(records, args.source))
     print(f"Generated {len(records)} synthetic bookings and {sum(r['nights'] for r in records)} price lines: {args.output}")
 
 

@@ -2,11 +2,10 @@
 
 ## Aktuel status
 
-v1 har API, MySQL, bookingfrontend og lokal Swagger. Tillægsopgave uge 2 er nu
-specifikationsudkast: PostgreSQL og analysevisninger i frontend er planlagt, men
-ikke implementeret. Alle KPI-beregninger skal fortsat ligge i backendens
-service-lag. Tableau-status afventer Clarify. Referenceinventar og salg er
-syntetiske demodata.
+T-031/T-032: API, bookingfrontend og Swagger kører nu mod PostgreSQL 17.
+Schema, anonymiserede fixtures og CSV-loader er portet. Eksisterende API-kontrakt
+bevares. Analysefrontend og de åbne C-013–C-016-punkter er ikke løst her.
+Se docs/postgres-migration.md for testbevis og verifikationsbevis.
 
 Præsentationsversionen er sikret på GitHub som tag/branch
 `v1-mysql-tableau`. Se README.md for checkout og start.
@@ -15,8 +14,8 @@ Præsentationsversionen er sikret på GitHub som tag/branch
 2. Følg README.md for `docker compose up --build -d` og testkommandoer.
 3. Åbn http://localhost:8000/docs og brug docs/api-testing.md.
 4. Læs specs/constitution.md, spec.md, clarify.md, plan.md, tasks.md og user-stories.md.
-5. Aktuel v1-status/testbevis: specs/converge-api-2026-10-28.md. Rapporten er
-   historisk og dokumenterer ikke PostgreSQL-kravene.
+5. Aktuelt PostgreSQL-testbevis: specs/converge-postgres-2026-11-03.md.
+   specs/converge-api-2026-10-28.md er historisk MySQL-bevis.
 
 Kravgrundlag: de to udleverede PDF'er E26 Tværfaglig Opgave Hotel Kong Arthur og
 Tillægsspørgsmål_swa. De findes i den lokale hovedmappe uden for Git-repositoryet.

@@ -9,7 +9,8 @@ udviklingsdatasæt. Det er ikke historiske hoteldata fra ITAKEA/hoteldata.
 
 ## Globale konventioner
 
-- Database: MySQL 8+, InnoDB, utf8mb4.
+- Runtime: PostgreSQL 17, UTF-8, UTC. Baseline: database/postgres/migrations/001_initial_schema.sql.
+- MySQL DDL nedenfor er historisk; IDENTITY, CHECK og triggers erstatter MySQL-specifik syntaks.
 - Penge: `DECIMAL`, altid DKK i MVP. Floating point bruges ikke til penge.
 - Datoer: ISO 8601 (`YYYY-MM-DD`) i Europe/Copenhagen.
 - Check-in er inkluderet; check-out er eksklusiv og tæller ikke som overnatning.

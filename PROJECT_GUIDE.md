@@ -7,14 +7,13 @@ Tillægsopgave uge 2: trelags-backend, REST/JSON, OpenAPI/Swagger, PostgreSQL,
 Docker Compose, booking-CRUD, hotel-/baranalyser via API, booking- og
 analysefrontend samt dokumentation. Tableau-status afventer C-016.
 Brugeren har prioriteret API og valgt 1–5-rating pr. afsluttet booking.
-Specifikationsarbejdet er i gang på `feature/tillaeg-uge2`; implementering må
-først starte efter gruppens review. MySQL + Tableau-versionen fra før ændringen
+Brugeren har 2026-11-03 bestilt implementering på `feature/T-031-postgres-migration`. MySQL + Tableau-versionen fra før ændringen
 er bevaret i tagget `v1-mysql-tableau` på GitHub.
 
 Den kanoniske funktionelle specifikation er specs/spec.md. Arbejdsflow:
 Constitution → Specify → Clarify → Plan → Tasks → Implement → Converge.
-Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. Aktuel
-Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
+Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. PostgreSQL-
+Converge: specs/converge-postgres-2026-11-03.md; ældre rapporter er historik.
 
 ## Teknisk struktur
 
@@ -22,17 +21,15 @@ Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
 - services/: bookingregler, sæsonpriser, nøgletal og bedømmelser.
 - repositories/: parameteriseret SQL, persistence og låse; intet HTTP.
 - PostgreSQL: måldatabase; seed/import fra CSV/XLSX, ingen datamigrering fra v1.
-- PostgreSQL er planlagt, men runtimekoden i denne branch bruger fortsat MySQL,
-  indtil migrations- og repositorytaskene er udført. De importerede skoleophold
-  eksponeres som anonymiserede, skrivebeskyttede `synthetic_import`-bookinger.
+- PostgreSQL 17 er runtime på migrationsbranchen. Schema/seed ligger i
+  database/postgres; MySQL-filer bevares som historiske v1-kilder.
+- Importerede skoleophold er anonymiserede, skrivebeskyttede `synthetic_import`-rækker.
 - Frontend: HTML/CSS/JavaScript; kalder API og skal vise API-beregnede analyser.
-- Tableau: hvis fortsat krævet, bruger kun API-beregnede værdier.
+- Tableau: REST API Connector bruger API-beregnede værdier og extracts; legacyeksport er ude af scope.
 
-Planlagt Compose starter PostgreSQL → migrations/seed → API-health → nginx/frontend.
-Swagger serveres i API-containeren med lokale JS/CSS-filer. PostgreSQL-data skal
-bevares i projektets navngivne volume. Testprofilen skal have separat
-PostgreSQL-database og API-testcontainer. Databaseændringen er endnu ikke
-implementeret. Se README for planlagte porte og fremtidige testkommandoer.
+Compose starter PostgreSQL → db-init → API-health → nginx/frontend.
+Data ligger i postgres_data; mysql_data bevares urørt. Testprofilen har separat
+PostgreSQL-database med sikkert reset. Se README og docs/postgres-migration.md.
 
 ## Gældende domæneregler
 
