@@ -31,10 +31,14 @@ docker compose up --build -d --wait
 docker compose ps
 ```
 
-A fresh volume has 1,004 bookings (four foundation bookings and 1,000 anonymized
-source-derived stays). Default source fixture dates are generated in future years.
-To preserve the school's exact CSV values locally and regenerate all source stays
-in 2026, plus 100 extra mocks:
+T-040 follow-up: Compose now prepares 1,104 bookings automatically (1,000 source
+stays + 100 extra mocks + four foundation bookings), with the school stays in
+2026. `demo-init` also upgrades older volumes safely. See
+[automatic demo setup](automatic-demo-data.md). The earlier 1,004-booking count
+below describes SQL-only initialization before that follow-up.
+
+The optional exact CSV loader preserves original source strings and names locally;
+it is no longer needed to create the complete demo:
 
 ```sh
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt

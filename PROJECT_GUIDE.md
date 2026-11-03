@@ -27,7 +27,9 @@ Converge: specs/converge-postgres-2026-11-03.md; ældre rapporter er historik.
 - Frontend: HTML/CSS/JavaScript; kalder API og skal vise API-beregnede analyser.
 - Tableau: REST API Connector bruger API-beregnede værdier og extracts; legacyeksport er ude af scope.
 
-Compose starter PostgreSQL → db-init → API-health → nginx/frontend.
+Compose starter PostgreSQL → db-init → demo-init → API-health → nginx/frontend.
+Demo-init klargør automatisk 1.000 kildeophold og 100 ekstra mocks i 2026;
+der er 1.104 bookinger inkl. fire basiseksempler, uden eksterne råfiler.
 Data ligger i postgres_data; mysql_data bevares urørt. Testprofilen har separat
 PostgreSQL-database med sikkert reset. Se README og docs/postgres-migration.md.
 

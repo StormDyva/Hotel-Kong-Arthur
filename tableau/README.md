@@ -7,7 +7,8 @@ Brugeren har 2026-11-03 bekræftet REST API Connector som den aktive forbindelse
 Tableau læser JSON fra API'et; backend beregner priser, summer og KPI'er.
 Ingen direkte databaseforbindelse, CSV-bro eller workbook-generator bruges.
 
-1. Start `docker compose up --build -d --wait` fra repository-roden.
+1. Start `docker compose up --build -d --wait` fra repository-roden. Det klargør
+   1.104 bookinger automatisk, inklusive alle 1.000 + 100 skoleophold i 2026.
 2. Konfigurér REST API Connector i Tableau Desktop med `http://localhost:8000`.
 3. Tilføj de nødvendige endpoints som tabeller. Se
    [API-handoff](../docs/tableau-api-handoff.md) for kontrakter og felter.

@@ -2,7 +2,7 @@
 
 ## Status for tillægsopgave uge 2
 
-PostgreSQL-runtime er implementeret på migrationsbranchen. 35 API-/database-
+PostgreSQL-runtime er implementeret på migrationsbranchen. 37 API-/database-
 og kontrakttests består mod PostgreSQL 17; frontendens nye analysevisninger mangler.
 Se [migrationsstatus](postgres-migration.md) og [analyse-API](analysis-api.md).
 
@@ -95,7 +95,7 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 ## Reproducerbar verifikation
 
 I den nuværende kodebase: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 35 tests i et separat test-image mod en isoleret
+fra roden. Det kører 37 tests i et separat test-image mod en isoleret
 PostgreSQL-testdatabase.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
@@ -135,3 +135,7 @@ nøgletal i tillægsopgaven (C-013).
 
 RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
 månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.
+
+Testprofilen beholder de oprindelige SQL-fixtures til golden tests. De særskilte
+T-040-tests klargør den komplette demo i rollback-transaktioner; runtime Compose
+kører altid demo-init før API-start. Se automatic-demo-data.md.

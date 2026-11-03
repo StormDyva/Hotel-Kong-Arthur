@@ -150,3 +150,8 @@ API-tests; de er ikke PostgreSQL-testbevis. Historisk Converge fra 2026-10-28
 omskrives ikke.
 
 2026-11-03: Tableau-forbindelsen er REST API Connector. Portering af den historiske CSV/Hyper-bro er ikke del af PostgreSQL-migrationen.
+
+T-040: db-init → demo-init → API. Demo-init bruger runtime-imaget og backendens
+bookingservice til ekstra mockpriser, tildeler kildestays inden for deres sæson i
+2026 og gemmer en versionsmarkør i samme transaktion. Fælles hjælpere bruges af
+den valgfrie CSV-loader, så batchidentitet og dubletstrategi forbliver ens.

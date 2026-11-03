@@ -22,8 +22,10 @@ Brug de eksisterende credentials eller en eksplicit planlagt databaseændring.
 
 ## Opstartsrækkefølge og opdatering
 
-PostgreSQL health → db-init (migrationer og seed) → API health → frontend health.
-db-init afslutter med kode 0; det er forventet. Runtime-target starter uvicorn;
+PostgreSQL health → db-init (schema/seed) → demo-init (1.000 + 100 skoleophold i
+2026) → API health → frontend health. db-init og demo-init afslutter med kode 0;
+det er forventet. Eksisterende volumes opgraderes uden reset. Demo-versionen
+gemmes atomisk i import_batches, så genstart ikke tilføjer dubletter. Runtime-target starter uvicorn;
 test-target starter pytest. Swagger JS/CSS er inkluderet i API-imaget.
 
 Efter nye commits: `docker compose up --build -d --wait`. Nye migrations-/seedfiler
@@ -44,7 +46,7 @@ kilde eller manuel kontrol; migrations forsøger ikke at opfinde mistede værdie
 
 ```sh
 docker compose --profile test run --build --rm api-tests
-docker compose logs --tail=100 db-init api frontend
+docker compose logs --tail=100 db-init demo-init api frontend
 ```
 
 Testprofilen har egen database, fixtures og test-image. App-volumenen bruges ikke.

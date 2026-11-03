@@ -3,7 +3,8 @@
 ## Aktuel status
 
 T-031/T-032: API, bookingfrontend og Swagger kører nu mod PostgreSQL 17.
-Schema, anonymiserede fixtures og CSV-loader er portet. Eksisterende API-kontrakt
+Schema, anonymiserede fixtures og CSV-loader er portet. T-040 klargør hele
+1.000 + 100-datasættet automatisk i Compose; ingen manuel import kræves. Eksisterende API-kontrakt
 bevares. Analysefrontend og de åbne C-013–C-016-punkter er ikke løst her.
 Se docs/postgres-migration.md for testbevis og verifikationsbevis.
 

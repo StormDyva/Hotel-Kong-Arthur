@@ -407,3 +407,15 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
   frontendopdatering og Tableau-omfang.
 - Testbarhed: PostgreSQL-, API-, concurrency-, frontend- og manuel Tableau-
   verifikation er planlagt, men ikke udført i specifikationsopgaven.
+
+### T-040 — Komplet skole-demo ved første Compose-start
+
+- **Status:** Implementeret; 37 backend-/importtests og ren Compose-opstart verificeret.
+- **Stories/accept:** US-002, US-007; samme komplette 2026-datasæt hos alle studerende.
+- **Omfang:** demo-init efter schema/seed og før API; 1.000 kildeophold + 100 ekstra
+  mocks i 2026 uden eksterne CSV/XLSX. Fire basisbookinger giver 1.104 i alt.
+- **Opgradering:** gamle volumes med fremtidige kildeophold opdateres én gang;
+  eksisterende 2026-ophold, operational-bookinger og gamle mocks bevares.
+- **Verifikation:** friskt Compose-projekt, 21 lande/24 type-sæsonkombinationer,
+  gentagen startup, eksisterende volume, ingen overlap/dubletter og rollback ved fejl.
+- **Kontrakt:** ingen ændring af API eller OpenAPI; oprindelige kildepriser bevares.

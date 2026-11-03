@@ -1,3 +1,12 @@
+# Aktuel status — T-040 automatisk demodata
+
+Compose klargør 1.000 + 100 skoleophold i 2026 uden eksterne råfiler; fire
+basiseksempler giver 1.104 bookinger. 37 tests består. Se
+[opstart/testbevis](../docs/automatic-demo-data.md). Tidligere migrationsbevis nedenfor
+bevares som historik. API-/OpenAPI-kontrakten er uændret.
+
+---
+
 # Aktuel status — T-031/T-032 (2026-11-03)
 
 T-031/T-032 klar til review: PostgreSQL 17-runtime, schema, anonymiserede fixtures,

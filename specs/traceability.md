@@ -78,3 +78,5 @@ regressioner. Dette er ikke PostgreSQL-bevis. Converge-rapporterne fra
 `specs/converge-tillaeg-uge2.md`.
 
 T-031/T-032 → US-001/US-002 → database/postgres, repositories/database.py, load_school_csv.py → 35 PostgreSQL-tests inkl. importgeneratorer. Se docs/postgres-migration.md.
+
+T-040 → US-002/US-007 → demo-init + school_demo.py → 37 backendtests, ren Compose-start, upgrade/persistence → docs/automatic-demo-data.md.

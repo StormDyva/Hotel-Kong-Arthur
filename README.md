@@ -43,6 +43,16 @@ drinks sample is loaded into a new database automatically. Restarting does not
 overwrite edited bookings.
 Do not delete the volume if you need to retain data.
 
+**First start includes the complete demo automatically:** 1,000 source-derived
+stays + 100 extra mocks + four foundation bookings = **1,104 total bookings**.
+All 1,100 source/mock stays use generated dates in 2026, so Tableau's default
+2026 queries see all 20 source countries plus Denmark from the foundation data.
+No local CSV/XLSX, Python installation or manual import is required. Existing
+volumes are upgraded on the next `docker compose up --build -d --wait`; do not
+reset/delete them. Repeated starts preserve operational bookings and do not
+add duplicate mocks. See [demo setup](docs/automatic-demo-data.md).
+
+
 ## Architecture
 
 ```mermaid
@@ -59,7 +69,8 @@ flowchart LR
 The API presentation layer is `backend/app/api`, business rules and calculations
 are in `backend/app/services`, and SQL is in `backend/app/repositories`.
 `frontend` is served by nginx and proxies `/api`, `/analytics`, health, Swagger and its static assets to the API service.
-`db-init` waits for PostgreSQL health; the API waits for successful initialization;
+`db-init` waits for PostgreSQL health; `demo-init` prepares all 1,100 school stays
+in 2026; the API waits for both initialization steps to complete;
 nginx waits for the API health check and has its own healthcheck. Swagger runs inside the API container.
 
 ## Follow a booking request
@@ -127,7 +138,7 @@ docker compose --profile test run --build --rm api-tests
 ```
 
 Testprofilen starter test-db → test-runner (schema/seed/checks) → api-tests.
-35 tests består mod isoleret PostgreSQL, inklusive OpenAPI-lighed og samtidige
+37 tests består mod isoleret PostgreSQL, inklusive OpenAPI-lighed og samtidige
 bookinger. Appens database-volume berøres ikke. Runtime-imaget indeholder ikke pytest.
 
 Alternativt kan tests køres på værtsmaskinen med en
@@ -168,10 +179,10 @@ svarprocent. Ingen ratings seedes. De 1.000 kundestays er synlige på
 er syntetiske, og rækkerne er skrivebeskyttede. Drinkaggregater bruges ikke som
 daterede salg eller Helene-salg.
 
-Skoledata-loaderen bevarer de 1.000 kilderækker lokalt og forbinder dem med de
-anonymiserede demo-bookinger. Opholdsdatoer placeres i 2026, og 100 ekstra
-syntetiske bookinger tilføjes som særskilt mock-batch. Genkørsel er idempotent;
-rå CSV/navne committes ikke. Se importvejledningen.
+Compose klargør automatisk de 1.000 ophold og 100 ekstra syntetiske bookinger i
+2026. Den valgfrie CSV-loader bevarer desuden de præcise originale kilderækker
+lokalt; den er ikke nødvendig for at få alle demobookinger. Genkørsel er
+idempotent; rå CSV/navne committes ikke. Se importvejledningen.
 
 RevPAR findes nu i backend på `/api/analytics/revpar` og beregnes som
 værelsesomsætning / disponible værelsesnætter. Det er endnu ikke besluttet, om
