@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from import_customer_data import (
+    SQL_BEGIN, SQL_END, sql_script,
     batch_sql,
     read_xlsx,
     sql_decimal,
@@ -53,8 +54,7 @@ def main() -> int:
         )
 
     sql = [
-        "SET NAMES utf8mb4;",
-        "START TRANSACTION;",
+        SQL_BEGIN,
         "-- Generated from local XLSX source files; guest names are deliberately anonymized.",
         batch_sql(guest_path, len(guest_source), len(guests), 0),
     ]
@@ -70,12 +70,11 @@ def main() -> int:
             [
                 "INSERT INTO guests (first_name, last_name, country_code, country_name, import_key)",
                 f"VALUES ({sql_string(first_name)}, {sql_string(family_name)}, {sql_string(row['country_code'])}, {sql_string(row['country_name'])}, {sql_string(import_key)})",
-                "ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id);",
-                "SET @guest_id = LAST_INSERT_ID();",
+                "ON CONFLICT (import_key) DO UPDATE SET import_key = EXCLUDED.import_key RETURNING id INTO v_guest_id;",
                 "INSERT INTO customer_stay_records",
                 "    (import_batch_id, source_record_id, guest_id, first_name, family_name, country_name, country_code, source_room_type, days_rented, season_code, price_total, row_status)",
-                f"VALUES (@import_batch_id, {sql_string(source_record_id)}, @guest_id, {sql_string(first_name)}, {sql_string(family_name)}, {sql_string(row['country_name'])}, {sql_string(row['country_code'])}, {sql_string(row['room_type'])}, {row['days_rented']}, {sql_string(row['season'])}, {sql_decimal(row['price_total'])}, 'accepted')",
-                "ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id);",
+                f"VALUES (v_import_batch_id, {sql_string(source_record_id)}, v_guest_id, {sql_string(first_name)}, {sql_string(family_name)}, {sql_string(row['country_name'])}, {sql_string(row['country_code'])}, {sql_string(row['room_type'])}, {row['days_rented']}, {sql_string(row['season'])}, {sql_decimal(row['price_total'])}, 'accepted')",
+                "ON CONFLICT (import_batch_id,source_record_id) DO UPDATE SET source_record_id = EXCLUDED.source_record_id;",
             ]
         )
 
@@ -85,17 +84,16 @@ def main() -> int:
             [
                 "INSERT INTO bar_products (name, category, price, active)",
                 f"VALUES ({sql_string(row['drink_name'])}, {sql_string(row['category'])}, {sql_decimal(row['unit_price'])}, TRUE)",
-                "ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), category = VALUES(category), price = VALUES(price), active = TRUE;",
-                "SET @product_id = LAST_INSERT_ID();",
+                "ON CONFLICT (name) DO UPDATE SET category = EXCLUDED.category, price = EXCLUDED.price, active = TRUE RETURNING id INTO v_product_id;",
                 "INSERT INTO customer_bar_sales_aggregates",
                 "    (import_batch_id, source_record_id, product_id, drink_name, category, unit_price, units_sold, row_status)",
-                f"VALUES (@import_batch_id, {sql_string(source_record_id)}, @product_id, {sql_string(row['drink_name'])}, {sql_string(row['category'])}, {sql_decimal(row['unit_price'])}, {row['units_sold']}, 'accepted')",
-                "ON DUPLICATE KEY UPDATE product_id = VALUES(product_id), drink_name = VALUES(drink_name), category = VALUES(category), unit_price = VALUES(unit_price), units_sold = VALUES(units_sold), row_status = VALUES(row_status), rejection_reason = NULL;",
+                f"VALUES (v_import_batch_id, {sql_string(source_record_id)}, v_product_id, {sql_string(row['drink_name'])}, {sql_string(row['category'])}, {sql_decimal(row['unit_price'])}, {row['units_sold']}, 'accepted')",
+                "ON CONFLICT (import_batch_id,source_record_id) DO UPDATE SET product_id = EXCLUDED.product_id, drink_name = EXCLUDED.drink_name, category = EXCLUDED.category, unit_price = EXCLUDED.unit_price, units_sold = EXCLUDED.units_sold, row_status = EXCLUDED.row_status, rejection_reason = NULL;",
             ]
         )
 
-    sql.append("COMMIT;")
-    print("\n".join(sql))
+    sql.append(SQL_END)
+    print(sql_script(sql))
     print(
         f"Generated anonymized seed for {len(guests)} guest rows and {len(drinks)} drink rows.",
         file=sys.stderr,

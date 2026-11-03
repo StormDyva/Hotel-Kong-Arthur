@@ -34,8 +34,8 @@ def test_country_rows_are_flat_grouped_and_exclude_cancelled(client):
 
 
 def test_nightly_calculation_cross_season_clipping_and_cancellation(client,repo):
-    repo.execute("UPDATE room_type_prices p JOIN seasons s ON s.id=p.season_id SET p.price_per_night=900.15 WHERE p.room_type_id=1 AND s.code='low'")
-    repo.execute("UPDATE room_type_prices p JOIN seasons s ON s.id=p.season_id SET p.price_per_night=1100.27 WHERE p.room_type_id=1 AND s.code='mid'")
+    repo.execute("UPDATE room_type_prices p SET price_per_night=900.15 FROM seasons s WHERE s.id=p.season_id AND p.room_type_id=1 AND s.code='low'")
+    repo.execute("UPDATE room_type_prices p SET price_per_night=1100.27 FROM seasons s WHERE s.id=p.season_id AND p.room_type_id=1 AND s.code='mid'")
     p = payload(); p.update(check_in='2088-03-31',check_out='2088-04-02'); p['guest']['country_code']='SE'
     booking = client.post('/api/bookings',json=p)
     assert booking.status_code==201, booking.text

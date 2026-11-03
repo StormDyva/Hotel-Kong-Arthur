@@ -1,3 +1,16 @@
+# PostgreSQL PR #13 — aktuel reviewstatus (2026-11-03)
+
+Migrationen T-031/T-032 er klar til review. Se
+[nyt testbevis](../specs/converge-postgres-2026-11-03.md).
+35 PostgreSQL-/API-/importtests, 59 frontendtests, Swagger-smoke og ren
+Compose-opstart/persistence er verificeret. To reviewers kræves før merge.
+Tableau bruger REST API Connector; legacyeksport er ude af scope. Den samlede
+uge 2-leverance og dashboardets manuelle afstemning er ikke godkendt her.
+
+---
+
+Følgende er historisk MySQL-testbevis, ikke aktuelle opstartsinstruktioner.
+
 # PR-accept — T-024, 2026-10-28
 
 Denne liste adskiller verificeret API/Compose fra det udestående Tableau-dashboard.
