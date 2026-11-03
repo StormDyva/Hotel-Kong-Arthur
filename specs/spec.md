@@ -44,7 +44,13 @@ PostgreSQL og Swagger startes med `docker compose up --build`.
   Klientens price_total accepteres som kompatibilitetsfelt, men bestemmer aldrig prisen.
   Uændret værelse/datoer bevarer pris; ændret ophold genberegnes. Valuta er DKK.
 - Svar indeholder bl.a. guest_id, guest, room_id/number/type/capacity, datoer, antal,
-  price_total, gennemsnitlig price_per_night, status og UTC-timestamps.
+  price_total, gennemsnitlig price_per_night, status, data_origin og UTC-timestamps.
+- Imported customer-stay rows are exposed as read-only synthetic bookings so clients
+  can query the complete dataset. Their dates, room assignment and party size are
+  generated; source room category, country, season, stay length and total are retained.
+  `data_origin=synthetic_import` identifies them; API responses anonymize guest names
+  and omit contact details. Only operational bookings can be edited or cancelled.
+  See [decision record](../docs/decisions/synthetic-import-bookings.md).
 
 ## Inventar og barsalg
 
@@ -199,5 +205,33 @@ Browserprototypen på localhost:5500 søger ledighed, viser et forslag pr. type
 (mulighed for typefilter/alle rum), modtager gæstekontakt og opretter via API'et.
 Tilbuds- og bekræftelsesprisen kommer fra backend. Serverfeltfejl vises i formularen.
 Efter bekræftelse kan man gå direkte til oversigten. Et rigtigt browserflow
-verificerede historisk v1-databasepersistens efter reload; testbookingen annulleres
-til sidst. Det er ikke PostgreSQL-acceptbevis.
+verificerede MySQL-persistens i den nuværende runtime efter reload; testbookingen
+annulleres til sidst. Det er ikke PostgreSQL-acceptbevis.
+
+## T-027 — importerede ophold og RevPAR (ændringer fra main)
+
+### Importerede ophold
+
+De 1.000 kundestays vises i `/api/bookings` som anonymiserede, skrivebeskyttede
+bookinger med `data_origin=synthetic_import`. Datoer, værelser og gæsteantal er
+genereret; relevante kildefelter for kategori, land, sæson, opholdslængde og beløb
+bevares. Ingen importerede gæstenavne eller kontaktdata vises i API'et.
+
+### RevPAR
+
+RevPAR = værelsesomsætning / tilgængelige værelsesnætter (DKK). Barsalg indgår
+ikke. Endpointet `GET /api/analytics/revpar` returnerer samlet tal og månedlige
+rækker med periodens klipning; alle periodens måneder medtages, også uden salg.
+Nulkapacitet giver 0 med warning. Land filtrerer kun omsætningen; type/sæson
+filtrerer også kapaciteten. RevPAR findes nu i backend, men er ikke valgt som
+tillægsopgavens selvvalgte KPI (C-013).
+
+## T-028 — CSV-demodata
+
+Loaderen bevarer de 1.000 CSV-rækker i lokal `csv_source_rows`-JSON med batchhash,
+rækkenummer og bookingrelation. Eksisterende anonymiserede kildebookinger genbruges;
+der oprettes ikke dubletter. Genererede værelser/datoer placerer opholdene i 2026
+med matchende kilde-sæson og uden overlap. Kategori, land, nætter og total fra CSV
+bevares. En særskilt mock-batch tilføjer 100 tydeligt markerede bookinger.
+Loaderen er transaktionel og idempotent; rå CSV og navne committes ikke. Se
+`docs/customer-data-import.md`.

@@ -163,6 +163,9 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 ### C-013 — Selvvalgt nøgletal
 
 - **Status: ÅBEN.** Der er endnu ikke valgt et nøgletal.
+- **Nuværende implementation:** RevPAR er nu implementeret i main som
+  `/api/analytics/revpar` med månedsrækker. Det gør ikke RevPAR til gruppens
+  valgte selvstændige KPI; gruppens valg og acceptkriterium er fortsat åbent.
 - **RevPAR:** Omsætning / disponible værelsesnætter. Kræver omsætning og
   disponible værelsesnætter for samme periode. Værelser, perioder, bookinger og
   natpriser findes i den nuværende model; beregningen kan genbruge disse data,

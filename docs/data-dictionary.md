@@ -195,3 +195,9 @@ T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
 kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
 Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
 ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.
+
+T-028 / migration 009: csv_source_rows has composite key (import_batch_id,
+source_row_number), raw_record JSON and booking_id FK. This preserves all seven
+CSV fields verbatim, including original encoding defects, independently from the
+anonymized synthetic booking. The school loader schedules source stays and 100
+additional mocks in 2026. Generated dates/rooms/contacts are not historical facts.

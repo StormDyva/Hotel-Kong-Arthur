@@ -12,6 +12,27 @@ lokalt og placeres i `data/raw/`:
 Råfiler er ignoreret af Git, fordi de indeholder personlignende navne og derfor
 ikke skal pushes til det offentlige projektrepository.
 
+## Automatisk seed ved databaseoprettelse
+
+`database/seed/004_anonymized_customer_source.sql` indlæses automatisk af
+`db-init`, når en database initialiseres. Seedet indeholder de 1.000 opholdsrækker
+og 30 drinksrækker, men gæstenavne er erstattet med generiske labels. De øvrige
+felter og drinksdata er bevaret. Rå XLSX-filerne behøver derfor ikke at ligge hos
+andre brugere. Eksisterende rækker med samme kilde-ID bevares ved genkørsel.
+
+Det efterfølgende `005_synthetic_customer_bookings.sql` opretter 1.000
+skrivebeskyttede API-bookinger fra opholdsrækkerne. Check-in, checkout, værelses-ID
+og én gæst pr. ophold er syntetiske antagelser; kildebeløb, opholdslængde,
+værelseskategori, land og sæson bevares. API-svar markerer disse rækker med
+`data_origin=synthetic_import`, anonymiserer navne og udelader kontaktdata.
+Syntetiske bookinger vises også i bookingbaserede analyser for deres genererede år.
+Drinkaggregaterne ligger fortsat i `customer_bar_sales_aggregates`; de opretter
+ikke daterede `bar_sales`, fordi medarbejder og salgstidspunkt mangler.
+
+`db-init` anvender hvert seed én gang pr. databasevolume via `schema_migrations`.
+Når et seed tilføjes i en eksisterende checkout, køres `db-init` igen ved næste
+`docker compose up`.
+
 ## Importkommando
 
 Generér idempotent SQL med Python-standardbiblioteket:
@@ -48,8 +69,10 @@ mapper sådan:
 | Season | `customer_stay_records.season_code` |
 | Price | `customer_stay_records.price_total` |
 
-Der oprettes ikke bookings, fordi filen mangler check-in, check-out, status og
-sikkert værelsesnummer. Der opfindes heller ikke room IDs.
+Booking-seedet genererer check-in, checkout, værelses-ID, status `confirmed` og
+`guests_count=1`. Det er syntetiske analysefelter, ikke historisk dokumentation.
+`data_origin` gør oprindelsen synlig, og API'et tillader ikke redigering eller
+annullering af dem.
 
 `drinks_menu_with_sales.xlsx` mapper sådan:
 
@@ -70,8 +93,8 @@ men medarbejder- og vagtfiltre kræver en senere dateret salgskilde.
 - `guests.import_key` identificerer en kilderække med filhash og source_record_id.
   Navn og land bruges ikke som personidentitet.
 - Samme import kan køres igen uden nye gæster, staging-rækker eller produkter.
-- Gæste-XLSX’ens ekstra delvist tomme række afvises med årsag og gemmes som
-  `row_status = rejected`.
+- Den seedede gæste-XLSX indeholder 1.000 gyldige rækker; seedet accepterer alle
+  1.000 og gemmer ingen afviste rækker.
 
 
 T-023 erstatter navnebaseret deduplikering: guests.import_key er SHA-256 af
@@ -79,3 +102,40 @@ kildens filhash og source_record_id. Nøglen identificerer en importeret kilder�
 ikke en person. Gentagen import bruger samme kilde-ID; bookinger bruger NULL-nøgle
 og separate gæstesnapshots. Allerede importerede legacy-rækker får ved første
 genimport nye eksplicitte gæsterelationer, hvorefter genimport er stabil.
+
+## Exact CSV + extra school-project data (T-028)
+
+The running school dataset includes every row of international_names_with_rooms_1000.csv.
+The original seven string values are preserved in csv_source_rows.raw_record, keyed
+by file SHA-256 and source line, and linked to the existing source-derived booking.
+Original names are also restored into the linked local guests/customer_stay_records
+fields; API source bookings still display anonymized names. A shared guest link
+causes the loader to abort rather than overwrite another booking.
+The CSV already has 54 Unicode replacement characters; they are preserved, not guessed.
+
+After normal Compose startup, run from the repository root (Python dependencies:
+backend/requirements-dev.txt; MYSQL_PORT is your host database port):
+
+```sh
+MYSQL_PORT=3307 backend/.venv/bin/python database/import/load_school_csv.py \
+  --csv ../hoteldata-master/international_names_with_rooms_1000.csv
+```
+
+Alternatively put the file in ignored data/raw and use that path. Do not commit raw
+names, the CSV, or generated SQL containing them. The loader depends on main's
+anonymized source/booking seed and migration 009. It checks every source row against
+its seeded country/category/nights/season/total and aborts atomically on mismatches.
+
+Dates, room assignments and one person per source stay are synthetic. The loader
+places source stays within 2026 in the correct season, without overlaps, so default
+API/Tableau year filters include all 1,000. Source total prices are preserved exactly;
+cents are distributed across nightly snapshots. Existing operational bookings are
+untouched. The 100 additional bookings have generated contacts and current seasonal
+prices; they are marked synthetic_import with a separate school-project mock batch.
+Re-running adds neither CSV rows nor mock bookings and preserves existing assignments.
+No fabricated guest ratings are added.
+
+The anonymized seed is automatically loaded by Compose; the exact local CSV and
+100-extra-mock step is explicit because the raw file is not committed. Historical
+notes about the seed's generated future years describe the default seed before this
+optional school-project loader, not the current loaded 2026 dataset.

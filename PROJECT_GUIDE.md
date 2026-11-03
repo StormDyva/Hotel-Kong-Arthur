@@ -22,7 +22,10 @@ Converge: specs/converge-api-2026-10-28.md; ældre rapporter er historik.
 - services/: bookingregler, sæsonpriser, nøgletal og bedømmelser.
 - repositories/: parameteriseret SQL, persistence og låse; intet HTTP.
 - PostgreSQL: måldatabase; seed/import fra CSV/XLSX, ingen datamigrering fra v1.
-- Frontend: HTML/CSS/JavaScript; kalder API og viser API-beregnede analyser.
+- PostgreSQL er planlagt, men runtimekoden i denne branch bruger fortsat MySQL,
+  indtil migrations- og repositorytaskene er udført. De importerede skoleophold
+  eksponeres som anonymiserede, skrivebeskyttede `synthetic_import`-bookinger.
+- Frontend: HTML/CSS/JavaScript; kalder API og skal vise API-beregnede analyser.
 - Tableau: hvis fortsat krævet, bruger kun API-beregnede værdier.
 
 Planlagt Compose starter PostgreSQL → migrations/seed → API-health → nginx/frontend.

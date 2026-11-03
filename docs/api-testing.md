@@ -43,6 +43,12 @@ og i repositoryets openapi/openapi.yaml.
 
 Svaret skal være 201 og indeholde ID og serverberegnet pris. Gentag samme POST
 for at se 409 ved overlap. GET /api/bookings/{id} viser den gemte booking.
+GET /api/bookings indeholder også anonymiserede kildeophold med
+`data_origin: synthetic_import`; deres datoer, værelser og gæsteantal er
+syntetiske, og rækkerne kan ikke redigeres eller annulleres.
+GET /api/bookings returnerer også importerede ophold markeret med
+`data_origin: synthetic_import`. De har opfundne datoer/værelser og kan ikke
+redigeres eller annulleres; deres gæstenavne er anonymiserede.
 PUT bruger samme requestfelter inklusive status; ændr checkout eller værelse.
 DELETE annullerer og returnerer 204. Gentaget DELETE giver også 204.
 GET-listen understøtter status, room_id, guest_id, from/to og paginering.
@@ -90,9 +96,9 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 
 ## Reproducerbar verifikation
 
-I den nuværende v1-kodebase: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det historiske flow kører 26 tests i et separat test-image mod v1-
-testdatabasen. Det er ikke PostgreSQL-testbevis.
+I den nuværende kodebase: kør `docker compose --profile test run --build --rm api-tests`
+fra roden. Det kører 29 tests i et separat test-image mod v1's isolerede
+MySQL-testdatabase. Det er ikke PostgreSQL-testbevis.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
 ```sh
@@ -104,7 +110,7 @@ node backend/tests/swagger-smoke.mjs
 
 Swagger-smoke kræver Node 22+ og Chrome på macOS; den åbner en isoleret headless
 browser, tæller operationerne og udfører et rigtigt Swagger GET mod v1-databasen.
-De historiske tests bruger det syntetiske reference-seed; mutationer rulles tilbage.
+Testene bruger syntetisk reference- og CSV-demodata; mutationer rulles tilbage.
 Samtidighedstesten opretter og rydder sine egne testdata.
 
 ## Færdige indtjeningsrækker til Tableau (T-022)
@@ -122,3 +128,11 @@ Under Swagger-gruppen **Tableau revenue** findes:
 Begge understøtter også from/to i stedet for year. Backenden beregner og summerer
 natpris × antal nætter i logiklaget ud fra historiske prislinjer. Tableau bruger
 revenue direkte som et numerisk mål; valutaen er DKK.
+
+RevPAR beregnes i backend via `/api/analytics/revpar` som værelsesomsætning /
+disponible værelsesnætter. Svaret indeholder periode- og månedsrækker.
+RevPAR er implementeret, men gruppen har ikke afklaret, om det er det selvvalgte
+nøgletal i tillægsopgaven (C-013).
+
+RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
+månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.

@@ -1,7 +1,8 @@
 # Teknisk plan — tillægsopgave uge 2
 
-Status: planudkast; ingen database-, API-, frontend- eller Tableau-implementering
-er udført på denne branch. Databasevalget PostgreSQL er afklaret i C-012.
+Status: planudkast. PostgreSQL og analysevisninger i frontend er ikke implementeret.
+Nyere RevPAR- og CSV-demodatafunktioner fra main er med i denne branch, fortsat
+mod MySQL. Databasevalget PostgreSQL er afklaret i C-012.
 Specifikationen og åbne beslutninger findes i `spec.md` og `clarify.md`.
 
 ## Analyse af eksisterende MySQL-specifikke konstruktioner
@@ -12,10 +13,10 @@ Søgningen er læst som inventar til migreringsarbejdet; ingen kode eller SQL er
 | Fil(er) | Fund | Foreslået PostgreSQL-erstatning |
 |---|---|---|
 | `database/migrations/001_initial_schema.sql`, `002_booking_database_foundation.sql`, `003_customer_import_metadata.sql` | `AUTO_INCREMENT` på id-kolonner | `GENERATED ... AS IDENTITY` |
-| `database/migrations/001_initial_schema.sql`, `002_booking_database_foundation.sql`, `005_booking_reviews.sql` | `TINYINT UNSIGNED` | `SMALLINT`/`INTEGER` med tilsvarende `CHECK`-grænser |
-| `database/migrations/001_initial_schema.sql`, `002_booking_database_foundation.sql`, `003_customer_import_metadata.sql` | `ENUM` | `CHECK`-constraint eller PostgreSQL enum-type; valg pr. felt skal dokumenteres under implementering |
-| `database/seed/001_booking_foundation_seed.sql`, `002_assignment_reference_inventory.sql`, `003_christmas_high_season.sql`; `database/import/import_customer_data.py`; `backend/app/repositories/database.py` | `ON DUPLICATE KEY UPDATE` og MySQL `VALUES(...)` | `ON CONFLICT (...) DO UPDATE SET ... EXCLUDED...`; importørens genererede SQL skal følge samme strategi |
-| `database/migrations/*.sql` og `backend/app/repositories/database.py` | `DATEDIFF`, `IFNULL`, `INSERT IGNORE`, `DATE_ADD`, `GROUP_CONCAT` og backtick-quoted identifiers blev ikke fundet i den afgrænsede søgning | Ingen konkrete forekomster at omskrive; ved nyt fund brug dato-aritmetik, `COALESCE`, `ON CONFLICT DO NOTHING`, PostgreSQL dato-aritmetik, `string_agg` og dobbelte citationstegn |
+| `database/migrations/001_initial_schema.sql`, `002_booking_database_foundation.sql`, `004_cancel_unavailable_room.sql`, `005_booking_reviews.sql` | `TINYINT UNSIGNED` | `SMALLINT`/`INTEGER` med tilsvarende `CHECK`-grænser |
+| `database/migrations/001_initial_schema.sql`, `002_booking_database_foundation.sql`, `003_customer_import_metadata.sql`, `008_booking_data_origin.sql` | `ENUM` | `CHECK`-constraint eller PostgreSQL enum-type; valg pr. felt skal dokumenteres under implementering |
+| Seed 001–005, `database/import/import_customer_data.py`, `build_anonymized_customer_seed.py`, `build_synthetic_bookings_seed.py`, `load_school_csv.py`, `backend/app/repositories/database.py` | `ON DUPLICATE KEY UPDATE` og MySQL `VALUES(...)` | `ON CONFLICT (...) DO UPDATE SET ... EXCLUDED...`; alle seed-/importgeneratorer skal følge samme strategi |
+| `database/migrations/`, `database/seed/`, `database/import/`, `backend/app/repositories/` | `DATEDIFF`, `IFNULL`, `INSERT IGNORE`, `DATE_ADD`, `GROUP_CONCAT` og backtick-quoted identifiers blev ikke fundet | Ingen konkrete forekomster at omskrive; ved nyt fund brug dato-aritmetik, `COALESCE`, `ON CONFLICT DO NOTHING`, PostgreSQL dato-aritmetik, `string_agg` og dobbelte citationstegn |
 
 ## Teknologistak og lag
 
@@ -46,15 +47,17 @@ paths. Ny kontrakt for frontendens brug og eventuelle ændringer afklares i C-01
 | `GET /api/analytics/top-performers` | samme | top værelse, type og land | US-004 | Findes allerede |
 | `GET /api/analytics/bar-sales` | periode, `employee_name` | total, produkter og kategoriandele | US-005 | Findes allerede |
 | `GET /api/analytics/customer-satisfaction` | periode samt hotelkohortefiltre | rating, svarprocent, kohorte og fordeling | US-006 | Findes allerede |
+| `GET /api/analytics/revpar` | samme periode- og hotel-filtre | samlet RevPAR og månedlige rækker | US-004, US-007, US-008 | Findes allerede i main; om det er selvvalgt KPI er åbent |
 | `GET /api/analytics/dashboard` | samme som analysefilter | samlet analysepayload | US-003–007 | Findes allerede; Tableau-/frontendforbrug skal verificeres |
 | `GET /analytics/revenue/by-room-type-season` | `year` eller `from`/`to` | flade 24 type/sæson-rækker | US-004, US-007 | Findes allerede; ældre Tableau-path uden `/api` bevares |
 | `GET /analytics/revenue/by-country` | `year` eller `from`/`to` | flade land/omsætning-rækker | US-004, US-007 | Findes allerede; ældre Tableau-path uden `/api` bevares |
-| Selvvalgt nøgletal, endnu ikke valgt | afventer C-013 | afventer formel og responsbeslutning | US-004, US-007, US-008 | Skal oprettes efter valg |
+| Selvvalgt nøgletal, endnu ikke valgt | afventer C-013 | RevPAR findes som kandidat; andet valg kan kræve ny API-operation | US-004, US-007, US-008 | Implementering af valgte KPI-blokke afventer gruppens valg |
 
 Der er således allerede endpoints for de navngivne analyseområder. Ingen
 grundlæggende analyse-GET er identificeret som manglende i API'et; den nye
-frontendvisning mangler, PostgreSQL-runtime mangler, og KPI-specifik endpoint- og
-kontraktændring kan først afgøres efter Clarify-review.
+frontendvisning mangler, PostgreSQL-runtime mangler, og eventuelle KPI-specifikke
+API-ændringer afventer Clarify-review. Hvis gruppen vælger RevPAR, findes dens
+endpoint allerede i main; dette er ikke i sig selv beslutning om selvvalgt KPI.
 
 ## PostgreSQL-skift
 
@@ -101,7 +104,7 @@ Frontendens aktuelle README beskriver bookingflowet. Planlagt analysevisning:
 | Gæster pr. land | `/api/analytics/guests-by-country` | US-004, US-008 | API findes; frontendvisning mangler |
 | Barsalg | `/api/analytics/bar-sales` | US-005, US-008 | API findes; frontendvisning mangler |
 | Kundetilfredshed | `/api/analytics/customer-satisfaction` | US-006, US-008 | API findes; frontendvisning mangler |
-| Selvvalgt nøgletal | afventer C-013 | US-004, US-007, US-008 | Blokeret af valg og definition |
+| Selvvalgt nøgletal | `/api/analytics/revpar` findes, hvis RevPAR vælges; ellers afventer C-013 | US-004, US-007, US-008 | RevPAR er kandidat; valg åbent |
 
 Frontend kalder kun REST API, implementerer ingen formler og har tydelige loading-,
 tom- og fejltilstande. Om kald foretages automatisk ved sidevisning eller via
@@ -125,9 +128,21 @@ flowchart LR
     Import[CSV/XLSX seed/import] --> PostgreSQL
 ```
 
+## Eksisterende main-funktioner, som indgår i baseline
+
+- RevPAR beregnes som omsætning / tilgængelige værelsesnætter. Månedsrækker
+  klipper omsætning og kapacitet til valgt periode; periodens RevPAR beregnes ikke
+  som gennemsnit af afrundede månedsværdier. Det er endnu ikke afklaret, om RevPAR
+  er tillægsopgavens selvvalgte KPI.
+- CSV-loaderen bevarer 1.000 kilderækker som JSON i `csv_source_rows`, med batch-
+  hash, linjenummer og bookingrelation. Den genbruger anonymiserede kildebookinger,
+  genererer 2026-datoer/værelser uden overlap og tilføjer særskilt 100 mock-
+  bookinger. Genkørsel er idempotent; rå CSV/navne er ikke i Git.
+
 ## Verifikation og kommende Converge
 
 PostgreSQL-implementationen skal verificere eksisterende API- og OpenAPI-tests,
 bookingconcurrency, import-idempotens, database-resetspærrer, frontendens rigtige
-API-flow, Swagger og Compose-health. Der tilføjes en kommende Converge efter
-tillægsopgaven; historisk Converge fra 2026-10-28 omskrives ikke.
+API-flow, Swagger og Compose-health. Main indeholder aktuelt 29 MySQL-baserede
+API-tests; de er ikke PostgreSQL-testbevis. Historisk Converge fra 2026-10-28
+omskrives ikke.

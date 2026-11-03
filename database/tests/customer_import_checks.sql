@@ -1,4 +1,4 @@
--- Read-only checks for migration 003 and the generated customer import SQL.
+-- Read-only checks for migration 003 and the anonymized customer seed.
 
 DELIMITER //
 
@@ -38,8 +38,16 @@ BEGIN
     SELECT COUNT(*) INTO failed_checks
       FROM customer_stay_records
      WHERE row_status = 'rejected' AND rejection_reason IS NOT NULL;
-    IF failed_checks <> 1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expected one explained rejected customer row';
+    IF failed_checks <> 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expected no rejected customer rows in the seed';
+    END IF;
+
+    SELECT COUNT(*) INTO failed_checks
+      FROM customer_stay_records
+     WHERE row_status = 'accepted'
+       AND (first_name <> 'Guest' OR family_name NOT LIKE 'Imported Record %');
+    IF failed_checks <> 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Seeded guest names must be anonymized';
     END IF;
 
     SELECT COUNT(*) INTO failed_checks
@@ -80,13 +88,18 @@ BEGIN
     END IF;
 
     SELECT COUNT(*) INTO failed_checks FROM bookings;
-    IF failed_checks <> 4 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Existing bookings were changed';
+    IF failed_checks <> 1004 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expected four operational and 1000 synthetic bookings';
+    END IF;
+
+    SELECT COUNT(*) INTO failed_checks FROM bookings WHERE data_origin='synthetic_import';
+    IF failed_checks <> 1000 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expected 1000 marked synthetic bookings';
     END IF;
 
     SELECT COUNT(*) INTO failed_checks FROM booking_price_lines;
-    IF failed_checks <> 8 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Existing booking price lines were changed';
+    IF failed_checks <> 5387 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Expected 8 operational and 5379 synthetic price lines';
     END IF;
 
     SELECT 'customer import checks passed' AS result;

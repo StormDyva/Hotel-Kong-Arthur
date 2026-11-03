@@ -14,10 +14,10 @@ git checkout v1-mysql-tableau
 docker compose up --build -d
 ```
 
-Dette er en specifikationsbranch for tillægsopgave uge 2. PostgreSQL-skiftet er
-planlagt, men ikke implementeret her; den eksisterende runtime/Compose og de
-historiske testkommandoer svarer fortsat til v1. Brug tagget ovenfor til en
-reproducerbar præsentation, indtil PostgreSQL-taskene er gennemført.
+PostgreSQL-skiftet er planlagt, men ikke implementeret. Koden på denne branch
+indeholder nyere API-/CSV-funktioner fra main, men runtime-databasen og Compose
+bruger fortsat MySQL. Brug v1-tagget ovenfor til den oprindelige præsentation,
+indtil PostgreSQL-taskene er gennemført.
 
 ## Run
 
@@ -39,7 +39,9 @@ Example development credentials are in `.env.example`. Copy to `.env` to overrid
 Ports 5500, 8000 and the proposed PostgreSQL host port 5433 are configurable.
 Services bind to localhost.
 `docker compose down` stops services while retaining database data in a named volume.
-Migrations and demo seed run once; restarting does not overwrite edited bookings.
+Migrations and seeds run once per database volume; the anonymized customer and
+drinks sample is loaded into a new database automatically. Restarting does not
+overwrite edited bookings.
 Do not delete the volume if you need to retain data.
 
 ## Architecture
@@ -80,7 +82,7 @@ booking. Names and countries are not person identifiers. No authentication is pr
 
 ## Swagger og API-test
 
-Åbn http://localhost:8000/docs. Alle 27 operationer er samlet efter Bookings,
+Åbn http://localhost:8000/docs. Alle 28 operationer er samlet efter Bookings,
 Inventory, Analytics, Bar og Guest feedback. Vælg en operation, Try it out og Execute.
 Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 [trin-for-trin API-test](docs/api-testing.md) for konkrete booking-, bar- og review-kald.
@@ -121,17 +123,19 @@ PostgreSQL-testdatabase (ingen lokal Python kræves):
 docker compose --profile test run --build --rm api-tests
 ```
 
-Testprofilen skal starte test-db → test-runner (migrations/seed) → api-tests.
-Den må ikke berøre appens PostgreSQL-volume. Runtime-imaget indeholder ikke pytest eller
+Den aktuelle v1-testprofil starter test-db → test-runner (migrations/seed) →
+api-tests (29 tests) mod en isoleret MySQL-testdatabase. Den berører ikke appens
+database-volume. Dette er ikke PostgreSQL-testbevis. Runtime-imaget indeholder ikke pytest eller
 testværktøjer; Dockerfile har et separat test-target. API-testene omfatter også
 OpenAPI-validering og regressionstest af Tableau-gæsteeksportens rækker.
 
-Alternativt på værtsmaskinen, med den lokale appdatabase kørende:
+Når PostgreSQL-implementeringen er udført, kør tests på værtsmaskinen med en
+initialiseret PostgreSQL-testdatabase:
 
 ```sh
 uv venv backend/.venv
 uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.txt
-PYTHONPATH=backend DATABASE_URL=postgresql+psycopg://... backend/.venv/bin/pytest -q backend/tests
+PYTHONPATH=backend DATABASE_URL=postgresql+psycopg://<user>:<password>@<host>:5432/<database> backend/.venv/bin/pytest -q backend/tests
 node backend/tests/swagger-smoke.mjs
 npm --prefix frontend run smoke:live
 npm --prefix frontend test
@@ -158,11 +162,22 @@ migreres ikke. Importerede rækker skal mærkes `synthetic_import` og være
 skrivebeskyttede. Prisfordeling og værelsesnumre påstår ikke hotellets faktiske drift.
 
 Kundetilfredshed er implementeret med brugerens valgte 1–5-skala, gennemsnit og
-svarprocent. Ingen ratings seedes. Historiske kundefiler mangler datoer og
-medarbejderoplysninger og bruges derfor ikke som live bookinger eller Helene-salg.
+svarprocent. Ingen ratings seedes. De 1.000 kundestays er synlige på
+`/api/bookings` med `data_origin=synthetic_import`; datoer, værelser og gæsteantal
+er syntetiske, og rækkerne er skrivebeskyttede. Drinkaggregater bruges ikke som
+daterede salg eller Helene-salg.
+
+Skoledata-loaderen bevarer de 1.000 kilderækker lokalt og forbinder dem med de
+anonymiserede demo-bookinger. Opholdsdatoer placeres i 2026, og 100 ekstra
+syntetiske bookinger tilføjes som særskilt mock-batch. Genkørsel er idempotent;
+rå CSV/navne committes ikke. Se importvejledningen.
+
+RevPAR findes nu i backend på `/api/analytics/revpar` og beregnes som
+værelsesomsætning / disponible værelsesnætter. Det er endnu ikke besluttet, om
+RevPAR er gruppens selvvalgte KPI; se C-013.
 
 Ingen login/roller eller produktionshosting indgår i denne lokale prototype.
-Tableau bygges senere manuelt. Se den aktuelle
+Tableau-status afventer C-016. Se den historiske
 [API Converge-rapport](specs/converge-api-2026-10-28.md).
 
 ## Spec-driven delivery
