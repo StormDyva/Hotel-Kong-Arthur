@@ -86,7 +86,7 @@ Bedømmelsen påvirker næste analyse-request; eksempelopkald er rigtige databas
 ## Reproducerbar verifikation
 
 Uden lokal Python: kør `docker compose --profile test run --build --rm api-tests`
-fra roden. Det kører 26 tests i et separat test-image mod den isolerede testdatabase.
+fra roden. Det kører 29 tests i et separat test-image mod den isolerede testdatabase.
 Swagger-browser-smoke køres på værtsmaskinen. Alternativ lokal Python-opsætning:
 
 ```sh
@@ -113,3 +113,6 @@ Under Swagger-gruppen **Tableau revenue** findes:
 Begge understøtter også from/to i stedet for year. Backenden beregner og summerer
 natpris × antal nætter i logiklaget ud fra historiske prislinjer. Tableau bruger
 revenue direkte som et numerisk mål; valutaen er DKK.
+
+RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
+månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.

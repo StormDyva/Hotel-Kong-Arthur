@@ -58,3 +58,6 @@ legacy-import ellers kunne ændre katalog/priser og give ikke-reproducerbare tes
 Reset afvises ved andet database-/hostnavn; dette er verificeret før DB-forbindelse.
 PR er klar til menneskeligt review af API'et. Der er ikke konfigureret GitHub Actions;
 testbeviset ovenfor er fra lokale/containeriserede kørsler. Tableau-demo følger senere.
+
+T-027 tilføjer RevPAR og tre regressionstests: nu 29 containeriserede tests
+og 28 Swagger-operationer. Se /api/analytics/revpar og Tableau-handoff.

@@ -16,7 +16,7 @@ from app.services import bookings, analytics, feedback, revenue_rows
 from .schemas import (
     BookingWrite, BookingUpdate, Booking, BookingPage, DashboardReport,
     ErrorResponse, AnalyticsResponse, Summary, Group, BarReport, TopPerformers,
-    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow,
+    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow, RevPARReport,
 )
 
 ERRORS = {code: dict(model=ErrorResponse, description=description) for code, description in {
@@ -186,6 +186,7 @@ def register_metric(path,model,summary,description):
 
 
 for path,model,summary,description in [
+    ('revpar',RevPARReport,'Revenue per available room night (RevPAR)', 'Room revenue divided by available room nights in DKK. Includes monthly rows, with clipped period and season capacity. Country filters revenue only; room type/season also filter capacity. Zero denominator returns zero with warnings.'),
     ('occupancy',Summary,'Occupancy and average daily rate','Sold nights / active inventory nights × 100. Country filters only the numerator; season/type also filter inventory.'),
     ('revenue',Summary,'Hotel revenue for a year or period','Sum of nightly historical price snapshots for confirmed bookings. Checkout is exclusive.'),
     ('revenue-by-room',list[Group],'Revenue by physical room','Sorted by revenue descending. Room number identifies the physical room.'),

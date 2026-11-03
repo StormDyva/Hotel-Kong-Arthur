@@ -52,3 +52,6 @@ T-023: Gæster sammenkobles ikke længere efter navn/land. Nye bookinger og
 kontaktændringer bruger egne snapshots. Uændret PUT genbruger samme snapshot.
 Bedømte bookinger tillader kun email-/telefonrettelser; gæst/ophold kan ikke
 ændres. Historisk mistede kontaktoplysninger kan ikke gendannes automatisk.
+
+RevPAR beregnes nu i backenden: /api/analytics/revpar, med periodens tal og
+månedlige rækker til Tableau. Omsætning / tilgængelige værelsesnætter, DKK.

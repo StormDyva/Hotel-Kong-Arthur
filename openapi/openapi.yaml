@@ -838,6 +838,121 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/analytics/revpar:
+    get:
+      tags:
+      - Analytics
+      summary: Revenue per available room night (RevPAR)
+      description: Room revenue divided by available room nights in DKK. Includes
+        monthly rows, with clipped period and season capacity. Country filters revenue
+        only; room type/season also filter capacity. Zero denominator returns zero
+        with warnings.
+      operationId: analytics_revpar_api_analytics_revpar_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      - name: country_code
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^[A-Z]{2}$
+          - type: 'null'
+          title: Country Code
+      - name: room_type_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0
+          - type: 'null'
+          title: Room Type Id
+      - name: season
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - low
+            - mid
+            - high
+            type: string
+          - type: 'null'
+          title: Season
+      - name: employee_name
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 160
+          default: Helene Christine
+          title: Employee Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse_RevPARReport_'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/analytics/occupancy:
     get:
       tags:
@@ -2273,6 +2388,39 @@ components:
       - data
       - hotel_filters_apply_to_bar
       title: AnalyticsResponse[BarReport]
+    AnalyticsResponse_RevPARReport_:
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        applied_filters:
+          $ref: '#/components/schemas/AppliedFilters'
+        generated_at:
+          type: string
+          format: date-time
+          title: Generated At
+        currency:
+          type: string
+          title: Currency
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+        data:
+          $ref: '#/components/schemas/RevPARReport'
+        hotel_filters_apply_to_bar:
+          type: boolean
+          title: Hotel Filters Apply To Bar
+      type: object
+      required:
+      - period
+      - applied_filters
+      - generated_at
+      - currency
+      - warnings
+      - data
+      - hotel_filters_apply_to_bar
+      title: AnalyticsResponse[RevPARReport]
     AnalyticsResponse_Satisfaction_:
       properties:
         period:
@@ -2583,7 +2731,8 @@ components:
           - operational
           - synthetic_import
           title: Data Origin
-          description: 'synthetic_import rows have generated dates, rooms, and party sizes; read-only.'
+          description: synthetic_import rows have generated dates, rooms, and party
+            sizes; read-only.
       type: object
       required:
       - id
@@ -3051,6 +3200,29 @@ components:
       - status
       - database
       title: Health
+    MonthlyRevPAR:
+      properties:
+        month:
+          type: string
+          title: Month
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        available_room_nights:
+          type: integer
+          title: Available Room Nights
+        revpar:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revpar
+      type: object
+      required:
+      - month
+      - revenue
+      - available_room_nights
+      - revpar
+      title: MonthlyRevPAR
     Period:
       properties:
         from_date:
@@ -3096,6 +3268,31 @@ components:
       - quantity
       - revenue
       title: Product
+    RevPARReport:
+      properties:
+        revpar:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revpar
+        revenue:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revenue
+        available_room_nights:
+          type: integer
+          title: Available Room Nights
+        monthly:
+          items:
+            $ref: '#/components/schemas/MonthlyRevPAR'
+          type: array
+          title: Monthly
+      type: object
+      required:
+      - revpar
+      - revenue
+      - available_room_nights
+      - monthly
+      title: RevPARReport
     Review:
       properties:
         booking_id:
@@ -3361,6 +3558,12 @@ components:
           type: string
           pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
           title: Adr
+        revpar:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Revpar
+          description: Room revenue / available room nights, in DKK. Zero for zero
+            capacity.
         bar_revenue:
           type: string
           pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
@@ -3375,6 +3578,7 @@ components:
       - available_room_nights
       - occupancy_percent
       - adr
+      - revpar
       - bar_revenue
       - inventory_rooms
       title: Summary
