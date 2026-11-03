@@ -38,13 +38,32 @@ services:
       - ./database/postgres/apply-database.sh:/scripts/apply-database.sh:ro
     command: ["/bin/sh", "/scripts/apply-database.sh"]
 
+  demo-init:
+    build:
+      context: ./backend
+      target: runtime
+    restart: "no"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /app
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-hotel_kong_arthur}
+      POSTGRES_USER: ${POSTGRES_USER:-hotel_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_locally}
+    volumes:
+      - ./database:/project/database:ro
+    command: ["python", "/project/database/import/load_demo_data.py"]
+
   api:
     build:
       context: ./backend
       target: runtime
     restart: unless-stopped
     depends_on:
-      db-init:
+      demo-init:
         condition: service_completed_successfully
     environment:
       POSTGRES_HOST: db

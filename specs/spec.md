@@ -242,3 +242,12 @@ T-031/T-032 bruger PostgreSQL 17, psycopg 3, separat postgres_data-volume,
 IDENTITY/CHECK og PostgreSQL-triggers. CSV genindlæses fra kildefilen, ikke fra
 MySQL. API-kontrakten er uændret og kontrolleres mod OpenAPI. Se
 [implementeringsbevis](../docs/postgres-migration.md). XLSX-/SQL-generatorer er PostgreSQL-porteret og testet; øvrige uge 2-opgaver er ikke afsluttet af denne migration.
+
+## Automatisk skole-datasæt — T-040
+
+`docker compose up --build -d --wait` skal alene oprette alle 1.000 kildebaserede
+ophold og 100 ekstra mockbookinger i 2026, plus fire basiseksempler. Kilderne er
+committede anonymiserede fixtures; rå CSV/XLSX må ikke være en startup-afhængighed.
+API-start afventer klargøringen. Genstart tilføjer ikke dubletter; eksisterende
+operational-bookinger og allerede klargjorte 2026-ophold bevares. Gamle volumes
+opgraderes uden reset. Eksakte CSV-strenge/navne er fortsat en valgfri lokal import.

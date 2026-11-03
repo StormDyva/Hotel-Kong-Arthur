@@ -196,17 +196,17 @@ read connections.
 The connector is **extract-only**. After changes: **Data → Refresh All Extracts**.
 There is no continuous live push or automatic five-minute refresh in this setup.
 
-A new Docker volume automatically contains 1,004 bookings, but the 1,000 imported
-stays initially have generated dates from 2027 onward. The 2026 example revenue
-therefore covers Denmark, United Kingdom and Germany only. That is expected for
-that seed, not proof of a broken JSONPath or missing source records.
+Compose now automatically prepares **1,104 bookings**: 1,000 source stays,
+100 extra mocks and four foundation bookings. All 1,100 source/mock stays are in
+2026. No separate CSV loader is required. A fresh 2026 country query returns 21
+countries. Revenue excludes the one cancelled foundation booking.
 
-To load all CSV stays into generated 2026 dates and add 100 extra mock bookings,
-follow [the CSV loader instructions](customer-data-import.md#exact-csv--extra-school-project-data-t-028),
-then refresh the extract. Alternatively query another year or a supported date range
-(maximum 3,660 days); one range cannot include every future seed year.
-On the verified local CSV-loaded database, 2026 country revenue has 21 rows.
-Do not expect the same count on a separate student's unmodified seed database.
+Older versions seeded the 1,000 source stays into future years and omitted the
+100 extra mocks, so their 2026 data showed only Denmark, United Kingdom and
+Germany. If you still see that result, update to the version containing T-040 and
+run `docker compose up --build -d --wait`, then refresh Tableau extracts. Do not
+delete the database volume. Check `docker compose logs demo-init` if setup fails.
+See [automatic demo data](automatic-demo-data.md).
 
 If the browser has 21 rows but Tableau has three, check the selected connection,
 extract, worksheet/data-source filters and relationships. Create a blank worksheet

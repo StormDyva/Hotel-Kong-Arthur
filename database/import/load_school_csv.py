@@ -1,29 +1,17 @@
 #!/usr/bin/env python3
 """Load exact local CSV rows, link existing demo stays, add 100 extra mock bookings."""
 import argparse
-import hashlib
 import json
 import sys
-from datetime import date, timedelta
-from decimal import Decimal
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'backend'))
 from sqlalchemy import text
 from app.repositories.database import engine, Repository
-from app.api.schemas import BookingWrite
-from app.services import bookings
-from app.services.analytics import season_contains
-from build_synthetic_bookings_seed import ROOM_TYPES
+from school_demo import batch, place_source_stay, add_mock_bookings
 from import_customer_data import read_csv, validate_guest_row, file_sha256
-
-
-def batch(db, name, digest, count):
-    db.execute(text("""INSERT INTO import_batches(source_system,file_name,file_sha256,row_count,accepted_count,rejected_count,status)
-        VALUES('school-project',:name,:digest,:count,:count,0,'completed')
-        ON CONFLICT(source_system,file_name,file_sha256) DO NOTHING"""),dict(name=name,digest=digest,count=count))
-    return db.execute(text("SELECT id FROM import_batches WHERE source_system='school-project' AND file_name=:name AND file_sha256=:digest"),dict(name=name,digest=digest)).scalar_one()
 
 
 def load(path):
@@ -66,54 +54,11 @@ def load(path):
                 first=row['First Name'],last=row['Family Name'],id=booking_id)
             already_recorded=repo.one('SELECT booking_id FROM csv_source_rows WHERE import_batch_id=:batch AND source_row_number=:row',batch=bid,row=i)
             if not already_recorded or source_booking['check_in'].year != 2026 or source_booking['check_out']>date(2027,1,1):
-                candidates=[r for r in inventory if r['room_type_id']==ROOM_TYPES[value['room_type']]]
-                chosen=None
-                for offset in range(365):
-                    start=date(2026,1,1)+timedelta(days=(i*11+offset)%365)
-                    end=start+timedelta(days=value['days_rented'])
-                    if end>date(2027,1,1):continue
-                    if not all(season_contains(start+timedelta(days=n),calendars[value['season']]) for n in range(value['days_rented'])):continue
-                    for room in candidates:
-                        if not repo.overlaps(room['id'],start,end,booking_id):
-                            chosen=(room,start,end);break
-                    if chosen:break
-                if chosen is None:raise ValueError(f'No 2026 slot for source line {i}')
-                room,start,end=chosen
-                repo.execute('UPDATE bookings SET room_id=:room,check_in=:start,check_out=:end WHERE id=:id',room=room['id'],start=start,end=end,id=booking_id)
-                repo.execute('DELETE FROM booking_price_lines WHERE booking_id=:id',id=booking_id)
-                cents=int(value['price_total']*100)
-                base,remainder=divmod(cents,value['days_rented'])
-                for n in range(value['days_rented']):
-                    amount=Decimal(base+(1 if n<remainder else 0))/100
-                    repo.add_price_line(booking_id,dict(night_date=start+timedelta(days=n),season_id=season_ids[value['season']],price_per_night=amount,line_total=amount))
+                place_source_stay(repo,booking_id,i,value,inventory,calendars,season_ids)
             repo.execute("""INSERT INTO csv_source_rows(import_batch_id,source_row_number,raw_record,booking_id)
                 VALUES(:batch,:row,CAST(:raw AS JSON),:booking) ON CONFLICT(import_batch_id,source_row_number) DO NOTHING""",
                 batch=bid,row=i,raw=json.dumps(row,ensure_ascii=False),booking=matches[0]['id'])
-        mock_batch=batch(db,'extra_mock_bookings_v1',hashlib.sha256(b'extra_mock_bookings_v1:100:2026').hexdigest(),100)
-        rooms=[r for r in repo.rooms() if r['active'] and r['type_active'] and r['status']=='available']
-        added=0
-        for i in range(100):
-            key=f'Mock:{i+1:03}'
-            if repo.one('SELECT id FROM bookings WHERE import_batch_id=:batch AND source_record_id=:key',batch=mock_batch,key=key):continue
-            start=date(2026,1,1)+timedelta(days=(i*17)%360)
-            nights=1+i%5
-            selected=None
-            for offset in range(366):
-                check_in=start+timedelta(days=offset)
-                if check_in+timedelta(days=nights)>date(2027,1,1): break
-                for room in rooms[i%len(rooms):]+rooms[:i%len(rooms)]:
-                    if not repo.overlaps(room['id'],check_in,check_in+timedelta(days=nights)):
-                        selected=(room,check_in);break
-                if selected:break
-            if selected is None:raise ValueError('No available mock room/date; transaction rolled back')
-            room,check_in=selected
-            p=BookingWrite(room_id=room['id'],check_in=check_in,check_out=check_in+timedelta(days=nights),
-                guests_count=1+i%room['capacity'],guest=dict(name=f'Mock Guest {i+1:03}',
-                    email=f'mock-{i+1:03}@example.test',phone=f'+45{70000000+i}',country_code=validated[i%len(validated)]['country_code']))
-            result=bookings.save(repo,p)
-            repo.execute("""UPDATE bookings SET data_origin='synthetic_import',import_batch_id=:batch,
-                source_record_id=:key WHERE id=:id""",batch=mock_batch,key=key,id=result['id'])
-            added+=1
+        mock_batch,added=add_mock_bookings(repo,[v['country_code'] for v in validated])
         saved=repo.rows('SELECT source_row_number,raw_record FROM csv_source_rows WHERE import_batch_id=:id ORDER BY source_row_number',id=bid)
         assert [json.loads(r['raw_record']) if isinstance(r['raw_record'],str) else r['raw_record'] for r in saved]==rows
         # Verify that synthetic nightly snapshots still sum exactly to source prices.

@@ -15,7 +15,8 @@ ikke skal pushes til det offentlige projektrepository.
 ## Automatisk seed ved databaseoprettelse
 
 `database/postgres/seed/004_anonymized_customer_source.sql` indlæses automatisk af
-`db-init`, når en database initialiseres. Seedet indeholder de 1.000 opholdsrækker
+`db-init`, når en database initialiseres. `demo-init` placerer derefter opholdene
+i 2026 og opretter de 100 ekstra mockbookinger automatisk, uden råfiler. Seedet indeholder de 1.000 opholdsrækker
 og 30 drinksrækker, men gæstenavne er erstattet med generiske labels. De øvrige
 felter og drinksdata er bevaret. Rå XLSX-filerne behøver derfor ikke at ligge hos
 andre brugere. Eksisterende rækker med samme kilde-ID bevares ved genkørsel.
@@ -142,7 +143,7 @@ POSTGRES_PORT=5433 backend/.venv/bin/python database/import/load_school_csv.py \
 
 Alternatively put the file in ignored data/raw and use that path. Do not commit raw
 names, the CSV, or generated SQL containing them. The loader depends on main's
-anonymized source/booking seed and migration 009. It checks every source row against
+PostgreSQL baseline and anonymized source/booking seeds. It checks every source row against
 its seeded country/category/nights/season/total and aborts atomically on mismatches.
 
 Dates, room assignments and one person per source stay are synthetic. The loader
@@ -154,7 +155,8 @@ prices; they are marked synthetic_import with a separate school-project mock bat
 Re-running adds neither CSV rows nor mock bookings and preserves existing assignments.
 No fabricated guest ratings are added.
 
-The anonymized seed is automatically loaded by Compose; the exact local CSV and
-100-extra-mock step is explicit because the raw file is not committed. Historical
-notes about the seed's generated future years describe the default seed before this
-optional school-project loader, not the current loaded 2026 dataset.
+Compose automatically prepares the full 1,000 + 100 demo in 2026 without the
+raw file. This optional CSV loader additionally preserves exact original strings
+and names locally; it reuses the same mock batch and does not add another 100.
+See [automatic demo data](automatic-demo-data.md). Historical references to future
+seed years describe the SQL staging step before demo-init, not the final API data.
