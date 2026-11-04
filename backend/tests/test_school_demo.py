@@ -2,7 +2,8 @@
 import sys
 from pathlib import Path
 import pytest
-from test_api import repo, payload
+from decimal import Decimal
+from test_api import repo, client, payload
 from app.api.schemas import BookingWrite
 from app.services import bookings, analytics
 
@@ -12,7 +13,7 @@ sys.path.insert(0,str(IMPORT))
 import school_demo
 
 
-def test_complete_demo_upgrade_and_repeat_preserve_existing_bookings(repo):
+def test_complete_demo_upgrade_and_repeat_preserve_existing_bookings(repo,client):
     p=payload();p.update(check_in='2026-01-23',check_out='2026-01-25')
     existing=bookings.save(repo,BookingWrite(**p))
     before=repo.bookings(existing['id'])[0]
@@ -26,9 +27,25 @@ def test_complete_demo_upgrade_and_repeat_preserve_existing_bookings(repo):
         AND b.price_total IS DISTINCT FROM (SELECT sum(line_total) FROM booking_price_lines l WHERE l.booking_id=b.id)""")['n']==0
     assert repo.one("""SELECT count(*) n FROM bookings a JOIN bookings b ON a.id<b.id AND a.room_id=b.room_id
         AND a.check_in<b.check_out AND a.check_out>b.check_in WHERE a.status='confirmed' AND b.status='confirmed'""")['n']==0
+    totals=repo.one("""SELECT COUNT(*) sales,COALESCE(SUM(quantity),0) units
+        FROM bar_sales WHERE created_at=TIMESTAMP '2026-11-04 00:00:00'""")
+    assert totals['units']==repo.one("""SELECT SUM(units_sold) n FROM customer_bar_sales_aggregates
+        WHERE row_status='accepted'""")['n']
+    assert totals['sales']>100000
+    bar=client.get('/api/analytics/bar-sales?year=2026').json()['data']
+    assert Decimal(bar['total_revenue'])>0
+    assert bar['employee_name']=='Helene Christine'
+    satisfaction=client.get('/api/analytics/customer-satisfaction?year=2026').json()['data']
+    assert 30<=float(satisfaction['response_percent'])<=50
+    assert 3.5<=float(satisfaction['average_rating'])<=5
+    assert sum(row['count'] for row in satisfaction['distribution'])==satisfaction['rated_bookings']
     snapshots=repo.rows("SELECT id,guest_id,room_id,check_in,check_out,price_total FROM bookings ORDER BY id")
+    generated_counts=repo.one("""SELECT (SELECT COUNT(*) FROM bar_sales WHERE created_at=TIMESTAMP '2026-11-04 00:00:00') sales,
+        (SELECT COUNT(*) FROM booking_reviews) reviews""")
     assert school_demo.prepare_demo(repo)['status']=='already prepared'
     assert repo.rows("SELECT id,guest_id,room_id,check_in,check_out,price_total FROM bookings ORDER BY id")==snapshots
+    assert repo.one("""SELECT (SELECT COUNT(*) FROM bar_sales WHERE created_at=TIMESTAMP '2026-11-04 00:00:00') sales,
+        (SELECT COUNT(*) FROM booking_reviews) reviews""")==generated_counts
     # Simulate a volume already populated with 2026 CSV stays + the old 100 mocks,
     # but without the new automatic-bootstrap marker. No duplicate or moved stays.
     repo.execute('DELETE FROM import_batches WHERE file_name=:name',name=school_demo.DEMO_VERSION)

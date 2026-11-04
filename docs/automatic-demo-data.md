@@ -26,7 +26,9 @@ The final database contains **1,104 bookings** on a fresh volume:
 Revenue excludes cancelled bookings: 2026 analyses normally represent 1,103
 confirmed bookings, with 21 country rows and all 24 room-type/season combinations.
 These row counts describe grouped results, not missing reservations.
-No ratings are fabricated; source drinks aggregates are not dated employee sales.
+The complete demo also turns the 30 accepted drink aggregates into dated 2026
+transactions, and adds deterministic reviews for 40% of completed demo stays.
+The extra operational bookings made locally are preserved and can change totals.
 
 ## Existing installations
 
@@ -40,8 +42,18 @@ The separate MySQL volume is untouched.
 Bootstrap uses a transaction and a version marker (`demo_calendar_2026_v1`) in
 import_batches. Failure rolls back the calendar, mock rows and marker together;
 retrying is safe. Once prepared, normal restarts skip the work instead of
-resetting edited data. Do not run the loader manually to repair deliberate SQL
-changes without reviewing what changed.
+resetting edited data. Bar sales and reviews have separate version markers in
+import_batches and are added on existing volumes without resetting bookings or
+user-entered rows. `bar_sales` has no import-batch or data-origin column, so generated
+transactions use the fixed demo-import timestamp `2026-11-04 00:00:00` alongside the
+batch marker to identify the synthetic rows. Do not run the loader manually to repair
+deliberate SQL changes without reviewing what changed.
+
+Imported customer prices remain historical snapshots and can differ from the
+current room_type_prices tariff table. The separate 100 mock stays and operational
+bookings use current room tariffs. See [realistic demo data](realistic-demo-data.md)
+for the original table counts, sources and the reason those imported snapshots are
+preserved.
 
 The optional [exact CSV loader](customer-data-import.md#exact-csv--extra-school-project-data-t-028)
 adds exact original strings/names locally. It is not needed for all 1,100 school

@@ -297,6 +297,12 @@ class CountryRevenueRow(BaseModel):
     revenue: float = Field(ge=0, description='Backend-calculated revenue in DKK, returned as a JSON number')
 
 
+class CombinedRevenueRow(BaseModel):
+    hotelRevenue: float = Field(ge=0, description='Confirmed hotel stay revenue in DKK, returned as a JSON number')
+    barRevenue: float = Field(ge=0, description='Dated bar sales across all employees in DKK, returned as a JSON number')
+    totalRevenue: float = Field(ge=0, description='Hotel plus dated bar revenue in DKK, returned as a JSON number')
+
+
 class MonthlyRevPAR(BaseModel):
     month: str
     revenue: Decimal

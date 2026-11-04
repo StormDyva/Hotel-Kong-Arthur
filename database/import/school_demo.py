@@ -8,6 +8,7 @@ from app.api.schemas import BookingWrite
 from app.services import bookings
 from app.services.analytics import season_contains
 from build_synthetic_bookings_seed import ROOM_TYPES, batch_hash
+from realistic_demo_data import prepare_realistic_data
 
 DEMO_VERSION = 'demo_calendar_2026_v1'
 MOCK_VERSION = 'extra_mock_bookings_v1'
@@ -79,7 +80,8 @@ def prepare_demo(repo):
     repo.rows('SELECT id FROM room_types ORDER BY id FOR UPDATE')
     digest=hashlib.sha256(DEMO_VERSION.encode()).hexdigest()
     if repo.one("SELECT id FROM import_batches WHERE source_system='school-project' AND file_name=:name AND file_sha256=:digest",name=DEMO_VERSION,digest=digest):
-        return dict(status='already prepared',source_bookings=1000,extra_mock_bookings=100)
+        return dict(status='already prepared',source_bookings=1000,extra_mock_bookings=100,
+                    **prepare_realistic_data(repo))
     rows=repo.rows("""SELECT b.id booking_id,b.check_in,b.check_out,c.source_record_id,
         c.source_room_type room_type,c.days_rented,c.season_code season,c.price_total,c.country_code
         FROM customer_stay_records c JOIN import_batches ib ON ib.id=c.import_batch_id
@@ -100,4 +102,5 @@ def prepare_demo(repo):
         raise ValueError('Expected exactly 100 extra mock bookings')
     # Marker is written last, in the same transaction as all generated rows.
     batch(repo.db,DEMO_VERSION,digest,1000)
-    return dict(status='prepared',source_bookings=1000,extra_mock_bookings=100,newly_added_mocks=added)
+    return dict(status='prepared',source_bookings=1000,extra_mock_bookings=100,newly_added_mocks=added,
+                **prepare_realistic_data(repo))

@@ -89,6 +89,12 @@ Alle nedenstående GET-endpoints har selvstændige schemas og beskrivelser i Swa
 | customer-satisfaction | gennemsnit, svarprocent og ratingfordeling |
 | dashboard | samlet JSON til API-forbrugere |
 
+Tableau kan hente begge periodetal i én tabel fra
+`GET /analytics/revenue/combined`, som returnerer et én-rækkes array med
+numeriske `hotelRevenue`, `barRevenue` og backendberegnet `totalRevenue` i DKK.
+Hotelomsætning omfatter bekræftede ophold; baromsætning omfatter daterede salg
+for alle medarbejdere. Udaterede importerede drinkaggregater indgår ikke.
+
 Disse beregninger leveres af backend og er datakilde for frontendens
 analysevisninger og et eventuelt Tableau-dashboard. Endpoint- og warning-detaljer
 for nye/ændrede operationer kræver afklaring; eksisterende endpoints bevares.

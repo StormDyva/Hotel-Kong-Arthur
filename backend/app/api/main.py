@@ -16,7 +16,7 @@ from app.services import bookings, analytics, feedback, revenue_rows
 from .schemas import (
     BookingWrite, BookingUpdate, Booking, BookingPage, DashboardReport,
     ErrorResponse, AnalyticsResponse, Summary, Group, BarReport, TopPerformers,
-    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow, RevPARReport,
+    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow, CombinedRevenueRow, RevPARReport,
 )
 
 ERRORS = {code: dict(model=ErrorResponse, description=description) for code, description in {
@@ -340,3 +340,10 @@ def room_type_season_rows(query=Depends(RevenuePeriodQuery), repo=Depends(reposi
          description='Backend sums historical nightly price × quantity by booking guest country. Danish country labels where mapped; database name/code otherwise. Confirmed stays only; default year 2026. DKK JSON numbers. Empty period returns [].')
 def country_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
     return revenue_rows.by_country(repo,query.start,query.end)
+
+
+@app.get('/analytics/revenue/combined',response_model=list[CombinedRevenueRow],
+         tags=['Tableau revenue'], summary='One Tableau row with hotel, bar, and combined revenue',
+         description='One root-array row with numeric DKK fields for confirmed hotel stays and dated bar sales across all employees over the same period. The total is calculated by the backend. Undated imported bar aggregates are excluded. Uses year or from/to, defaulting to calendar 2026.')
+def combined_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return revenue_rows.combined_revenue(repo,query.start,query.end)
