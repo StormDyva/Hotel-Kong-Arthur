@@ -42,6 +42,14 @@ They are the simplest sources for the required revenue charts.
 |---|---|---|---|
 | RevenueCountry | `http://localhost:8000/analytics/revenue/by-country?year=2026` | `$[*]` | `country`, `revenue` |
 | RevenueRoomSeason | `http://localhost:8000/analytics/revenue/by-room-type-season?year=2026` | `$[*]` | `roomType`, `season`, `revenue` |
+| CombinedRevenue | `http://localhost:8000/analytics/revenue/combined?year=2026` | `$[*]` | `hotelRevenue`, `barRevenue`, `totalRevenue` |
+
+CombinedRevenue returns exactly one row with numeric JSON fields. Use the Tableau
+calculated field `SUM([hotelRevenue]) + SUM([barRevenue])` if you want to calculate
+the combined amount in the workbook; `totalRevenue` is included for reconciliation.
+Hotel revenue includes confirmed room stays. Bar revenue includes dated sales by
+all employees; undated imported drink aggregates are excluded. Use the same `year`
+or `from`/`to` period for both values.
 
 RevenueRoomSeason always has **24 rows** (eight types × three seasons), including
 zero revenue. RevenueCountry has one row per country with matching confirmed stays;

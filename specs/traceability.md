@@ -80,3 +80,5 @@ regressioner. Dette er ikke PostgreSQL-bevis. Converge-rapporterne fra
 T-031/T-032 → US-001/US-002 → database/postgres, repositories/database.py, load_school_csv.py → 35 PostgreSQL-tests inkl. importgeneratorer. Se docs/postgres-migration.md.
 
 T-040 → US-002/US-007 → demo-init + school_demo.py → 37 backendtests, ren Compose-start, upgrade/persistence → docs/automatic-demo-data.md.
+T-041 → US-007 → GET /analytics/revenue/combined → 38 API-/kontrakttests består; Tableau-preview afventer.
+T-042 → US-005/US-006/US-007 → school_demo.py + realistic_demo_data.py → 38 tests, fresh-volume, idempotens, foundation checks og API-afstemning består; se docs/realistic-demo-data.md.

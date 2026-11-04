@@ -5,6 +5,21 @@ basiseksempler giver 1.104 bookinger. 37 tests består. Se
 [opstart/testbevis](../docs/automatic-demo-data.md). Tidligere migrationsbevis nedenfor
 bevares som historik. API-/OpenAPI-kontrakten er uændret.
 
+## T-041 — Tableau samlet omsætning
+
+`GET /analytics/revenue/combined` er implementeret på en separat feature-branch.
+API- og OpenAPI-kontrakttests består (38 tests i alt). Manuel preview i Tableau
+mangler stadig, så samlet Tableau-afstemning er ikke markeret færdig.
+
+## T-042 — Realistiske 2026-demodata
+
+Kortlægning og deterministisk demo-init implementeret på `feat/realistic-demo-data`.
+38 backendtests består; ren Compose-volume og gentagen opstart bekræftet uden
+dubletter. US-005 returnerede Helene Christines 5.651.287,53 DKK; US-006 viste
+317/803 anmeldelser (39,48 %) med 3,97 i gennemsnit. Se
+[`docs/realistic-demo-data.md`](../docs/realistic-demo-data.md) for optællingen,
+API-tal og øvrige checks. Ingen manuel Tableau UI-test udført.
+
 ---
 
 # Aktuel status — T-031/T-032 (2026-11-03)

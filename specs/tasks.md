@@ -419,3 +419,27 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 - **Verifikation:** friskt Compose-projekt, 21 lande/24 type-sæsonkombinationer,
   gentagen startup, eksisterende volume, ingen overlap/dubletter og rollback ved fejl.
 - **Kontrakt:** ingen ændring af API eller OpenAPI; oprindelige kildepriser bevares.
+
+### T-041 — Kombineret hotel- og baromsætning til Tableau
+
+- **Story:** US-007.
+- **Status:** API implementeret på `feature/T-041-combined-tableau-revenue`; 38 API-/kontrakttests består. Manuel Tableau-preview afventer.
+- **Omfang:** `GET /analytics/revenue/combined` returnerer ét root-array med én
+  række og numeriske `hotelRevenue`, `barRevenue` og `totalRevenue`. Backend
+  bruger samme periode på begge datasæt; baromsætningen omfatter daterede salg
+  for alle medarbejdere. Udaterede importerede drinkaggregater udelades.
+- **Tableau:** JSONPath `$[*]`; beregnet felt `SUM([hotelRevenue]) + SUM([barRevenue])`.
+- **Accept:** API- og OpenAPI-kontrakt matcher; periodegrænser og summer afstemmes
+  mod hotelprislinjer og daterede barsalg; Tableau connector-preview gennemgås.
+
+### T-042 — Realistiske 2026-demoanalyser
+
+- **Stories:** US-005, US-006, US-007.
+- **Status:** Implementeret på `feat/realistic-demo-data`; 38 backendtests, frisk Compose-volume, idempotent genstart, foundation checks og US-005/US-006 API-kald verificeret. Manuel Tableau UI-test er ikke udført.
+- **Omfang:** Udvid `demo-init` idempotent med daterede transaktioner fra accepterede
+  drinkaggregater og realistiske anmeldelser for afsluttede ophold. Ingen schema- eller
+  API-kontraktændring; `csv_source_rows` syntetiseres ikke.
+- **Accept:** deterministiske 2026-rækker, produktmængder/priser afstemt, 30–50 %
+  anmeldelsessvar, FK/CHECK- og datogrænser kontrolleret; ren-volume opstart og
+  gentagelse giver samme rækker; US-005/US-006 API-tal afstemmes. Detaljer og
+  optælling før ændring: `docs/realistic-demo-data.md`.

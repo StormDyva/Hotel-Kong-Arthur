@@ -3,6 +3,7 @@ from test_api import repo, client, payload
 
 MATRIX = '/analytics/revenue/by-room-type-season'
 COUNTRIES = '/analytics/revenue/by-country'
+COMBINED = '/analytics/revenue/combined'
 
 
 def test_full_matrix_numeric_revenue_and_golden_total(client):
@@ -33,6 +34,17 @@ def test_country_rows_are_flat_grouped_and_exclude_cancelled(client):
     assert sum(r['revenue'] for r in rows)==12700
 
 
+def test_combined_revenue_is_one_flat_numeric_row_for_tableau(client):
+    response=client.get(COMBINED+'?year=2026')
+    assert response.status_code==200, response.text
+    rows=response.json()
+    assert len(rows)==1
+    row=rows[0]
+    assert set(row)=={'hotelRevenue','barRevenue','totalRevenue'}
+    assert all(isinstance(value,(int,float)) for value in row.values())
+    assert row=={'hotelRevenue':12700,'barRevenue':710,'totalRevenue':13410}
+
+
 def test_nightly_calculation_cross_season_clipping_and_cancellation(client,repo):
     repo.execute("UPDATE room_type_prices p SET price_per_night=900.15 FROM seasons s WHERE s.id=p.season_id AND p.room_type_id=1 AND s.code='low'")
     repo.execute("UPDATE room_type_prices p SET price_per_night=1100.27 FROM seasons s WHERE s.id=p.season_id AND p.room_type_id=1 AND s.code='mid'")
@@ -53,6 +65,6 @@ def test_nightly_calculation_cross_season_clipping_and_cancellation(client,repo)
 
 
 def test_invalid_period_is_consistent_on_both_exports(client):
-    for path in [MATRIX,COUNTRIES]:
+    for path in [MATRIX,COUNTRIES,COMBINED]:
         assert client.get(path+'?year=2026&from=2026-01-01').status_code==422
         assert client.get(path+'?from=2026-02-01&to=2026-01-01').status_code==422

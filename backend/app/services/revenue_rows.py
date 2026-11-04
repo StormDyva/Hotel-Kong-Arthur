@@ -1,6 +1,6 @@
 """Tableau-ready revenue: all multiplication and grouping happens in this layer."""
 from decimal import Decimal
-from .analytics import period
+from .analytics import period, utc_midnight
 
 SEASON_NAMES = {'low': 'Lav', 'mid': 'Mellem', 'high': 'Høj'}
 COUNTRY_NAMES = {
@@ -33,3 +33,11 @@ def by_country(repo, start=None, end=None, year=None):
         totals[code] = totals.get(code, Decimal('0')) + night['price_per_night'] * night['quantity']
     return [dict(country=names[code], revenue=totals[code])
             for code in sorted(totals, key=lambda c: (names[c], c))]
+
+
+def combined_revenue(repo, start, end):
+    """Return hotel and all dated bar revenue for one shared period."""
+    hotel = sum((row['line_total'] for row in repo.nights(start, end)), Decimal('0'))
+    bar = sum((row['quantity'] * row['unit_price'] for row in
+               repo.sales(utc_midnight(start), utc_midnight(end), None)), Decimal('0'))
+    return [dict(hotelRevenue=hotel, barRevenue=bar, totalRevenue=hotel + bar)]

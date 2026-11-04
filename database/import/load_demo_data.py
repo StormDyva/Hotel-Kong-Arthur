@@ -11,4 +11,6 @@ from school_demo import prepare_demo
 if __name__=='__main__':
     with engine.begin() as connection:
         result=prepare_demo(Repository(connection))
+        checks=Path(__file__).resolve().parents[1]/'postgres/tests/foundation_checks.sql'
+        connection.exec_driver_sql(checks.read_text(encoding='utf-8'))
     print(json.dumps(result))

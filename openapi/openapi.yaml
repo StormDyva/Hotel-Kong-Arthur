@@ -2460,6 +2460,86 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/revenue/combined":
+    get:
+      tags:
+      - Tableau revenue
+      summary: One Tableau row with hotel, bar, and combined revenue
+      description: One root-array row with numeric DKK fields for confirmed hotel
+        stays and dated bar sales across all employees over the same period. The total
+        is calculated by the backend. Undated imported bar aggregates are excluded.
+        Uses year or from/to, defaulting to calendar 2026.
+      operationId: combined_revenue_rows_analytics_revenue_combined_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CombinedRevenueRow"
+                title: Response Combined Revenue Rows Analytics Revenue Combined
+                  Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
 components:
   schemas:
     AnalyticsResponse_BarReport_:
@@ -3042,6 +3122,29 @@ components:
       - country
       - revenue
       title: CountryRevenueRow
+    CombinedRevenueRow:
+      properties:
+        hotelRevenue:
+          type: number
+          minimum: 0.0
+          title: Hotelrevenue
+          description: Confirmed hotel stay revenue in DKK, returned as a JSON number
+        barRevenue:
+          type: number
+          minimum: 0.0
+          title: Barrevenue
+          description: Dated bar sales across all employees in DKK, returned as a JSON number
+        totalRevenue:
+          type: number
+          minimum: 0.0
+          title: Totalrevenue
+          description: Hotel plus dated bar revenue in DKK, returned as a JSON number
+      type: object
+      required:
+      - hotelRevenue
+      - barRevenue
+      - totalRevenue
+      title: CombinedRevenueRow
     DashboardReport:
       properties:
         from_date:
