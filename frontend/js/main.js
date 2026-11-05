@@ -6,6 +6,7 @@ import { initReception } from './ui/reception.js';
 import { initRoomsView } from './ui/rooms-view.js';
 import { initSearchForm } from './ui/search-form.js';
 import { initTabs } from './ui/tabs.js';
+import { initDashboard } from './ui/dashboard.js';
 
 document.getElementById('mode-banner').hidden = !config.useMock;
 
@@ -17,9 +18,12 @@ const reception = initReception(document.getElementById('view-reception'), {
   service: bookingService,
 });
 
+const dashboard = initDashboard(document.getElementById('view-dashboard'));
+
 const tabs = initTabs(document.querySelector('.tabs'), {
   onChange(panelId) {
     if (panelId === 'view-reception') reception.refresh();
+    if (panelId === 'view-dashboard') dashboard.refresh();
   },
 });
 
