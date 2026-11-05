@@ -35,7 +35,7 @@ og RevPAR. De omtales nedenfor med opgavenavn. T-028 er CSV-demodata.
 | Gæster pr. land | spec Analyser | US-004 | T-033, T-034, T-037 | API-test | Verificeret mod PostgreSQL |
 | Prislinjer, annullering og sæsonfordeling | clarify C-004/C-007 | US-004 | T-033, T-037 | Formel-/API-test | Verificeret mod PostgreSQL |
 | RevPAR = værelsesomsætning / disponible værelsesnætter | spec T-027 (RevPAR) | US-004 | T-027 (RevPAR), T-037 | `test_revpar.py` + API-test | Implementeret i main; ikke genverificeret her |
-| Selvvalgt KPI med formel i API/frontend/dashboard | clarify C-013 | US-004, US-007, US-008 | T-030, T-034–T-036 | API-, frontend- og manuel dashboardtest | **Mangler; valg åbent. RevPAR findes som kandidat** |
+| Selvvalgt KPI (ALOS) med formel i API/frontend/dashboard | clarify C-013 | US-004, US-007, US-008 | T-030, T-045, T-034–T-036 | API-, frontend- og manuel dashboardtest | Valgt og defineret; ALOS API implementeret, automatisk test/frontend/Tableau-verifikation afventer |
 | Tom periode giver tomt resultat | clarify C-010 | US-004 | T-033, T-037 | API-test | Verificeret mod PostgreSQL |
 | Analyse-GET dokumenteret i OpenAPI | clarify C-014 | US-004 | T-033, T-034 | OpenAPI-/kontrakttest | Nuværende paths findes; ændringer afventer kontraktbeslutning |
 | Bar-total for Helene Christine | clarify C-008 | US-005 | T-012, T-037 | API-/golden dataset-test | Verificeret mod PostgreSQL |
@@ -82,3 +82,6 @@ T-031/T-032 → US-001/US-002 → database/postgres, repositories/database.py, l
 T-040 → US-002/US-007 → demo-init + school_demo.py → 37 backendtests, ren Compose-start, upgrade/persistence → docs/automatic-demo-data.md.
 T-041 → US-007 → GET /analytics/revenue/combined → 38 API-/kontrakttests består; Tableau-preview afventer.
 T-042 → US-005/US-006/US-007 → school_demo.py + realistic_demo_data.py → 38 tests, fresh-volume, idempotens, foundation checks og API-afstemning består; se docs/realistic-demo-data.md.
+T-043 → US-007 → GET /analytics/revenue/daily-combined → daglige hotel-/barsalgspunkter og backend-korrelationer til Tableau; automatisk test og Tableau-preview afventer.
+T-044 → US-006/US-007 → GET /analytics/customer-satisfaction/by-country-room-type → numeriske ratings-, kohorte- og svarprocentrækker pr. land/rumtype; automatisk test og Tableau-preview afventer.
+T-045 → US-004/US-007/US-008 → GET /analytics/bookings/average-stay-length → samlet ALOS samt måned-, værelsestype- og landeopdeling; automatisk test, frontend og Tableau-preview afventer.

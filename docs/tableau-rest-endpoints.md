@@ -43,6 +43,8 @@ They are the simplest sources for the required revenue charts.
 | RevenueCountry | `http://localhost:8000/analytics/revenue/by-country?year=2026` | `$[*]` | `country`, `revenue` |
 | RevenueRoomSeason | `http://localhost:8000/analytics/revenue/by-room-type-season?year=2026` | `$[*]` | `roomType`, `season`, `revenue` |
 | CombinedRevenue | `http://localhost:8000/analytics/revenue/combined?year=2026` | `$[*]` | `hotelRevenue`, `barRevenue`, `totalRevenue` |
+| DailyHotelBar | `http://localhost:8000/analytics/revenue/daily-combined?year=2026` | `$.data[*]` | `date`, `hotelRevenue`, `barRevenue`, `guestNights`, `roomNights`, `occupancyPercent` |
+| DailyHotelBarCorrelations | same URL | `$.correlations` | `barRevenueGuestNights`, `barRevenueHotelRevenue` |
 
 CombinedRevenue returns exactly one row with numeric JSON fields. Use the Tableau
 calculated field `SUM([hotelRevenue]) + SUM([barRevenue])` if you want to calculate
@@ -50,6 +52,14 @@ the combined amount in the workbook; `totalRevenue` is included for reconciliati
 Hotel revenue includes confirmed room stays. Bar revenue includes dated sales by
 all employees; undated imported drink aggregates are excluded. Use the same `year`
 or `from`/`to` period for both values.
+
+DailyHotelBar returns one row for every date in the requested period, including
+days with no sales or stays. For a scatter plot, place `guestNights` on Columns
+and `barRevenue` on Rows; put `date` on Detail. The API returns Pearson
+correlations under `$.correlations`, calculated by the backend. Demo bar
+transactions were generated with guest-night, weekend and season weights, so a
+correlation in demo data is illustrative rather than evidence from real hotel
+operations. Occupancy is room nights divided by active rooms, expressed as percent.
 
 RevenueRoomSeason always has **24 rows** (eight types × three seasons), including
 zero revenue. RevenueCountry has one row per country with matching confirmed stays;
@@ -96,6 +106,29 @@ The same URL can supply multiple tables by choosing different JSONPaths.
 | DrinkCategoryShares | `http://localhost:8000/api/analytics/bar-sales?year=2026` | `$.data.categories[*]` | `category`, `revenue`, `percent` |
 | SatisfactionKPIs | `http://localhost:8000/api/analytics/customer-satisfaction?year=2026` | `$.data` | `average_rating`, `response_percent`, `rated_bookings`, `eligible_bookings` |
 | RatingDistribution | `http://localhost:8000/api/analytics/customer-satisfaction?year=2026` | `$.data.distribution[*]` | `rating`, `count` |
+| SatisfactionByCountryRoomType | `http://localhost:8000/analytics/customer-satisfaction/by-country-room-type?year=2026` | `$[*]` | `country`, `room_type`, `average_rating`, `response_percent`, `rated_bookings`, `eligible_bookings`, `rating_1_count` … `rating_5_count` |
+
+## 5. Booking metrics
+
+| Table | Complete URL | JSONPath | Useful fields |
+|---|---|---|---|
+| AverageStaySummary | `http://localhost:8000/analytics/bookings/average-stay-length?year=2026` | `$.summary` | `average_stay_nights`, `room_nights`, `bookings` |
+| AverageStayByMonth | same URL | `$.monthly[*]` | `month`, `average_stay_nights`, `room_nights`, `bookings` |
+| AverageStayByRoomType | same URL | `$.by_room_type[*]` | `room_type`, `average_stay_nights`, `room_nights`, `bookings` |
+| AverageStayByCountry | same URL | `$.by_country[*]` | `country`, `average_stay_nights`, `room_nights`, `bookings` |
+
+Average stay length is the total nights for confirmed bookings divided by the
+number of those bookings. The cohort is selected by check-in date; each included
+booking contributes its full stay even if checkout falls outside the period.
+Monthly rows without check-ins have zero counts and a null average. The overall
+and monthly measures are numeric JSON values calculated by the backend.
+
+SatisfactionByCountryRoomType returns a flat row per country/room-type pair.
+Rating and response metrics are numeric JSON values; rating counts are integers.
+For a heatmap, put `country` on Rows, `room_type` on Columns and `average_rating`
+on Color. Use `response_percent` or `rated_bookings` in the tooltip so small
+samples remain visible. Only confirmed stays with checkout in the selected period
+and no future checkout are eligible; groups with no eligible stays do not appear.
 
 Bar analyses default to employee **Helene Christine**. The source drinks aggregate
 is not employee/date-level sales, so it is not silently included in these totals.

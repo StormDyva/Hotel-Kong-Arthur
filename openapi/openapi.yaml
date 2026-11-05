@@ -2540,6 +2540,195 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/revenue/daily-combined":
+    get:
+      tags:
+      - Tableau revenue
+      summary: Daily hotel and bar revenue with occupancy correlations
+      description: Daily DKK series for all bar employees and confirmed hotel stays,
+        plus backend-calculated Pearson correlations. Days without bookings or sales
+        are included with zero values. Correlations are illustrative for synthetic demo data.
+      operationId: daily_combined_revenue_rows_analytics_revenue_daily_combined_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DailyCombinedRevenueReport"
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/customer-satisfaction/by-country-room-type":
+    get:
+      tags:
+      - Tableau customer satisfaction
+      summary: Customer ratings grouped by country and room type
+      description: One numeric row per country and room type for confirmed stays
+        with checkout in the selected period and no future checkout.
+      operationId: customer_satisfaction_by_country_room_type_analytics_customer_satisfaction_by_country_room_type_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CountryRoomTypeSatisfactionRow"
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+  "/analytics/bookings/average-stay-length":
+    get:
+      tags:
+      - Tableau booking metrics
+      summary: Average stay length by check-in month
+      description: Average nights per confirmed booking whose check-in falls in
+        the selected period. Includes overall, monthly, room type and country rows.
+      operationId: average_stay_length_analytics_bookings_average_stay_length_get
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 9998
+            minimum: 1900
+          - type: 'null'
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AverageStayLengthReport"
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
 components:
   schemas:
     AnalyticsResponse_BarReport_:
@@ -3145,6 +3334,259 @@ components:
       - barRevenue
       - totalRevenue
       title: CombinedRevenueRow
+    DailyCombinedRevenuePoint:
+      properties:
+        date:
+          type: string
+          format: date
+          title: Date
+        hotelRevenue:
+          type: number
+          minimum: 0
+          title: Hotelrevenue
+        barRevenue:
+          type: number
+          minimum: 0
+          title: Barrevenue
+        guestNights:
+          type: integer
+          minimum: 0
+          title: Guestnights
+        roomNights:
+          type: integer
+          minimum: 0
+          title: Roomnights
+        occupancyPercent:
+          type: number
+          minimum: 0
+          title: Occupancypercent
+      type: object
+      required:
+      - date
+      - hotelRevenue
+      - barRevenue
+      - guestNights
+      - roomNights
+      - occupancyPercent
+      title: DailyCombinedRevenuePoint
+    RevenueCorrelations:
+      properties:
+        barRevenueGuestNights:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Barrevenueguestnights
+          description: Pearson correlation across daily bar revenue and guest nights
+        barRevenueHotelRevenue:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Barrevenuehotelrevenue
+          description: Pearson correlation across daily bar and hotel revenue
+      type: object
+      required:
+      - barRevenueGuestNights
+      - barRevenueHotelRevenue
+      title: RevenueCorrelations
+    DailyCombinedRevenueReport:
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+        end_exclusive:
+          type: boolean
+          title: End Exclusive
+        timezone:
+          type: string
+          title: Timezone
+        currency:
+          type: string
+          title: Currency
+        correlations:
+          "$ref": "#/components/schemas/RevenueCorrelations"
+        data:
+          items:
+            "$ref": "#/components/schemas/DailyCombinedRevenuePoint"
+          type: array
+          title: Data
+      type: object
+      required:
+      - from_date
+      - to_date
+      - end_exclusive
+      - timezone
+      - currency
+      - correlations
+      - data
+      title: DailyCombinedRevenueReport
+    CountryRoomTypeSatisfactionRow:
+      properties:
+        country_code:
+          type: string
+          title: Country Code
+        country:
+          type: string
+          title: Country
+        room_type_id:
+          type: integer
+          title: Room Type Id
+        room_type:
+          type: string
+          title: Room Type
+        average_rating:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Rating
+        rated_bookings:
+          type: integer
+          title: Rated Bookings
+        eligible_bookings:
+          type: integer
+          title: Eligible Bookings
+        response_percent:
+          type: number
+          title: Response Percent
+        rating_1_count:
+          type: integer
+          title: Rating 1 Count
+        rating_2_count:
+          type: integer
+          title: Rating 2 Count
+        rating_3_count:
+          type: integer
+          title: Rating 3 Count
+        rating_4_count:
+          type: integer
+          title: Rating 4 Count
+        rating_5_count:
+          type: integer
+          title: Rating 5 Count
+      type: object
+      required:
+      - country_code
+      - country
+      - room_type_id
+      - room_type
+      - average_rating
+      - rated_bookings
+      - eligible_bookings
+      - response_percent
+      - rating_1_count
+      - rating_2_count
+      - rating_3_count
+      - rating_4_count
+      - rating_5_count
+      title: CountryRoomTypeSatisfactionRow
+    AverageStayMetric:
+      properties:
+        bookings:
+          type: integer
+          title: Bookings
+        room_nights:
+          type: integer
+          title: Room Nights
+        average_stay_nights:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Stay Nights
+      type: object
+      required:
+      - bookings
+      - room_nights
+      - average_stay_nights
+      title: AverageStayMetric
+    AverageStayMonthlyRow:
+      allOf:
+      - "$ref": "#/components/schemas/AverageStayMetric"
+      - type: object
+        properties:
+          month:
+            type: string
+            title: Month
+        required:
+        - month
+      title: AverageStayMonthlyRow
+    AverageStayRoomTypeRow:
+      allOf:
+      - "$ref": "#/components/schemas/AverageStayMetric"
+      - type: object
+        properties:
+          room_type_id:
+            type: integer
+            title: Room Type Id
+          room_type:
+            type: string
+            title: Room Type
+        required:
+        - room_type_id
+        - room_type
+      title: AverageStayRoomTypeRow
+    AverageStayCountryRow:
+      allOf:
+      - "$ref": "#/components/schemas/AverageStayMetric"
+      - type: object
+        properties:
+          country_code:
+            type: string
+            title: Country Code
+          country:
+            type: string
+            title: Country
+        required:
+        - country_code
+        - country
+      title: AverageStayCountryRow
+    AverageStayLengthReport:
+      properties:
+        from_date:
+          type: string
+          format: date
+          title: From Date
+        to_date:
+          type: string
+          format: date
+          title: To Date
+        end_exclusive:
+          type: boolean
+          title: End Exclusive
+        cohort_basis:
+          type: string
+          title: Cohort Basis
+        summary:
+          "$ref": "#/components/schemas/AverageStayMetric"
+        monthly:
+          items:
+            "$ref": "#/components/schemas/AverageStayMonthlyRow"
+          type: array
+          title: Monthly
+        by_room_type:
+          items:
+            "$ref": "#/components/schemas/AverageStayRoomTypeRow"
+          type: array
+          title: By Room Type
+        by_country:
+          items:
+            "$ref": "#/components/schemas/AverageStayCountryRow"
+          type: array
+          title: By Country
+      type: object
+      required:
+      - from_date
+      - to_date
+      - end_exclusive
+      - cohort_basis
+      - summary
+      - monthly
+      - by_room_type
+      - by_country
+      title: AverageStayLengthReport
     DashboardReport:
       properties:
         from_date:
@@ -3824,3 +4266,5 @@ tags:
 - name: US-006 – Kundetilfredshed
 - name: US-007/US-008 – Dashboard og frontend
 - name: Tableau revenue
+- name: Tableau customer satisfaction
+- name: Tableau booking metrics

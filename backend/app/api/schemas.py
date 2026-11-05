@@ -303,6 +303,77 @@ class CombinedRevenueRow(BaseModel):
     totalRevenue: float = Field(ge=0, description='Hotel plus dated bar revenue in DKK, returned as a JSON number')
 
 
+class DailyCombinedRevenuePoint(BaseModel):
+    date: date
+    hotelRevenue: float = Field(ge=0)
+    barRevenue: float = Field(ge=0)
+    guestNights: int = Field(ge=0)
+    roomNights: int = Field(ge=0)
+    occupancyPercent: float = Field(ge=0)
+
+
+class RevenueCorrelations(BaseModel):
+    barRevenueGuestNights: float | None = Field(description='Pearson correlation across daily bar revenue and guest nights')
+    barRevenueHotelRevenue: float | None = Field(description='Pearson correlation across daily bar and hotel revenue')
+
+
+class DailyCombinedRevenueReport(BaseModel):
+    from_date: date
+    to_date: date
+    end_exclusive: bool
+    timezone: str
+    currency: str
+    correlations: RevenueCorrelations
+    data: list[DailyCombinedRevenuePoint]
+
+
+class CountryRoomTypeSatisfactionRow(BaseModel):
+    country_code: str
+    country: str
+    room_type_id: int
+    room_type: str
+    average_rating: float | None
+    rated_bookings: int
+    eligible_bookings: int
+    response_percent: float
+    rating_1_count: int
+    rating_2_count: int
+    rating_3_count: int
+    rating_4_count: int
+    rating_5_count: int
+
+
+class AverageStayMetric(BaseModel):
+    bookings: int
+    room_nights: int
+    average_stay_nights: float | None
+
+
+class AverageStayMonthlyRow(AverageStayMetric):
+    month: str
+
+
+class AverageStayRoomTypeRow(AverageStayMetric):
+    room_type_id: int
+    room_type: str
+
+
+class AverageStayCountryRow(AverageStayMetric):
+    country_code: str
+    country: str
+
+
+class AverageStayLengthReport(BaseModel):
+    from_date: date
+    to_date: date
+    end_exclusive: bool
+    cohort_basis: str
+    summary: AverageStayMetric
+    monthly: list[AverageStayMonthlyRow]
+    by_room_type: list[AverageStayRoomTypeRow]
+    by_country: list[AverageStayCountryRow]
+
+
 class MonthlyRevPAR(BaseModel):
     month: str
     revenue: Decimal

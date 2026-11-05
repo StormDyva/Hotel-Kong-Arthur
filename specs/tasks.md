@@ -310,14 +310,12 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-030 — Vælg og definér selvvalgt nøgletal
 
-- **Status:** Blokerende, afventer gruppens valg (C-013).
+- **Status:** Valgt og defineret af brugeren 2026-11-05: gennemsnitlig opholdslængde (ALOS). Implementeret under T-045; automatisk verifikation afventer.
 - **Stories/accept:** US-004, US-007 og US-008.
-- **Afhængighed:** gruppens beslutning dokumenteret i Clarify.
-- **Omfang:** vælg blandt RevPAR, gennemsnitlig opholdslængde, annulleringsrate
-  eller andet godkendt tal; fastlæg formel, kohorte, filtre og tom-/nul-data.
-- **Verifikation:** beslutningsreview og sporbarhed. Blokerer kun valgte KPI's
-  eventuelle API-, frontend- og Tableau-arbejde; eksisterende RevPAR endpoint
-  forbliver som det er, indtil gruppen vælger.
+- **Formel/kohorte:** bekræftede bookinger valgt på check-in-dato; hele opholdets
+  nætter / antal bookinger. Tom kohorte returnerer null-gennemsnit og nul counts.
+- **Afhængighed:** beslutningen er dokumenteret i Clarify; se T-045 for endpoint
+  og Tableau-kontrakt.
 
 ### T-031 — PostgreSQL Compose og miljø
 
@@ -403,7 +401,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ## Kvalitetstjek — tillægsopgave uge 2
 
 - Dækning: målrettet mod de otte nye stories; status er planlagt, ikke verificeret.
-- Afhængigheder: C-013 blokerer selvvalgt KPI; C-014–C-016 afklarer kontrakt,
+- Afhængigheder: C-013 er afklaret som ALOS; C-014–C-016 afklarer kontrakt,
   frontendopdatering og Tableau-omfang.
 - Testbarhed: PostgreSQL-, API-, concurrency-, frontend- og manuel Tableau-
   verifikation er planlagt, men ikke udført i specifikationsopgaven.
@@ -443,3 +441,40 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
   anmeldelsessvar, FK/CHECK- og datogrænser kontrolleret; ren-volume opstart og
   gentagelse giver samme rækker; US-005/US-006 API-tal afstemmes. Detaljer og
   optælling før ændring: `docs/realistic-demo-data.md`.
+
+### T-043 — Daglig hotel/bar-sammenhæng til Tableau
+
+- **Story:** US-007; understøtter US-004/US-005.
+- **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
+  automatisk test og Tableau-preview afventer.
+- **Omfang:** `GET /analytics/revenue/daily-combined` returnerer daglig hotel- og
+  baromsætning, gæstenætter, værelsesnætter og belægning samt backendberegnede
+  Pearson-korrelationer. Alle medarbejderes daterede barsalg medtages; kun
+  bekræftede ophold indgår.
+- **Tableau:** `$.data[*]` til daglige punkter; `$.correlations` til KPI-kort.
+  Demoens bartransaktioner er vægtet efter belægning, weekend og sæson, så en
+  observeret korrelation er syntetisk og kun illustrativ.
+
+### T-044 — Kundetilfredshed pr. land og værelsestype
+
+- **Story:** US-006, Tableau-forbrug under US-007.
+- **Status:** Implementeret på `feat/tableau-bar-occupancy-correlation`;
+  automatisk test og Tableau-preview afventer.
+- **Omfang:** `GET /analytics/customer-satisfaction/by-country-room-type` returnerer
+  én numerisk række pr. land/værelsestype med gennemsnitsrating, svarprocent,
+  kvalificerede/bedømte ophold og fordeling af rating 1–5.
+- **Kohorte:** Kun bekræftede bookinger med checkout i perioden, hvor checkout
+  ikke ligger i fremtiden. Ingen anmeldelsesdata opfindes af endpointet.
+- **Tableau:** JSONPath `$[*]`; brug land og værelsestype som dimensioner og
+  rating/svarprocent som measures.
+
+### T-045 — Gennemsnitlig opholdslængde til Tableau
+
+- **Story:** US-004/US-007/US-008.
+- **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
+  automatisk test og Tableau-preview afventer.
+- **Kohorte/formel:** Bekræftede bookinger med check-in i perioden; samlet antal
+  overnatninger divideret med antal bookinger. Hele opholdet tæller med, også
+  når checkout ligger uden for perioden.
+- **Tableau:** `GET /analytics/bookings/average-stay-length`; JSONPaths
+  `$.summary`, `$.monthly[*]`, `$.by_room_type[*]` og `$.by_country[*]`.

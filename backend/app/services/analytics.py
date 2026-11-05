@@ -158,3 +158,67 @@ def metric_result(data, metric):
         warnings = [w for w in data['warnings'] if not w.startswith(('No bar','No guest ratings'))]
     return dict(period=data['period'], applied_filters=data['applied_filters'], generated_at=data['generated_at'],
                 currency='DKK', warnings=warnings, data=result, hotel_filters_apply_to_bar=False)
+
+
+def satisfaction_breakdown(repo, start=None, end=None, year=None):
+    """Return one numeric satisfaction summary per country and room type."""
+    start, end = period(start, end, year)
+    today = datetime.now(COPENHAGEN).date()
+    grouped_rows = {}
+    for row in repo.satisfaction_breakdown_rows(start, end, today):
+        key = (row['country_code'], row['room_type_id'])
+        group = grouped_rows.setdefault(key, dict(
+            country_code=row['country_code'], country=row['country'],
+            room_type_id=row['room_type_id'], room_type=row['room_type'],
+            eligible_bookings=0, ratings=[]))
+        group['eligible_bookings'] += 1
+        if row['rating'] is not None:
+            group['ratings'].append(row['rating'])
+
+    results = []
+    for key in sorted(grouped_rows):
+        group = grouped_rows[key]
+        ratings = group.pop('ratings')
+        rated = len(ratings)
+        results.append({**group,
+            'average_rating': round(sum(ratings) / rated, 2) if rated else None,
+            'rated_bookings': rated,
+            'response_percent': round(100 * rated / group['eligible_bookings'], 2)
+                if group['eligible_bookings'] else 0.0,
+            **{f'rating_{rating}_count': ratings.count(rating) for rating in range(1, 6)}})
+    return results
+
+
+def average_stay_length(repo, start=None, end=None, year=None):
+    """Average nights per confirmed booking, grouped by check-in cohort."""
+    start, end = period(start, end, year)
+    monthly = {}
+    month = date(start.year, start.month, 1)
+    while month < end:
+        label = month.strftime('%Y-%m')
+        monthly[label] = dict(month=label, bookings=0, room_nights=0)
+        month = date(month.year + (month.month == 12), month.month % 12 + 1, 1)
+
+    totals = dict(bookings=0, room_nights=0)
+    by_room_type, by_country = {}, {}
+    for row in repo.stay_length_rows(start, end):
+        nights = (row['check_out'] - row['check_in']).days
+        month_group = monthly[row['check_in'].strftime('%Y-%m')]
+        room_group = by_room_type.setdefault(row['room_type_id'], dict(
+            room_type_id=row['room_type_id'], room_type=row['room_type'], bookings=0, room_nights=0))
+        country_group = by_country.setdefault(row['country_code'], dict(
+            country_code=row['country_code'], country=row['country'], bookings=0, room_nights=0))
+        for group in (totals, month_group, room_group, country_group):
+            group['bookings'] += 1
+            group['room_nights'] += nights
+
+    def add_average(group):
+        return {**group, 'average_stay_nights': round(group['room_nights'] / group['bookings'], 2)
+                if group['bookings'] else None}
+
+    return dict(from_date=start, to_date=end, end_exclusive=True,
+                cohort_basis='confirmed bookings grouped by check-in date',
+                summary=add_average(totals),
+                monthly=[add_average(group) for group in monthly.values()],
+                by_room_type=[add_average(group) for _, group in sorted(by_room_type.items())],
+                by_country=[add_average(group) for _, group in sorted(by_country.items())])

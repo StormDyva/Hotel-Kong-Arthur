@@ -142,6 +142,27 @@ class Repository:
                 WHERE l.booking_id=b.id AND s.code=:season))""",
             start=start, end=end, today=today, country=country, room_type=room_type, season=season)
 
+    def satisfaction_breakdown_rows(self, start, end, today):
+        return self.rows("""SELECT g.country_code, COALESCE(NULLIF(trim(g.country_name), ''), g.country_code) country,
+            r.room_type_id, rt.name room_type, v.rating
+            FROM bookings b JOIN guests g ON g.id=b.guest_id
+            JOIN rooms r ON r.id=b.room_id JOIN room_types rt ON rt.id=r.room_type_id
+            LEFT JOIN booking_reviews v ON v.booking_id=b.id
+            WHERE b.status='confirmed' AND b.check_out>=:start AND b.check_out<:end
+              AND b.check_out<=:today
+            ORDER BY g.country_code, r.room_type_id, b.id""",
+            start=start, end=end, today=today)
+
+    def stay_length_rows(self, start, end):
+        return self.rows("""SELECT b.check_in, b.check_out, r.room_type_id,
+            rt.name room_type, g.country_code,
+            COALESCE(NULLIF(trim(g.country_name), ''), g.country_code) country
+            FROM bookings b JOIN rooms r ON r.id=b.room_id
+            JOIN room_types rt ON rt.id=r.room_type_id
+            JOIN guests g ON g.id=b.guest_id
+            WHERE b.status='confirmed' AND b.check_in>=:start AND b.check_in<:end
+            ORDER BY b.check_in, b.id""", start=start, end=end)
+
     def bar_products(self):
         return self.rows("SELECT id,name,category,price,'DKK' currency FROM bar_products WHERE active ORDER BY id")
 
