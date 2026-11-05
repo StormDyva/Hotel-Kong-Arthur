@@ -105,7 +105,7 @@ ophævet. Se den daterede beslutning nedenfor.
 | Manglende data | Approved | Projektgruppen | 2026-10-26 |
 | Dobbeltbooking/kapacitet | Approved | Projektgruppen | 2026-10-26 |
 | PostgreSQL som måldatabase | Afklaret | Projektgruppen | Tillægsopgave uge 2 |
-| Selvvalgt nøgletal | Åben | Projektgruppen | Afventer |
+| Selvvalgt nøgletal | Afklaret: gennemsnitlig opholdslængde (ALOS) | Brugeren | 2026-11-05 |
 | Analysekontrakt og warnings | Åben | Projektgruppen | Afventer |
 | Frontend-opdatering | Åben | Projektgruppen | Afventer |
 | Tableau som forbruger/leverance | Åben | Projektgruppen | Afventer |
@@ -162,10 +162,17 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 
 ### C-013 — Selvvalgt nøgletal
 
-- **Status: ÅBEN.** Der er endnu ikke valgt et nøgletal.
-- **Nuværende implementation:** RevPAR er nu implementeret i main som
-  `/api/analytics/revpar` med månedsrækker. Det gør ikke RevPAR til gruppens
-  valgte selvstændige KPI; gruppens valg og acceptkriterium er fortsat åbent.
+- **Status: AFKLARET 2026-11-05.** Brugeren valgte gennemsnitlig opholdslængde
+  (Average Length of Stay, ALOS) som selvvalgt nøgletal. Afbestillingsprocenten
+  blev fravalgt, fordi demoens kohorte kun havde én afbestilt booking.
+- **Formel:** Sum af hele opholdsnætter divideret med antal bekræftede bookinger.
+  En booking tilhører perioden/måneden for sin check-in; alle nætterne i det
+  ophold tæller med, også hvis checkout ligger uden for perioden.
+- **Tomt datasæt:** `bookings=0`, `room_nights=0` og `average_stay_nights=null`.
+- **Opdeling:** samlet, check-in-måned, værelsestype og bookinggæstens land.
+  Averages og ratios beregnes i backend og returneres numerisk.
+- **Nuværende implementation:** RevPAR findes stadig som eksisterende API-KPI,
+  men ALOS er gruppens valgte selvstændige nøgletal.
 - **RevPAR:** Omsætning / disponible værelsesnætter. Kræver omsætning og
   disponible værelsesnætter for samme periode. Værelser, perioder, bookinger og
   natpriser findes i den nuværende model; beregningen kan genbruge disse data,

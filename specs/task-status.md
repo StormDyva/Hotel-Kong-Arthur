@@ -20,6 +20,25 @@ dubletter. US-005 returnerede Helene Christines 5.651.287,53 DKK; US-006 viste
 [`docs/realistic-demo-data.md`](../docs/realistic-demo-data.md) for optællingen,
 API-tal og øvrige checks. Ingen manuel Tableau UI-test udført.
 
+## T-043 — Daglig hotel/bar-sammenhæng til Tableau
+
+`GET /analytics/revenue/daily-combined` leverer daglige hotel-/barværdier og
+backendberegnede korrelationer til Tableau. Preview og automatisk test afventer.
+Demoens barværdier er syntetisk vægtet efter gæstenætter og sæson; se
+`docs/tableau-rest-endpoints.md` for JSONPath og scatter-plotopsætning.
+
+## T-044 — Kundetilfredshed pr. land og værelsestype
+
+`GET /analytics/customer-satisfaction/by-country-room-type` returnerer flade
+ratings- og svarprocentrækker pr. land/rumtype til Tableau. Endpointet og
+OpenAPI-kontrakten er implementeret; test og Tableau-preview afventer.
+
+## T-045 — Gennemsnitlig opholdslængde til Tableau
+
+`GET /analytics/bookings/average-stay-length` returnerer samlet og månedlig ALOS
+samt opdelinger pr. værelsestype og land. Automatisk test og Tableau-preview
+afventer.
+
 ---
 
 # Aktuel status — T-031/T-032 (2026-11-03)

@@ -87,6 +87,7 @@ Alle nedenstående GET-endpoints har selvstændige schemas og beskrivelser i Swa
 | top-performers | mest indbringende værelse, type og land |
 | bar-sales | medarbejdertotal, salg pr. drink og kategoriandele |
 | customer-satisfaction | gennemsnit, svarprocent og ratingfordeling |
+| Tableau customer-satisfaction breakdown | ratings grupperet pr. land og værelsestype |
 | dashboard | samlet JSON til API-forbrugere |
 
 Tableau kan hente begge periodetal i én tabel fra
@@ -94,6 +95,23 @@ Tableau kan hente begge periodetal i én tabel fra
 numeriske `hotelRevenue`, `barRevenue` og backendberegnet `totalRevenue` i DKK.
 Hotelomsætning omfatter bekræftede ophold; baromsætning omfatter daterede salg
 for alle medarbejdere. Udaterede importerede drinkaggregater indgår ikke.
+
+Til Tableau-scatterplots returnerer `GET /analytics/revenue/daily-combined`
+daglige numeriske hotel- og barsalg, gæstenætter, værelsesnætter og
+belægningsprocent. Samme svar indeholder backendberegnede Pearson-koefficienter
+for barsalg mod gæstenætter og hotelomsætning. Dage uden salg/ophold udfyldes med
+0; datoer fortolkes i `Europe/Copenhagen`. Demoens syntetiske barsalg er vægtet
+efter gæstenætter, weekend og sæson, så korrelationen ikke er empirisk evidens.
+
+`GET /analytics/customer-satisfaction/by-country-room-type` returnerer én
+Tableau-række pr. land/værelsestype med numerisk gennemsnitsrating, svarprocent,
+antal kvalificerede/bedømte ophold og antal ratings 1–5. Kun bekræftede ophold
+med checkout i perioden og checkout ikke efter dags dato tæller med.
+
+`GET /analytics/bookings/average-stay-length` returnerer gennemsnitligt antal
+overnatninger pr. bekræftet booking, samlet, pr. check-in-måned, værelsestype og
+land. Kohorten bestemmes af check-in i perioden; hver booking bidrager med hele
+opholdslængden, også hvis checkout ligger uden for perioden.
 
 Disse beregninger leveres af backend og er datakilde for frontendens
 analysevisninger og et eventuelt Tableau-dashboard. Endpoint- og warning-detaljer
@@ -110,8 +128,11 @@ bookingrelation har; dette fremgår af hotel_filters_apply_to_bar=false.
 - Belægning = solgte nætter / (aktive værelser i valgt type × valgte sæsonnætter) × 100.
   Landefilter ændrer kun tælleren. Inventarets aktuelle aktive status bruges, da der
   ikke findes historiske inventar-snapshots. Over 100 % giver datakvalitets-warning.
-- ADR = indtjening / solgte nætter findes allerede som API-beregning. Det er ikke
-  valgt som tillægsopgavens selvvalgte nøgletal; C-013 er fortsat åben.
+- ADR = indtjening / solgte nætter findes allerede som API-beregning.
+- Selvvalgt nøgletal (C-013): gennemsnitlig opholdslængde (ALOS) = hele
+  opholdsnætter / bekræftede bookinger med check-in i perioden. Hele opholdet
+  tæller, også hvis checkout ligger uden for perioden. Ingen bookinger giver
+  `average_stay_nights=null`.
 - Gæster pr. land: booking_guests tæller selskabet én gang pr. matchende booking;
   distinct_bookers tæller gæsteprofiler; guest_nights tæller antal × opholdsnætter.
   Hele selskabets land antages at være bookinggæstens land, fordi øvrige nationaliteter
@@ -159,7 +180,7 @@ Frontend-analysevisninger og eventuel Tableau-rendering afstemmes mod API-tal.
 - Backend beregner alle KPI'er og eksponerer dem via REST/JSON. Frontend og
   Tableau forbruger API'et; frontend beregner ikke KPI'er og bruger ikke SQL.
 - Løsningen startes med én `docker compose up --build`.
-- Det selvvalgte KPI er åbent og må ikke implementeres før C-013 er afklaret.
+- Det selvvalgte KPI er afklaret som ALOS; se C-013.
 
 ## Frontendens analysevisninger
 

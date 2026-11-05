@@ -16,7 +16,7 @@ from app.services import bookings, analytics, feedback, revenue_rows
 from .schemas import (
     BookingWrite, BookingUpdate, Booking, BookingPage, DashboardReport,
     ErrorResponse, AnalyticsResponse, Summary, Group, BarReport, TopPerformers,
-    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow, CombinedRevenueRow, RevPARReport,
+    Satisfaction, ReviewWrite, Review, SaleWrite, Sale, Availability, RoomType, BarProduct, Health, Room, RoomTypeSeasonRevenueRow, CountryRevenueRow, CombinedRevenueRow, DailyCombinedRevenueReport, CountryRoomTypeSatisfactionRow, AverageStayLengthReport, RevPARReport,
 )
 
 ERRORS = {code: dict(model=ErrorResponse, description=description) for code, description in {
@@ -34,6 +34,8 @@ OPENAPI_TAGS = [
     {'name': 'US-006 – Kundetilfredshed'},
     {'name': 'US-007/US-008 – Dashboard og frontend'},
     {'name': 'Tableau revenue'},
+    {'name': 'Tableau customer satisfaction'},
+    {'name': 'Tableau booking metrics'},
 ]
 app = FastAPI(title='Hotel Kong Arthur API', version='1.1.0', docs_url=None, redoc_url=None,
     openapi_tags=OPENAPI_TAGS, responses=ERRORS, description=(
@@ -347,3 +349,26 @@ def country_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(reposit
          description='One root-array row with numeric DKK fields for confirmed hotel stays and dated bar sales across all employees over the same period. The total is calculated by the backend. Undated imported bar aggregates are excluded. Uses year or from/to, defaulting to calendar 2026.')
 def combined_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
     return revenue_rows.combined_revenue(repo,query.start,query.end)
+
+
+@app.get('/analytics/revenue/daily-combined',response_model=DailyCombinedRevenueReport,
+         tags=['Tableau revenue'], summary='Daily hotel and bar revenue with occupancy correlations',
+         description='Daily rows for scatter plots and time series, plus backend-calculated Pearson correlations for bar revenue vs guest nights and hotel revenue. Uses all bar employees, confirmed hotel stays, Europe/Copenhagen dates and numeric DKK JSON fields.')
+def daily_combined_revenue_rows(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return revenue_rows.daily_combined(repo,query.start,query.end)
+
+
+@app.get('/analytics/customer-satisfaction/by-country-room-type',
+         response_model=list[CountryRoomTypeSatisfactionRow], tags=['Tableau customer satisfaction'],
+         summary='Customer ratings grouped by country and room type',
+         description='One row per country and room type for confirmed stays with checkout in the selected period and no future checkout. Returns numeric ratings, response rates and counts for Tableau.')
+def customer_satisfaction_by_country_room_type(
+        query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return analytics.satisfaction_breakdown(repo, query.start, query.end)
+
+
+@app.get('/analytics/bookings/average-stay-length', response_model=AverageStayLengthReport,
+         tags=['Tableau booking metrics'], summary='Average stay length by check-in month',
+         description='Average nights per confirmed booking whose check-in falls in the selected period. Returns numeric averages overall, by month, room type and country; all averages are calculated by the backend.')
+def average_stay_length(query=Depends(RevenuePeriodQuery), repo=Depends(repository,scope='function')):
+    return analytics.average_stay_length(repo, query.start, query.end)
