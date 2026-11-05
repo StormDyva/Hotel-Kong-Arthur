@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hotel Kong Arthur – Booking</title>
+  <title>Hotel Kong Arthur – Booking & Analyse</title>
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/main.js"></script>
 </head>
@@ -20,6 +20,7 @@
       <nav class="tabs" role="tablist" aria-label="Visning">
         <button type="button" role="tab" id="tab-booking" aria-controls="view-booking" aria-selected="true">Ny booking</button>
         <button type="button" role="tab" id="tab-reception" aria-controls="view-reception" aria-selected="false" tabindex="-1">Bookingoversigt</button>
+        <button type="button" role="tab" id="tab-dashboard" aria-controls="view-dashboard" aria-selected="false" tabindex="-1">Analyse</button>
       </nav>
     </div>
   </header>
@@ -152,6 +153,67 @@
           </table>
         </div>
       </div>
+    </section>
+
+    <section id="view-dashboard" class="view dashboard-shell" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+      <header class="dashboard-topbar">
+        <div>
+          <p class="dashboard-kicker">Hotel intelligence</p>
+          <h1>Overview</h1>
+          <p class="dashboard-subtitle">Et samlet overblik over hotellets performance fra REST API’et.</p>
+        </div>
+        <div class="dashboard-status" data-dashboard-status>
+          <span class="status-dot" aria-hidden="true"></span>
+          <span data-last-updated>Venter på data</span>
+        </div>
+      </header>
+
+      <div class="dashboard-toolbar">
+        <div class="dashboard-filter-chips" data-active-filters aria-live="polite"></div>
+        <button class="dashboard-icon-button mobile-filter-toggle" type="button" data-open-filters aria-label="Åbn analysefiltre">☷ <span>Filtre</span></button>
+        <button class="dashboard-icon-button" type="button" data-refresh-dashboard aria-label="Opdatér analyse" title="Opdatér analyse">↻ <span>Opdatér</span></button>
+      </div>
+
+      <div class="dashboard-layout">
+        <div class="dashboard-main">
+          <div class="kpi-grid" data-kpi-grid>
+            <article class="kpi-card" data-kpi="occupancy"><span class="kpi-label">Belægning</span><strong class="kpi-value">—</strong><span class="kpi-meta">Valgt periode</span></article>
+            <article class="kpi-card" data-kpi="revenue"><span class="kpi-label">Hotelomsætning</span><strong class="kpi-value">—</strong><span class="kpi-meta">Bekræftede ophold</span></article>
+            <article class="kpi-card" data-kpi="room-nights"><span class="kpi-label">Værelsesnætter</span><strong class="kpi-value">—</strong><span class="kpi-meta">Solgte nætter</span></article>
+            <article class="kpi-card" data-kpi="revpar"><span class="kpi-label">RevPAR</span><strong class="kpi-value">—</strong><span class="kpi-meta">Omsætning / tilgængelig nat</span></article>
+            <article class="kpi-card" data-kpi="bar"><span class="kpi-label">Barsalg</span><strong class="kpi-value">—</strong><span class="kpi-meta">Cocktails og kaffe</span></article>
+          </div>
+
+          <div class="dashboard-chart-grid">
+            <article class="dashboard-panel" data-panel="room-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Indtjening</p><h2>Pr. værelsestype</h2></div></div><div class="chart-stage" data-room-chart></div></article>
+            <article class="dashboard-panel" data-panel="season-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Mix</p><h2>Pr. sæson</h2></div></div><div class="chart-stage" data-season-chart></div></article>
+          </div>
+
+          <div class="dashboard-chart-grid">
+            <article class="dashboard-panel" data-panel="country-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Oprindelse</p><h2>Omsætning pr. land</h2></div></div><div class="chart-stage" data-country-chart></div></article>
+            <article class="dashboard-panel" data-panel="guest-country"><div class="panel-heading"><div><p class="panel-eyebrow">Gæster</p><h2>Gæster pr. land</h2></div></div><div class="chart-stage" data-guest-chart></div></article>
+          </div>
+
+          <div class="dashboard-chart-grid">
+            <article class="dashboard-panel" data-panel="bar"><div class="panel-heading"><div><p class="panel-eyebrow">Cocktailbar</p><h2>Kategori og produkter</h2></div></div><div class="bar-split"><div class="chart-stage" data-bar-category-chart></div><div class="chart-stage" data-bar-product-chart></div></div></article>
+            <article class="dashboard-panel satisfaction-panel" data-panel="satisfaction"><div class="panel-heading"><div><p class="panel-eyebrow">Feedback</p><h2>Kundetilfredshed</h2></div></div><div data-satisfaction></div></article>
+          </div>
+        </div>
+
+        <aside class="analysis-panel" aria-label="Analyseindstillinger">
+          <div class="analysis-panel-header"><div><p class="panel-eyebrow">Analysepanel</p><h2>Filtre</h2></div><button class="dashboard-icon-button mobile-panel-close" type="button" data-close-filters aria-label="Luk filtre">×</button></div>
+          <form class="dashboard-filters" data-dashboard-filters>
+            <div class="field"><label for="dashboard-year">År</label><select id="dashboard-year" name="year"><option value="2026">2026</option></select></div>
+            <div class="field"><label for="dashboard-country">Land</label><select id="dashboard-country" name="country_code"><option value="">Alle lande</option></select></div>
+            <div class="field"><label for="dashboard-room-type">Værelsestype</label><select id="dashboard-room-type" name="room_type_id"><option value="">Alle typer</option></select></div>
+            <div class="field"><label for="dashboard-season">Sæson</label><select id="dashboard-season" name="season"><option value="">Alle sæsoner</option><option value="low">Lavsæson</option><option value="mid">Mellemsæson</option><option value="high">Højsæson</option></select></div>
+            <div class="filter-actions"><button class="btn btn-secondary dashboard-reset" type="button" data-reset-filters>Nulstil filtre</button></div>
+          </form>
+          <div class="analysis-note"><span class="note-mark">i</span><p>Hotel-KPI’er følger samme definitioner som backendens analyse-service og Tableau. Barsalg filtreres ikke af hotellets land, værelsestype eller sæson.</p></div>
+          <div class="analysis-source"><span class="source-indicator"></span><div><strong>REST API</strong><span>Seneste hentning vises øverst</span></div></div>
+        </aside>
+      </div>
+      <p class="dashboard-error" data-dashboard-error role="alert" hidden></p>
     </section>
   </main>
 
