@@ -1,8 +1,8 @@
 import { createAnalyticsService } from '../services/analytics-service.js';
 import { config } from '../config.js';
 import {
-  categoryDonut, countryName, emptyState, escapeHtml, formatCount, formatDKK,
-  horizontalBars, roomTypeSeasonChart, seasonLabel,
+  categoryDonut, countryName, emptyState, escapeHtml, formatCount, formatDKK, formatPercent,
+  horizontalBars, roomTypeSeasonChart, satisfactionSummary, seasonLabel,
 } from './dashboard-charts.js';
 
 const roomLabel = (row) => `Værelse ${row.label}`;
@@ -29,7 +29,7 @@ function updateFilterChips(root, filters, roomTypes) {
 }
 
 /** Skriver API-resultatet ind i analysefanens paneler. */
-export function renderDashboard(root, data) {
+export function renderDashboard(root, data, averageStay = null) {
   const summary = data?.summary ?? {};
   const year = String(data?.from_date ?? '').slice(0, 4);
   const employee = data?.employee_name ?? 'Helene Christine';
@@ -39,7 +39,11 @@ export function renderDashboard(root, data) {
     data?.top_room ? `${formatDKK(data.top_room.revenue)} · ${formatCount(data.top_room.room_nights)} nætter` : 'Ingen ophold');
   renderKpi(root, 'top-country', data?.top_country ? countryLabel(data.top_country) : '—',
     data?.top_country ? `${formatDKK(data.top_country.revenue)} · ${formatCount(data.top_country.bookings)} bookinger` : 'Ingen ophold');
-  renderKpi(root, 'adr', formatDKK(summary.adr), `Gns. pris pr. solgt nat · ${formatCount(summary.room_nights)} nætter`);
+  renderKpi(root, 'occupancy', formatPercent(summary.occupancy_percent),
+    `${formatCount(summary.room_nights)} af ${formatCount(summary.available_room_nights)} værelsesnætter`);
+  const alos = averageStay?.summary;
+  renderKpi(root, 'alos', alos?.average_stay_nights == null ? '—' : `${String(alos.average_stay_nights).replace('.', ',')} nætter`,
+    alos ? `${formatCount(alos.bookings)} bookinger · hele perioden` : 'Ikke tilgængelig');
   renderKpi(root, 'bar', formatDKK(summary.bar_revenue), `${employee} · ${year}`.trim());
   root.querySelectorAll('[data-employee-name]').forEach((node) => { node.textContent = employee; });
 
@@ -63,6 +67,7 @@ export function renderDashboard(root, data) {
     valueKey: 'revenue', labelKey: 'product', limit: Infinity, compact: true, rank: true,
     colorFor: (row) => (row.category === 'coffee' ? 'coffee' : 'cocktail'),
   });
+  root.querySelector('[data-satisfaction-chart]').innerHTML = satisfactionSummary(data.satisfaction);
 }
 
 export function initDashboard(root) {
@@ -74,8 +79,8 @@ export function initDashboard(root) {
 
   const readFilters = () => Object.fromEntries([...new FormData(form).entries()].filter(([, value]) => value));
 
-  function render(data) {
-    renderDashboard(root, data);
+  function render(data, averageStay) {
+    renderDashboard(root, data, averageStay);
     if (!countriesLoaded) {
       const select = form.elements.country_code;
       [...(data.by_country ?? [])].map((row) => [row.label, countryName(row.label)])
@@ -94,7 +99,12 @@ export function initDashboard(root) {
     root.classList.add('is-loading');
     error.hidden = true;
     try {
-      render(await service.getDashboard(filters));
+      // ALOS er et supplement: fejler det, vises resten af dashboardet stadig.
+      const [data, averageStay] = await Promise.all([
+        service.getDashboard(filters),
+        service.getAverageStay(filters).catch(() => null),
+      ]);
+      render(data, averageStay);
     } catch (requestError) {
       root.querySelector('[data-last-updated]').textContent = 'Kunne ikke hente data';
       root.querySelector('[data-dashboard-status]').classList.add('is-error');
@@ -113,7 +123,7 @@ export function initDashboard(root) {
   root.querySelector('[data-reset-filters]').addEventListener('click', () => { form.reset(); refresh(); });
   root.querySelector('[data-close-filters]')?.addEventListener('click', () => root.classList.remove('filters-open'));
 
-  const panelForKpi = { revenue: 'room-type', 'top-room': 'top-rooms', 'top-country': 'country-revenue', adr: 'room-type', bar: 'bar' };
+  const panelForKpi = { revenue: 'room-type', occupancy: 'room-type', alos: 'room-type', 'top-room': 'top-rooms', 'top-country': 'country-revenue', bar: 'bar' };
   root.querySelectorAll('[data-kpi]').forEach((card) => {
     card.tabIndex = 0;
     const focus = () => root.querySelector(`[data-panel="${panelForKpi[card.dataset.kpi]}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });

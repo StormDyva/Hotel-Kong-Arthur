@@ -195,3 +195,8 @@ T-046: Analysefanen viser opgavens hotel- og baranalyser (gæster/indtjening pr.
 land, værelsestype, værelsestype × sæson, top-værelser, årets indtjening, ADR og
 Helene Christines barsalg pr. drink og kategori). Kun API-beregnede værdier;
 ingen kontraktændring. Hele frontenden bruger nu hvid/guld-paletten. 66 frontendtests og 19 browser-checks består.
+
+T-047: Analysefanen viser belægning, ALOS og kundetilfredshed; OpenAPI-filen
+matcher koden igen (kontrakttesten består). Nye ALOS-tests. SWA-svar, README-
+diagram og sidste Converge opdateret. 41 backendtests, 70 frontendtests og 19
+browser-checks består.

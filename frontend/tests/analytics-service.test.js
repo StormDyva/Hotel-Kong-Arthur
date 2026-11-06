@@ -42,6 +42,13 @@ describe('analyse-service', () => {
     ]);
   });
 
+  test('ALOS sender kun periodeparametre, ikke hotelfiltre', async () => {
+    const fake = fakeFetch([{ status: 200, body: { summary: { average_stay_nights: 5.15 } } }]);
+    const service = createAnalyticsService({ baseUrl: 'http://api.test', fetchImpl: fake.fetchImpl });
+    await service.getAverageStay({ year: '2026', country_code: 'DK', season: 'high' });
+    assert.deepEqual(fake.calls, ['http://api.test/analytics/bookings/average-stay-length?year=2026']);
+  });
+
   test('bevarer API-fejl som ApiError', async () => {
     const fake = fakeFetch([{ status: 503, body: { error: 'UNAVAILABLE', message: 'API nede' } }]);
     const service = createAnalyticsService({ baseUrl: 'http://api.test', fetchImpl: fake.fetchImpl });

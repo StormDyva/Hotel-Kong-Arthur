@@ -496,3 +496,17 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
   `bar_categories`). Frontend sorterer og formaterer kun.
 - **Visuel stil:** Hele frontenden (booking, bookingoversigt og analyse) bruger
   hotellets hvide/creme og guld-palet; analysefanen er ikke længere mørk.
+
+### T-047 — Converge og manglende analysevisninger
+
+- **Stories:** US-006; desuden opgavekrav uden story efter C-018 (belægning, ALOS).
+- **Status:** Implementeret på `feature/T-047-converge-and-analytics-gaps`;
+  41 backendtests, 70 frontendtests og 19 browser-checks består.
+- **Omfang:** Analysefanen viser igen belægning og kundetilfredshed (gennemsnit,
+  svarprocent, antal og fordeling) og viser ALOS (C-013) i stedet for ADR.
+  ALOS hentes fra `GET /analytics/bookings/average-stay-length` og følger kun
+  perioden. `openapi/openapi.yaml` er bragt i overensstemmelse med koden for
+  T-043/T-044/T-045, og API-beskrivelsen nævner PostgreSQL. Nye ALOS-tests.
+  SWA-svar, README-diagram, traceability og sidste Converge er opdateret.
+- **Kontrakt:** Ingen ændring af endpoints eller felter; kun OpenAPI-tekster og
+  -skemaer, der allerede afveg fra den kørende kode.

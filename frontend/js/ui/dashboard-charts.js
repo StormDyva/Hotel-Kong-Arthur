@@ -37,13 +37,15 @@ export function emptyState(message = 'Data ikke tilgængelig') {
 
 /**
  * Vandrette bjælker som HTML (teksten skaleres ikke ned på mobil). `rows`
- * sorteres efter `valueKey` (højeste først) og begrænses til `limit` (Infinity = alle).
+ * sorteres efter `valueKey` (højeste først, medmindre `sort: false`) og begrænses
+ * til `limit` (Infinity = alle).
  */
 export function horizontalBars(rows, {
   valueKey, labelKey = 'label', label = (row) => row[labelKey], formatter = formatDKK,
-  color = 'gold', colorFor, limit = 8, filterKey, filterParam = filterKey, rank = false, compact = false,
+  color = 'gold', colorFor, limit = 8, filterKey, filterParam = filterKey, rank = false, compact = false, sort = true,
 } = {}) {
-  const data = [...(rows ?? [])].sort((a, b) => asNumber(b[valueKey]) - asNumber(a[valueKey])).slice(0, limit);
+  const ordered = sort ? [...(rows ?? [])].sort((a, b) => asNumber(b[valueKey]) - asNumber(a[valueKey])) : [...(rows ?? [])];
+  const data = ordered.slice(0, limit);
   if (!data.length) return emptyState();
   const max = Math.max(...data.map((row) => asNumber(row[valueKey])), 1);
   const items = data.map((row, index) => {
@@ -107,4 +109,21 @@ export function categoryDonut(categories, totalRevenue) {
   const legend = data.map((row) => `<span class="legend-item"><i style="background:${colors[row.category] ?? 'var(--chart-cocktail)'}"></i>${escapeHtml(categoryLabel(row.category))} <strong>${escapeHtml(formatPercent(row.percent))}</strong><small>${escapeHtml(formatDKK(row.revenue))}</small></span>`).join('');
   return `<div class="donut-wrap"><svg class="donut-chart" viewBox="0 0 128 128" role="img" aria-label="Barsalg fordelt på cocktails og kaffe"><circle cx="64" cy="64" r="${radius}" class="donut-track"/>${segments}`
     + `<text x="64" y="61" text-anchor="middle" class="donut-total">${escapeHtml(formatDKK(totalRevenue).replace(' DKK', ''))}</text><text x="64" y="76" text-anchor="middle" class="donut-label">DKK i alt</text></svg><div class="legend">${legend}</div></div>`;
+}
+
+/**
+ * Kundetilfredshed fra API'ets `satisfaction`-objekt: gennemsnit, svarprocent,
+ * antal svar og fordeling pr. score (5 → 1). Uden ratings vises en tom tilstand.
+ */
+export function satisfactionSummary(satisfaction) {
+  if (!satisfaction || satisfaction.average_rating === null || satisfaction.average_rating === undefined) {
+    return emptyState('Ingen ratings for afsluttede ophold i perioden');
+  }
+  const distribution = [...(satisfaction.distribution ?? [])]
+    .sort((a, b) => b.rating - a.rating)
+    .map((row) => ({ ...row, label: `${row.rating} ${row.rating === 1 ? 'stjerne' : 'stjerner'}` }));
+  return `<div class="satisfaction-layout"><div class="satisfaction-score"><strong>${escapeHtml(decimalFormat.format(asNumber(satisfaction.average_rating)))}</strong><span>/ ${escapeHtml(satisfaction.scale_max ?? 5)}</span></div>`
+    + `<dl class="satisfaction-facts"><div><dt>Svarprocent</dt><dd>${escapeHtml(formatPercent(satisfaction.response_percent))}</dd></div>`
+    + `<div><dt>Besvarelser</dt><dd>${escapeHtml(formatCount(satisfaction.rated_bookings))} af ${escapeHtml(formatCount(satisfaction.eligible_bookings))}</dd></div></dl></div>`
+    + horizontalBars(distribution, { valueKey: 'count', sort: false, limit: Infinity, color: 'gold', formatter: (value) => `${formatCount(value)} svar` });
 }

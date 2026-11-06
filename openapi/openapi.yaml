@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Hotel Kong Arthur API
-  description: Three-layer REST API backed by MySQL. Dates use [from,to), checkout
+  description: Three-layer REST API backed by PostgreSQL. Dates use [from,to), checkout
     is exclusive. Money is DKK. Existing /api responses use decimal strings; flat
     /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026.
     Hotel filters do not filter bar sales. Demo inventory is synthetic.
@@ -2545,9 +2545,9 @@ paths:
       tags:
       - Tableau revenue
       summary: Daily hotel and bar revenue with occupancy correlations
-      description: Daily DKK series for all bar employees and confirmed hotel stays,
-        plus backend-calculated Pearson correlations. Days without bookings or sales
-        are included with zero values. Correlations are illustrative for synthetic demo data.
+      description: Daily rows for scatter plots and time series, plus backend-calculated Pearson
+        correlations for bar revenue vs guest nights and hotel revenue. Uses all bar employees,
+        confirmed hotel stays, Europe/Copenhagen dates and numeric DKK JSON fields.
       operationId: daily_combined_revenue_rows_analytics_revenue_daily_combined_get
       parameters:
       - name: from
@@ -2584,44 +2584,45 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/DailyCombinedRevenueReport"
+                $ref: '#/components/schemas/DailyCombinedRevenueReport'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Booking conflict or operation not eligible
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
         '503':
           description: Database unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
   "/analytics/customer-satisfaction/by-country-room-type":
     get:
       tags:
       - Tableau customer satisfaction
       summary: Customer ratings grouped by country and room type
-      description: One numeric row per country and room type for confirmed stays
-        with checkout in the selected period and no future checkout.
+      description: One row per country and room type for confirmed stays with checkout in the
+        selected period and no future checkout. Returns numeric ratings, response rates and counts
+        for Tableau.
       operationId: customer_satisfaction_by_country_room_type_analytics_customer_satisfaction_by_country_room_type_get
       parameters:
       - name: from
@@ -2660,26 +2661,47 @@ paths:
               schema:
                 type: array
                 items:
-                  "$ref": "#/components/schemas/CountryRoomTypeSatisfactionRow"
+                  $ref: '#/components/schemas/CountryRoomTypeSatisfactionRow'
+                title: Response Customer Satisfaction By Country Room Type Analytics Customer
+                  Satisfaction By Country Room Type Get
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
   "/analytics/bookings/average-stay-length":
     get:
       tags:
       - Tableau booking metrics
       summary: Average stay length by check-in month
-      description: Average nights per confirmed booking whose check-in falls in
-        the selected period. Includes overall, monthly, room type and country rows.
+      description: Average nights per confirmed booking whose check-in falls in the selected period.
+        Returns numeric averages overall, by month, room type and country; all averages are calculated
+        by the backend.
       operationId: average_stay_length_analytics_bookings_average_stay_length_get
       parameters:
       - name: from
@@ -2716,19 +2738,37 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/AverageStayLengthReport"
+                $ref: '#/components/schemas/AverageStayLengthReport'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Booking conflict or operation not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: Invalid request
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Database unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Unexpected server error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     AnalyticsResponse_BarReport_:
@@ -3503,45 +3543,81 @@ components:
       - average_stay_nights
       title: AverageStayMetric
     AverageStayMonthlyRow:
-      allOf:
-      - "$ref": "#/components/schemas/AverageStayMetric"
-      - type: object
-        properties:
-          month:
-            type: string
-            title: Month
-        required:
-        - month
+      properties:
+        bookings:
+          type: integer
+          title: Bookings
+        room_nights:
+          type: integer
+          title: Room Nights
+        average_stay_nights:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Stay Nights
+        month:
+          type: string
+          title: Month
+      type: object
+      required:
+      - bookings
+      - room_nights
+      - average_stay_nights
+      - month
       title: AverageStayMonthlyRow
     AverageStayRoomTypeRow:
-      allOf:
-      - "$ref": "#/components/schemas/AverageStayMetric"
-      - type: object
-        properties:
-          room_type_id:
-            type: integer
-            title: Room Type Id
-          room_type:
-            type: string
-            title: Room Type
-        required:
-        - room_type_id
-        - room_type
+      properties:
+        bookings:
+          type: integer
+          title: Bookings
+        room_nights:
+          type: integer
+          title: Room Nights
+        average_stay_nights:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Stay Nights
+        room_type_id:
+          type: integer
+          title: Room Type Id
+        room_type:
+          type: string
+          title: Room Type
+      type: object
+      required:
+      - bookings
+      - room_nights
+      - average_stay_nights
+      - room_type_id
+      - room_type
       title: AverageStayRoomTypeRow
     AverageStayCountryRow:
-      allOf:
-      - "$ref": "#/components/schemas/AverageStayMetric"
-      - type: object
-        properties:
-          country_code:
-            type: string
-            title: Country Code
-          country:
-            type: string
-            title: Country
-        required:
-        - country_code
-        - country
+      properties:
+        bookings:
+          type: integer
+          title: Bookings
+        room_nights:
+          type: integer
+          title: Room Nights
+        average_stay_nights:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Average Stay Nights
+        country_code:
+          type: string
+          title: Country Code
+        country:
+          type: string
+          title: Country
+      type: object
+      required:
+      - bookings
+      - room_nights
+      - average_stay_nights
+      - country_code
+      - country
       title: AverageStayCountryRow
     AverageStayLengthReport:
       properties:

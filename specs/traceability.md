@@ -2,10 +2,10 @@
 
 ## Status
 
-T-031/T-032 er klar til review med 35 PostgreSQL-tests, 59 frontendtests,
-Swagger-browser-smoke og ren Compose-opstart/persistence. Se
-[PostgreSQL-Converge](converge-postgres-2026-11-03.md). Åbne uge 2-beslutninger
-og analysefrontend vurderes separat; samlet Tableau-afstemning er ikke verificeret.
+2026-11-06 (T-047): 41 backend-/API-tests mod PostgreSQL, 70 frontendtests og
+19 browser-checks består. Sidste Converge: [converge-tillaeg-uge2.md](converge-tillaeg-uge2.md).
+Tidligere PostgreSQL-bevis: [PostgreSQL-Converge](converge-postgres-2026-11-03.md).
+Tableau-dashboardet vedligeholdes manuelt af gruppen og er ikke automatisk verificeret.
 
 Main indeholder task-id-kollisioner: T-027 blev brugt både til importerede ophold
 og RevPAR. De omtales nedenfor med opgavenavn. T-028 er CSV-demodata.
@@ -38,18 +38,18 @@ matricen; tilsvarende kode og endpoints er bevaret uden story.
 | Ugyldig/fremtidig/annulleret bedømmelse afvises | clarify C-009 | US-006 | T-013, T-032, T-037 | API-test | Eksisterende v1-dækning |
 | Gennemsnit, svarprocent, antal og fordeling | spec Kundetilfredshed | US-006 | T-013, T-033, T-037 | Formel-/API-test | Verificeret mod PostgreSQL |
 | Ingen ratings giver null og advarsel | clarify C-010 | US-006 | T-013, T-033, T-037 | API-test | Eksisterende v1-dækning |
-| Tilfredshed-GET dokumenteret og afstemt | clarify C-014 | US-006 | T-033, T-034, T-036 | OpenAPI, API og manuel afstemning | API findes; UI-/dashboardafstemning mangler |
+| Tilfredshed-GET dokumenteret og afstemt | clarify C-014 | US-006 | T-033, T-034, T-036 | OpenAPI, API og manuel afstemning | Verificeret: API-tests, OpenAPI-lighed og vist i analysefanen (T-047) |
 
 ## Tværgående leverancer
 
 | Krav | Spec | Stories | Task | Test/verifikationstype | Status |
 |---|---|---|---|---|---|
-| PostgreSQL runtime og SQL-dialektskift | constitution, plan | US-002 | T-031, T-032 | Compose-, migrations- og integrationstest | Mangler |
+| PostgreSQL runtime og SQL-dialektskift | constitution, plan | US-002 | T-031, T-032 | Compose-, migrations- og integrationstest | Verificeret mod PostgreSQL 17 (T-031/T-032, 41 tests) |
 | Samme API-kontrakt efter databaseskift | constitution, spec | US-002 | T-033, T-034, T-037 | OpenAPI-lighed + API-regression | Verificeret med OpenAPI-lighed og API-tests |
-| Compose healthcheck, start og persistence | constitution, plan | US-002 | T-031 | Manuel Compose-smoke | Mangler |
-| Sikkert PostgreSQL-testreset | plan | US-002 | T-032, T-037 | Negativ sikkerheds-/integrationstest | Mangler |
+| Compose healthcheck, start og persistence | constitution, plan | US-002 | T-031 | Manuel Compose-smoke | Verificeret: alle services healthy, `/health` ok (2026-11-06) |
+| Sikkert PostgreSQL-testreset | plan | US-002 | T-032, T-037 | Negativ sikkerheds-/integrationstest | Verificeret i T-032/T-037 (separat test-db) |
 | README, guides og analysevejledning | tasks | US-002 | T-038 | Dokumentationsreview/clean checkout | Dokumenteret; runtimevejledninger afventer PostgreSQL |
-| Afsluttende Converge | constitution | — (leverance) | T-039 | Converge-review | Mangler |
+| Afsluttende Converge | constitution | — (leverance) | T-039 | Converge-review | Udført 2026-11-06, se converge-tillaeg-uge2.md |
 
 ## Historik og eksisterende bevis
 
@@ -66,4 +66,6 @@ T-041 → (ingen story; Tableau-endpoint) → GET /analytics/revenue/combined �
 T-042 → US-005/US-006 → school_demo.py + realistic_demo_data.py → 38 tests, fresh-volume, idempotens, foundation checks og API-afstemning består; se docs/realistic-demo-data.md.
 T-043 → (ingen story; Tableau-endpoint) → GET /analytics/revenue/daily-combined → daglige hotel-/barsalgspunkter og backend-korrelationer til Tableau; automatisk test og Tableau-preview afventer.
 T-044 → US-006 → GET /analytics/customer-satisfaction/by-country-room-type → numeriske ratings-, kohorte- og svarprocentrækker pr. land/rumtype; automatisk test og Tableau-preview afventer.
-T-045 → (ingen story; ALOS-endpoint) → GET /analytics/bookings/average-stay-length → samlet ALOS samt måned-, værelsestype- og landeopdeling; automatisk test, frontend og Tableau-preview afventer.
+T-045 → (ingen story; ALOS-endpoint) → GET /analytics/bookings/average-stay-length → samlet ALOS samt måned-, værelsestype- og landeopdeling; testet i T-047 (test_average_stay_length.py) og vist i frontend.
+T-046 → US-005 → frontend/js/ui/dashboard*.js → analysefane efter opgavens krav og hvid/guld-stil; 66 frontendtests og 19 browser-checks.
+T-047 → US-006 (+ opgavekrav uden story) → analysefane med belægning, ALOS og kundetilfredshed; OpenAPI-drift rettet; SWA-svar, README-diagram og Converge opdateret → 41 backendtests, 70 frontendtests, 19 browser-checks.
