@@ -478,3 +478,22 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
   når checkout ligger uden for perioden.
 - **Tableau:** `GET /analytics/bookings/average-stay-length`; JSONPaths
   `$.summary`, `$.monthly[*]`, `$.by_room_type[*]` og `$.by_country[*]`.
+
+### T-046 — Analysefane efter opgavens analysekrav
+
+- **Stories:** US-005, US-006, US-008.
+- **Status:** Implementeret på `feature/T-046-analytics-dashboard-requirements`;
+  66 frontendtests og 19 browser-smoke-checks består; analysefanen er verificeret
+  visuelt mod live Compose-API ved 1440 px og 390 px.
+- **Omfang:** Analysefanen viser nu opgavens spørgsmål i stedet for belægning,
+  RevPAR og kundetilfredshed: gæster pr. land, indtjening pr. land, pr.
+  værelsestype og pr. værelsestype × sæson, top 10 værelser, mest indbringende
+  værelse/land, årets hotelindtjening, ADR (gns. pris pr. solgt nat) som ekstra
+  nøgletal samt Helene Christines samlede barsalg, omsætning pr. drink og
+  cocktail/kaffe-fordeling.
+- **Kontrakt:** Ingen API- eller databaseændring; alle tal læses fra
+  `GET /api/analytics/dashboard` (`summary`, `by_country`, `by_room_type`,
+  `by_room_type_season`, `by_room`, `top_room`, `top_country`, `bar_products`,
+  `bar_categories`). Frontend sorterer og formaterer kun.
+- **Visuel stil:** Hele frontenden (booking, bookingoversigt og analyse) bruger
+  hotellets hvide/creme og guld-palet; analysefanen er ikke længere mørk.
