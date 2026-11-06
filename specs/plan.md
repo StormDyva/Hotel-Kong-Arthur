@@ -38,22 +38,22 @@ paths. Ny kontrakt for frontendens brug og eventuelle ændringer afklares i C-01
 
 | Endpoint | Parametre i nuværende API | Respons | Story | Status |
 |---|---|---|---|---|
-| `GET /api/analytics/occupancy` | `year` eller `from`/`to`; land, type, sæson | summary: solgte/disponible nætter, belægning, ADR | US-003 | Findes allerede |
-| `GET /api/analytics/revenue` | samme periode- og hotel-filtre | summary med indtjening | US-004 | Findes allerede |
-| `GET /api/analytics/revenue-by-room` | samme | grupper pr. fysisk værelse | US-004 | Findes allerede |
-| `GET /api/analytics/revenue-by-room-type` | samme | grupper pr. værelsestype | US-004 | Findes allerede |
-| `GET /api/analytics/revenue-by-country` | samme | grupper pr. bookinggæstens land | US-004 | Findes allerede |
-| `GET /api/analytics/revenue-by-season` | samme | grupper pr. sæson | US-004 | Findes allerede |
-| `GET /api/analytics/revenue-by-room-type-season` | samme | grupper pr. type og sæson | US-004 | Findes allerede |
-| `GET /api/analytics/guests-by-country` | samme | selskaber, bookingprofiler og gæstenætter pr. land | US-004 | Findes allerede |
-| `GET /api/analytics/top-performers` | samme | top værelse, type og land | US-004 | Findes allerede |
+| `GET /api/analytics/occupancy` | `year` eller `from`/`to`; land, type, sæson | summary: solgte/disponible nætter, belægning, ADR | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue` | samme periode- og hotel-filtre | summary med indtjening | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue-by-room` | samme | grupper pr. fysisk værelse | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue-by-room-type` | samme | grupper pr. værelsestype | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue-by-country` | samme | grupper pr. bookinggæstens land | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue-by-season` | samme | grupper pr. sæson | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/revenue-by-room-type-season` | samme | grupper pr. type og sæson | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/guests-by-country` | samme | selskaber, bookingprofiler og gæstenætter pr. land | — (uden for scope) | Findes allerede |
+| `GET /api/analytics/top-performers` | samme | top værelse, type og land | — (uden for scope) | Findes allerede |
 | `GET /api/analytics/bar-sales` | periode, `employee_name` | total, produkter og kategoriandele | US-005 | Findes allerede |
 | `GET /api/analytics/customer-satisfaction` | periode samt hotelkohortefiltre | rating, svarprocent, kohorte og fordeling | US-006 | Findes allerede |
-| `GET /api/analytics/revpar` | samme periode- og hotel-filtre | samlet RevPAR og månedlige rækker | US-004, US-007, US-008 | Findes allerede i main; om det er selvvalgt KPI er åbent |
-| `GET /api/analytics/dashboard` | samme som analysefilter | samlet analysepayload | US-003–007 | Findes allerede; Tableau-/frontendforbrug skal verificeres |
-| `GET /analytics/revenue/by-room-type-season` | `year` eller `from`/`to` | flade 24 type/sæson-rækker | US-004, US-007 | Findes allerede; ældre Tableau-path uden `/api` bevares |
-| `GET /analytics/revenue/by-country` | `year` eller `from`/`to` | flade land/omsætning-rækker | US-004, US-007 | Findes allerede; ældre Tableau-path uden `/api` bevares |
-| Selvvalgt nøgletal, endnu ikke valgt | afventer C-013 | RevPAR findes som kandidat; andet valg kan kræve ny API-operation | US-004, US-007, US-008 | Implementering af valgte KPI-blokke afventer gruppens valg |
+| `GET /api/analytics/revpar` | samme periode- og hotel-filtre | samlet RevPAR og månedlige rækker | — (uden for scope) | Findes allerede i main; om det er selvvalgt KPI er åbent |
+| `GET /api/analytics/dashboard` | samme som analysefilter | samlet analysepayload | US-005, US-006 | Findes allerede; Tableau-/frontendforbrug skal verificeres |
+| `GET /analytics/revenue/by-room-type-season` | `year` eller `from`/`to` | flade 24 type/sæson-rækker | — (uden for scope) | Findes allerede; ældre Tableau-path uden `/api` bevares |
+| `GET /analytics/revenue/by-country` | `year` eller `from`/`to` | flade land/omsætning-rækker | — (uden for scope) | Findes allerede; ældre Tableau-path uden `/api` bevares |
+| Selvvalgt nøgletal, endnu ikke valgt | afventer C-013 | RevPAR findes som kandidat; andet valg kan kræve ny API-operation | — (uden for scope) | Implementering af valgte KPI-blokke afventer gruppens valg |
 
 Der er således allerede endpoints for de navngivne analyseområder. Ingen
 grundlæggende analyse-GET er identificeret som manglende i API'et; den nye
@@ -101,12 +101,12 @@ Frontendens aktuelle README beskriver bookingflowet. Planlagt analysevisning:
 
 | Visning | API-kald (nyttige eksisterende paths) | Story | Status |
 |---|---|---|---|
-| Belægning | `/api/analytics/occupancy` | US-003, US-008 | API findes; frontendvisning mangler |
-| Hotelindtjening, type/sæson/land og topresultater | `/api/analytics/revenue`, `/api/analytics/revenue-by-*`, `/api/analytics/top-performers` | US-004, US-008 | API findes; frontendvisning mangler |
-| Gæster pr. land | `/api/analytics/guests-by-country` | US-004, US-008 | API findes; frontendvisning mangler |
-| Barsalg | `/api/analytics/bar-sales` | US-005, US-008 | API findes; frontendvisning mangler |
-| Kundetilfredshed | `/api/analytics/customer-satisfaction` | US-006, US-008 | API findes; frontendvisning mangler |
-| Selvvalgt nøgletal | `/api/analytics/revpar` findes, hvis RevPAR vælges; ellers afventer C-013 | US-004, US-007, US-008 | RevPAR er kandidat; valg åbent |
+| Belægning | `/api/analytics/occupancy` | — (uden for scope) | API findes; frontendvisning mangler |
+| Hotelindtjening, type/sæson/land og topresultater | `/api/analytics/revenue`, `/api/analytics/revenue-by-*`, `/api/analytics/top-performers` | — (uden for scope) | API findes; frontendvisning mangler |
+| Gæster pr. land | `/api/analytics/guests-by-country` | — (uden for scope) | API findes; frontendvisning mangler |
+| Barsalg | `/api/analytics/bar-sales` | US-005 | API findes; frontendvisning mangler |
+| Kundetilfredshed | `/api/analytics/customer-satisfaction` | US-006 | API findes; frontendvisning mangler |
+| Selvvalgt nøgletal | `/api/analytics/revpar` findes, hvis RevPAR vælges; ellers afventer C-013 | — (uden for scope) | RevPAR er kandidat; valg åbent |
 
 Frontend kalder kun REST API, implementerer ingen formler og har tydelige loading-,
 tom- og fejltilstande. Om kald foretages automatisk ved sidevisning eller via

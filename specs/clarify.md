@@ -197,7 +197,7 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 
 - **Status: ÅBEN.** Den konkrete endpoint-struktur, parameterkrav, responsform,
   fejlkoder og warning-format for analysesider skal gennemgås og godkendes.
-- **Åben formelafstemning:** US-003 nævner 214 værelser × alle periodens nætter,
+- **Åben formelafstemning:** Den fjernede US-003 nævnte 214 værelser × alle periodens nætter,
   mens tidligere C-005/T-020 bruger aktive værelser (og filtre på type/sæson) i
   nævneren. Gruppen skal afklare, om 214 er fast eller alene det nuværende
   referenceinventar, før kriterium/formel ændres eller implementeres.
@@ -218,8 +218,9 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
   CSV-/Hyper-bro og workbook-generator er ude af aktivt scope og skal ikke porteres.
   Connectoren bruger extracts; end-to-end refresh er endnu ikke verificeret.
 
-- **Status: ÅBEN.** Gruppen skal afklare, om Tableau fortsat er en obligatorisk
-  forbruger i tillægsopgaven, når analyser også skal vises i frontend.
+- **Status: AFKLARET 2026-11-06 (C-018).** Tableau er ikke længere en user story
+  i projektet. Tableau-endpoints og `tableau/` bevares, men accepteres ikke som
+  story-leverance.
 - **Fast krav:** Hvis Tableau bruges, læser det beregninger fra REST API'et og
   ikke direkte fra databasen.
 
@@ -229,3 +230,14 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
   seed/import i PostgreSQL; der udføres ingen datamigrering fra MySQL.
 - **Åben detalje:** Mapping af kildefelter, `synthetic_import`-markering,
   skrivebeskyttelse og dubletstrategi skal verificeres i den kommende importtask.
+
+### C-018 — Reduceret story-scope
+
+- **Status: AFKLARET 2026-11-06.** Gruppen beholder kun US-001 (bookinger),
+  US-002 (aktuelle data), US-005 (cocktailbaren) og US-006 (kundetilfredshed).
+  US-003 (belægning), US-004 (hotellets indtjening og gæster), US-007 (Tableau)
+  og US-008 (nøgletal i frontend) er fjernet fra `user-stories.md`.
+- **Konsekvens:** Kun dokumentationen er ændret. Koden, API-endpoints, OpenAPI
+  og analysefanen er bevaret, men hotelanalyser, belægning, det selvvalgte
+  nøgletal (C-013) og Tableau spores ikke længere som story-acceptkriterier.
+  Story-numrene bevares.

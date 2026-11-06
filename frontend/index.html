@@ -158,9 +158,9 @@
     <section id="view-dashboard" class="view dashboard-shell" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
       <header class="dashboard-topbar">
         <div>
-          <p class="dashboard-kicker">Hotel intelligence</p>
-          <h1>Overview</h1>
-          <p class="dashboard-subtitle">Et samlet overblik over hotellets performance fra REST API’et.</p>
+          <p class="dashboard-kicker">Hotel Kong Arthur</p>
+          <h1>Analyse</h1>
+          <p class="dashboard-subtitle">Overblik over hotellets indtjening, gæster og cocktailbaren.</p>
         </div>
         <div class="dashboard-status" data-dashboard-status>
           <span class="status-dot" aria-hidden="true"></span>
@@ -177,26 +177,32 @@
       <div class="dashboard-layout">
         <div class="dashboard-main">
           <div class="kpi-grid" data-kpi-grid>
-            <article class="kpi-card" data-kpi="occupancy"><span class="kpi-label">Belægning</span><strong class="kpi-value">—</strong><span class="kpi-meta">Valgt periode</span></article>
-            <article class="kpi-card" data-kpi="revenue"><span class="kpi-label">Hotelomsætning</span><strong class="kpi-value">—</strong><span class="kpi-meta">Bekræftede ophold</span></article>
-            <article class="kpi-card" data-kpi="room-nights"><span class="kpi-label">Værelsesnætter</span><strong class="kpi-value">—</strong><span class="kpi-meta">Solgte nætter</span></article>
-            <article class="kpi-card" data-kpi="revpar"><span class="kpi-label">RevPAR</span><strong class="kpi-value">—</strong><span class="kpi-meta">Omsætning / tilgængelig nat</span></article>
-            <article class="kpi-card" data-kpi="bar"><span class="kpi-label">Barsalg</span><strong class="kpi-value">—</strong><span class="kpi-meta">Cocktails og kaffe</span></article>
+            <article class="kpi-card" data-kpi="revenue"><span class="kpi-label">Årets indtjening (hotel)</span><strong class="kpi-value">—</strong><span class="kpi-meta">Hotellets værelsesindtjening</span></article>
+            <article class="kpi-card" data-kpi="top-room"><span class="kpi-label">Mest indbringende værelse</span><strong class="kpi-value">—</strong><span class="kpi-meta">Højeste omsætning</span></article>
+            <article class="kpi-card" data-kpi="top-country"><span class="kpi-label">Mest indbringende land</span><strong class="kpi-value">—</strong><span class="kpi-meta">Højeste omsætning</span></article>
+            <article class="kpi-card" data-kpi="adr"><span class="kpi-label">Gns. pris pr. nat (ADR)</span><strong class="kpi-value">—</strong><span class="kpi-meta">Omsætning ÷ solgte nætter</span></article>
+            <article class="kpi-card" data-kpi="bar"><span class="kpi-label">Barsalg i alt</span><strong class="kpi-value">—</strong><span class="kpi-meta">Helene Christine</span></article>
+          </div>
+
+          <h2 class="dashboard-section-title">Hotellet</h2>
+          <div class="dashboard-chart-grid">
+            <article class="dashboard-panel" data-panel="guest-country"><div class="panel-heading"><div><p class="panel-eyebrow">Gæster</p><h2>Hvor kommer gæsterne fra?</h2></div></div><p class="panel-note">Antal gæster pr. land på bekræftede bookinger.</p><div class="chart-stage" data-guest-country-chart></div></article>
+            <article class="dashboard-panel" data-panel="country-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Indtjening pr. land</p><h2>Hvilke lande tjener vi mest på?</h2></div></div><p class="panel-note">Klik på et land for at filtrere hele dashboardet.</p><div class="chart-stage" data-country-chart></div></article>
           </div>
 
           <div class="dashboard-chart-grid">
-            <article class="dashboard-panel" data-panel="room-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Indtjening</p><h2>Pr. værelsestype</h2></div></div><div class="chart-stage" data-room-chart></div></article>
-            <article class="dashboard-panel" data-panel="season-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Mix</p><h2>Pr. sæson</h2></div></div><div class="chart-stage" data-season-chart></div></article>
+            <article class="dashboard-panel" data-panel="room-type"><div class="panel-heading"><div><p class="panel-eyebrow">Indtjening pr. værelsestype</p><h2>Hvilke værelsestyper tjener vi mest på?</h2></div></div><div class="chart-stage" data-room-type-chart></div></article>
+            <article class="dashboard-panel" data-panel="room-type-season"><div class="panel-heading"><div><p class="panel-eyebrow">Indtjening pr. værelsestype og sæson</p><h2>Værelsestyper fordelt på sæson</h2></div></div><div class="chart-stage" data-room-type-season-chart></div></article>
           </div>
 
-          <div class="dashboard-chart-grid">
-            <article class="dashboard-panel" data-panel="country-revenue"><div class="panel-heading"><div><p class="panel-eyebrow">Oprindelse</p><h2>Omsætning pr. land</h2></div></div><div class="chart-stage" data-country-chart></div></article>
-            <article class="dashboard-panel" data-panel="guest-country"><div class="panel-heading"><div><p class="panel-eyebrow">Gæster</p><h2>Gæster pr. land</h2></div></div><div class="chart-stage" data-guest-chart></div></article>
+          <div class="dashboard-chart-grid dashboard-chart-grid-single">
+            <article class="dashboard-panel" data-panel="top-rooms"><div class="panel-heading"><div><p class="panel-eyebrow">Top 10</p><h2>Hvilke værelser tjener vi mest på?</h2></div></div><div class="chart-stage" data-top-rooms-chart></div></article>
           </div>
 
+          <h2 class="dashboard-section-title">Cocktailbaren · <span data-employee-name>Helene Christine</span></h2>
           <div class="dashboard-chart-grid">
-            <article class="dashboard-panel" data-panel="bar"><div class="panel-heading"><div><p class="panel-eyebrow">Cocktailbar</p><h2>Kategori og produkter</h2></div></div><div class="bar-split"><div class="chart-stage" data-bar-category-chart></div><div class="chart-stage" data-bar-product-chart></div></div></article>
-            <article class="dashboard-panel satisfaction-panel" data-panel="satisfaction"><div class="panel-heading"><div><p class="panel-eyebrow">Feedback</p><h2>Kundetilfredshed</h2></div></div><div data-satisfaction></div></article>
+            <article class="dashboard-panel" data-panel="bar"><div class="panel-heading"><div><p class="panel-eyebrow">Fordeling</p><h2>Cocktails og kaffe</h2></div></div><p class="panel-note">Andel af det samlede salg for året.</p><div class="chart-stage" data-bar-category-chart></div></article>
+            <article class="dashboard-panel" data-panel="drinks"><div class="panel-heading"><div><p class="panel-eyebrow">Omsætning pr. drink</p><h2>Salg pr. drink</h2></div></div><div class="chart-scale-key drink-key" aria-hidden="true"><span><i class="scale-swatch drink-cocktail"></i>Cocktail</span><span><i class="scale-swatch drink-coffee"></i>Kaffe</span></div><div class="chart-stage" data-drink-chart></div></article>
           </div>
         </div>
 
@@ -209,7 +215,7 @@
             <div class="field"><label for="dashboard-season">Sæson</label><select id="dashboard-season" name="season"><option value="">Alle sæsoner</option><option value="low">Lavsæson</option><option value="mid">Mellemsæson</option><option value="high">Højsæson</option></select></div>
             <div class="filter-actions"><button class="btn btn-secondary dashboard-reset" type="button" data-reset-filters>Nulstil filtre</button></div>
           </form>
-          <div class="analysis-note"><span class="note-mark">i</span><p>Hotel-KPI’er følger samme definitioner som backendens analyse-service og Tableau. Barsalg filtreres ikke af hotellets land, værelsestype eller sæson.</p></div>
+          <div class="analysis-note"><span class="note-mark">i</span><p>Alle tal beregnes i backendens analyse-service. Land, værelsestype og sæson filtrerer kun hotellet; barsalget viser altid Helene Christines salg for året.</p></div>
           <div class="analysis-source"><span class="source-indicator"></span><div><strong>REST API</strong><span>Seneste hentning vises øverst</span></div></div>
         </aside>
       </div>

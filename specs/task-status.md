@@ -190,3 +190,8 @@ Repeated loader adds zero records. See docs/customer-data-import.md for reproduc
 T-027: RevPAR i summary og GET /api/analytics/revpar med månedstal. Beregning i
 service-laget, nulkapacitet håndteres med warning. Tre nye MySQL-tests dækker
 summer/denominator, filtre, delvise måneder og annullering. 29 tests består.
+
+T-046: Analysefanen viser opgavens hotel- og baranalyser (gæster/indtjening pr.
+land, værelsestype, værelsestype × sæson, top-værelser, årets indtjening, ADR og
+Helene Christines barsalg pr. drink og kategori). Kun API-beregnede værdier;
+ingen kontraktændring. Hele frontenden bruger nu hvid/guld-paletten. 66 frontendtests og 19 browser-checks består.
