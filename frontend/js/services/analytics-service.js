@@ -4,6 +4,7 @@ import { ApiError } from './api-error.js';
 const DASHBOARD_PATH = '/api/analytics/dashboard';
 const REVPAR_PATH = '/api/analytics/revpar';
 const ROOM_TYPES_PATH = '/api/room-types';
+const AVERAGE_STAY_PATH = '/analytics/bookings/average-stay-length';
 
 async function request(baseUrl, path, query = {}, fetchImpl = globalThis.fetch?.bind(globalThis)) {
   const url = new URL(path, baseUrl || globalThis.location?.origin);
@@ -29,6 +30,8 @@ export function createAnalyticsService({ baseUrl, fetchImpl } = {}) {
   return {
     getDashboard: (filters) => request(baseUrl, DASHBOARD_PATH, filters, fetchImpl),
     getRevpar: (filters) => request(baseUrl, REVPAR_PATH, filters, fetchImpl),
+    // ALOS-endpointet understøtter kun periode (year eller from/to), ikke hotelfiltre.
+    getAverageStay: ({ year, from, to } = {}) => request(baseUrl, AVERAGE_STAY_PATH, { year, from, to }, fetchImpl),
     getRoomTypes: async () => {
       const data = await request(baseUrl, ROOM_TYPES_PATH, {}, fetchImpl);
       return Array.isArray(data) ? data : data?.items ?? [];

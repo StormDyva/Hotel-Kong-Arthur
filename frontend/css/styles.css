@@ -25,6 +25,7 @@
   color-scheme: light;
 }
 
+.dashboard-shell .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .mobile-filter-toggle { display: none; }
 @media (max-width: 1120px) {
   .dashboard-shell .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -174,6 +175,12 @@
 .analysis-source strong { color: var(--dashboard-text); font-size: 0.7rem; letter-spacing: 0.08em; }
 .analysis-source span:not(.source-indicator) { color: var(--dashboard-muted); font-size: 0.66rem; }
 .dashboard-section-title { margin: 6px 0 12px; font-size: 1.15rem; }
+.satisfaction-layout { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; margin-bottom: 16px; }
+.satisfaction-score { display: flex; align-items: baseline; gap: 6px; color: var(--dashboard-muted); }
+.satisfaction-score strong { color: var(--dashboard-accent); font-family: var(--font-serif); font-size: 3rem; line-height: 1; }
+.satisfaction-facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; }
+.satisfaction-facts dt { color: var(--dashboard-muted); font-size: 0.72rem; }
+.satisfaction-facts dd { margin: 2px 0 0; color: var(--dashboard-text); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .dashboard-chart-grid-single { grid-template-columns: minmax(0, 1fr); }
 .panel-note { margin: 6px 0 0; color: var(--dashboard-muted); font-size: 0.72rem; }
 .bar-list, .season-list, .season-bars { margin: 0; padding: 0; list-style: none; }

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { categoryDonut, countryName, horizontalBars, roomTypeSeasonChart } from '../js/ui/dashboard-charts.js';
+import { categoryDonut, countryName, horizontalBars, roomTypeSeasonChart, satisfactionSummary } from '../js/ui/dashboard-charts.js';
 
 const text = (html) => html.replace(/ | /g, ' ');
 
@@ -53,5 +53,26 @@ describe('analysefanens grafer', () => {
     assert.match(horizontalBars([], { valueKey: 'revenue' }), /Data ikke tilgængelig/);
     assert.match(roomTypeSeasonChart([], []), /Data ikke tilgængelig/);
     assert.match(categoryDonut([], 0), /Ingen barsalg/);
+  });
+
+  test('sort: false bevarer API-rækkefølgen', () => {
+    const html = horizontalBars([{ label: 'Lav', n: 1 }, { label: 'Høj', n: 9 }], { valueKey: 'n', sort: false, formatter: String });
+    assert.ok(html.indexOf('>Lav<') < html.indexOf('>Høj<'));
+  });
+
+  test('kundetilfredshed viser gennemsnit, svarprocent, antal og fordeling 5 → 1', () => {
+    const html = text(satisfactionSummary({
+      average_rating: '3.97', response_percent: '38.52', rated_bookings: 317, eligible_bookings: 823, scale_max: 5,
+      distribution: [1, 2, 3, 4, 5].map((rating) => ({ rating, count: rating * 10 })),
+    }));
+    assert.match(html, />3,97</);
+    assert.match(html, /38,52%/);
+    assert.match(html, /317 af 823/);
+    assert.ok(html.indexOf('5 stjerner') < html.indexOf('1 stjerne<'));
+    assert.match(html, /50 svar/);
+  });
+
+  test('kundetilfredshed uden ratings viser tom tilstand, ikke et opdigtet tal', () => {
+    assert.match(satisfactionSummary({ average_rating: null, distribution: [] }), /Ingen ratings/);
   });
 });

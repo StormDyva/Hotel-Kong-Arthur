@@ -39,7 +39,7 @@ OPENAPI_TAGS = [
 ]
 app = FastAPI(title='Hotel Kong Arthur API', version='1.1.0', docs_url=None, redoc_url=None,
     openapi_tags=OPENAPI_TAGS, responses=ERRORS, description=(
-        'Three-layer REST API backed by MySQL. Dates use [from,to), checkout is exclusive. '
+        'Three-layer REST API backed by PostgreSQL. Dates use [from,to), checkout is exclusive. '
         'Money is DKK. Existing /api responses use decimal strings; flat /analytics/revenue exports use JSON numbers. Analytics default to calendar 2026. '
         'Hotel filters do not filter bar sales. Demo inventory is synthetic.'))
 app.add_middleware(CORSMiddleware,
