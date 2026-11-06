@@ -2,7 +2,7 @@
 
 Booking prototype and hotel/bar analytics for the E26 interdisciplinary assignment.
 Python/FastAPI, SQLAlchemy, PostgreSQL 17, HTML/CSS/JavaScript og
-Tableau Public (krav om fortsat dashboard afventer afklaring).
+Tableau via REST API Connector.
 
 ## Præsentation: v1 (MySQL + Tableau)
 
@@ -57,13 +57,22 @@ add duplicate mocks. See [demo setup](docs/automatic-demo-data.md).
 
 ```mermaid
 flowchart LR
-    Browser[Booking browser] -->|REST JSON| API[FastAPI routes / Swagger]
-    API --> Service[Business services]
-    Service --> Repository[SQLAlchemy repositories]
-    Repository --> DB[(PostgreSQL)]
+    subgraph Browser
+        Booking[Booking + bookingoversigt]
+        Analyse[Analysefane]
+    end
+    subgraph Compose[Docker Compose]
+        Nginx[frontend: nginx] -->|/api proxy| API[api: FastAPI routes / Swagger]
+        API --> Service[Services: bookingregler + nøgletal]
+        Service --> Repository[Repositories: SQL]
+        Repository --> DB[(db: PostgreSQL 17)]
+        DBInit[db-init: schema + seed] --> DB
+        DemoInit[demo-init: 2026-demodata] --> DB
+    end
+    Booking -->|REST JSON: POST/PUT/DELETE/GET| Nginx
+    Analyse -->|GET analytics JSON| Nginx
     Connector[Tableau REST API Connector] -->|GET analytics JSON| API
-    Connector --> Extract[Tableau extracts]
-    Extract --> Tableau[Tableau dashboard]
+    Connector --> Extract[Tableau extracts] --> Tableau[Tableau dashboard]
 ```
 
 The API presentation layer is `backend/app/api`, business rules and calculations
@@ -104,9 +113,8 @@ Swagger UI serveres lokalt, inklusive JavaScript/CSS. Se
 Se [API-handoff til Tableau](docs/tableau-api-handoff.md) for endpoints, felter og refresh.
 Tableau bruger REST API Connector direkte mod API-beregnede analyser. CSV-/Hyper-
 broen er historisk og skal ikke porteres. Connectoren bruger extracts; opdatér med
-Data → Refresh All Extracts. Om dashboardet fortsat er
-obligatorisk, afventer C-016. Eksisterende Tableau-artefakter er ikke genvalideret
-som del af denne specifikationsopgave.
+Data → Refresh All Extracts. Tableau-dashboardet bygges og vedligeholdes manuelt
+af gruppen i Tableau Desktop; Tableau-workbooken valideres ikke af de automatiske tests.
 
 ## Analysevisninger i frontend
 
