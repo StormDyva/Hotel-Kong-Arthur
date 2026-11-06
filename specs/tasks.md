@@ -285,8 +285,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-027 (RevPAR) — Beregn RevPAR i backend (ændret i tillægsopgave uge 2)
 
 - **Status:** Gennemført i main; historisk task.
-- **Stories:** US-004/US-007 som analysefunktion; RevPAR er fortsat kun kandidat
-  til det selvvalgte nøgletal i US-004.
+- **Stories:** Ingen (US-004/US-007 fjernet 2026-11-06, C-018); endpoint bevaret.
 - **Accept:** `GET /api/analytics/revpar` leverer RevPAR og månedsrækker med
   periode/type/land/sæsonregler, nulnævner og API/OpenAPI-dokumentation.
 - **Verifikation:** `test_revpar.py` og MySQL-testbevis i main.
@@ -311,7 +310,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-030 — Vælg og definér selvvalgt nøgletal
 
 - **Status:** Valgt og defineret af brugeren 2026-11-05: gennemsnitlig opholdslængde (ALOS). Implementeret under T-045; automatisk verifikation afventer.
-- **Stories/accept:** US-004, US-007 og US-008.
+- **Stories/accept:** Ingen (US-004/US-007/US-008 fjernet 2026-11-06, C-018).
 - **Formel/kohorte:** bekræftede bookinger valgt på check-in-dato; hele opholdets
   nætter / antal bookinger. Tom kohorte returnerer null-gennemsnit og nul counts.
 - **Afhængighed:** beslutningen er dokumenteret i Clarify; se T-045 for endpoint
@@ -340,7 +339,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-033 — Analysekontrakt og endpoint-dækning
 
 - **Status:** Analyseinventar udført; kontraktafklaring afventer C-014.
-- **Stories/accept:** US-003–US-006.
+- **Stories/accept:** US-005 og US-006.
 - **Afhængighed:** review af eksisterende paths i `plan.md`, derefter Clarify.
 - **Accept:** afgør om eksisterende analyser dækker kravene og eventuelle præcise
   path-, parameter-, respons-, fejl- og warning-ændringer.
@@ -349,7 +348,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-034 — OpenAPI og Swagger for godkendte analysekontrakter
 
 - **Status:** Ikke startet.
-- **Stories/accept:** US-003–US-006; dokumenter godkendte analyseparametre og
+- **Stories/accept:** US-005 og US-006; dokumenter godkendte analyseparametre og
   responser uden utilsigtet kontraktændring.
 - **Afhængighed:** T-033 og T-030 for KPI-specifik kontrakt.
 - **Verifikation:** OpenAPI-validering, runtime-schema-lighed og Swagger-review.
@@ -357,7 +356,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-035 — Analysevisninger i frontend
 
 - **Status:** Ikke startet; ny frontendfunktion.
-- **Stories/accept:** US-008; vis US-003–US-006-analyser fra API med filtre,
+- **Stories/accept:** Ingen (US-008 fjernet 2026-11-06, C-018); vis analyser fra API med filtre,
   loading/tom-/fejltilstand og bookingopdatering.
 - **Afhængighed:** T-033; T-030 for valgt KPI; C-015 for opdateringsmåde.
 - **Verifikation:** browser-/frontendtests mod REST API og manuel UI-review.
@@ -366,7 +365,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 - **Status:** REST API Connector valgt af brugeren 2026-11-03; manuel dashboard-/refresh-verifikation udestår.
 - **Afgrænsning:** Ingen portering af legacy CSV/Hyper-eksport eller workbook-generator.
-- **Stories/accept:** US-007; API som eneste beregningskilde, filtre, refresh og
+- **Stories/accept:** Ingen (US-007 fjernet 2026-11-06, C-018); API som eneste beregningskilde, filtre, refresh og
   afstemning på kendt datasæt.
 - **Afhængighed:** C-016, T-033 og T-030 for valgt KPI.
 - **Verifikation:** Tableau-demo/refresh og manuel afstemning mod API-tal.
@@ -374,7 +373,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-037 — Regression- og PostgreSQL-testdækning
 
 - **Status:** Ikke startet.
-- **Stories/accept:** US-001–US-006; de nuværende 29 API-tests (inklusive de
+- **Stories/accept:** US-001, US-002, US-005 og US-006; de nuværende 29 API-tests (inklusive de
   oprindelige 26) og bookingconcurrency skal bestå mod PostgreSQL.
 - **Afhængighed:** T-031–T-035.
 - **Verifikation:** API-/kontrakt-/frontendtests og testreset-spærre.
@@ -384,7 +383,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 - **Dokumentationstilføjelse 2026-11-03:** docs/tableau-rest-endpoints.md giver URLs, JSONPath, felter og dataset-/paginationbegrænsninger. API-responsers paths kontrolleres; Tableau-UI er fortsat manuel verifikation.
 
 - **Status:** Ikke startet; ændret i tillægsopgave uge 2.
-- **Stories/accept:** US-002, US-007, US-008 og projektleverance.
+- **Stories/accept:** US-002 og projektleverance.
 - **Afhængighed:** T-031–T-036.
 - **Omfang:** README, guides, bidragsvejledninger, datagrundlag, API-testing,
   Tableau-handoff og analyse-API-vejledning.
@@ -409,7 +408,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-040 — Komplet skole-demo ved første Compose-start
 
 - **Status:** Implementeret; 37 backend-/importtests og ren Compose-opstart verificeret.
-- **Stories/accept:** US-002, US-007; samme komplette 2026-datasæt hos alle studerende.
+- **Stories/accept:** US-002; samme komplette 2026-datasæt hos alle studerende.
 - **Omfang:** demo-init efter schema/seed og før API; 1.000 kildeophold + 100 ekstra
   mocks i 2026 uden eksterne CSV/XLSX. Fire basisbookinger giver 1.104 i alt.
 - **Opgradering:** gamle volumes med fremtidige kildeophold opdateres én gang;
@@ -420,7 +419,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-041 — Kombineret hotel- og baromsætning til Tableau
 
-- **Story:** US-007.
+- **Story:** Ingen (US-007 fjernet 2026-11-06, C-018).
 - **Status:** API implementeret på `feature/T-041-combined-tableau-revenue`; 38 API-/kontrakttests består. Manuel Tableau-preview afventer.
 - **Omfang:** `GET /analytics/revenue/combined` returnerer ét root-array med én
   række og numeriske `hotelRevenue`, `barRevenue` og `totalRevenue`. Backend
@@ -432,7 +431,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-042 — Realistiske 2026-demoanalyser
 
-- **Stories:** US-005, US-006, US-007.
+- **Stories:** US-005, US-006.
 - **Status:** Implementeret på `feat/realistic-demo-data`; 38 backendtests, frisk Compose-volume, idempotent genstart, foundation checks og US-005/US-006 API-kald verificeret. Manuel Tableau UI-test er ikke udført.
 - **Omfang:** Udvid `demo-init` idempotent med daterede transaktioner fra accepterede
   drinkaggregater og realistiske anmeldelser for afsluttede ophold. Ingen schema- eller
@@ -444,7 +443,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-043 — Daglig hotel/bar-sammenhæng til Tableau
 
-- **Story:** US-007; understøtter US-004/US-005.
+- **Story:** Understøtter US-005 (US-004/US-007 fjernet 2026-11-06).
 - **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
   automatisk test og Tableau-preview afventer.
 - **Omfang:** `GET /analytics/revenue/daily-combined` returnerer daglig hotel- og
@@ -457,7 +456,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-044 — Kundetilfredshed pr. land og værelsestype
 
-- **Story:** US-006, Tableau-forbrug under US-007.
+- **Story:** US-006.
 - **Status:** Implementeret på `feat/tableau-bar-occupancy-correlation`;
   automatisk test og Tableau-preview afventer.
 - **Omfang:** `GET /analytics/customer-satisfaction/by-country-room-type` returnerer
@@ -470,7 +469,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-045 — Gennemsnitlig opholdslængde til Tableau
 
-- **Story:** US-004/US-007/US-008.
+- **Story:** Ingen (US-004/US-007/US-008 fjernet 2026-11-06, C-018).
 - **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
   automatisk test og Tableau-preview afventer.
 - **Kohorte/formel:** Bekræftede bookinger med check-in i perioden; samlet antal
@@ -481,7 +480,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-046 — Analysefane efter opgavens analysekrav
 
-- **Stories:** US-005, US-006, US-008.
+- **Stories:** US-005 (hotelanalyserne i fanen har ingen story efter C-018).
 - **Status:** Implementeret på `feature/T-046-analytics-dashboard-requirements`;
   66 frontendtests og 19 browser-smoke-checks består; analysefanen er verificeret
   visuelt mod live Compose-API ved 1440 px og 390 px.

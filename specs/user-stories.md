@@ -6,6 +6,15 @@ Udkast til tillægsopgave uge 2. Ikke implementeringsgodkendt. Hver story beskri
 et brugerbehov og konkrete acceptkriterier; åbne beslutninger står i
 `clarify.md`.
 
+## Scope
+
+Projektet omfatter fire user stories: US-001, US-002, US-005 og US-006.
+Gruppen besluttede 2026-11-06 at fjerne US-003 (belægningsgrad), US-004
+(hotellets indtjening og gæster), US-007 (Tableau-dashboard) og US-008
+(nøgletal i frontend) fra projektets user stories; se C-018 i `clarify.md`.
+Numrene bevares, så henvisninger i tasks, commits og PR'er stadig passer.
+Eksisterende kode og API-endpoints for de fjernede stories er ikke slettet.
+
 ## US-001 – Håndtér bookinger
 
 Som receptionist ønsker jeg at oprette, finde, redigere og annullere bookinger i
@@ -41,42 +50,6 @@ Acceptkriterier:
 - Databaseskiftet ændrer ikke API-kontrakten (samme endpoints, felter og
   fejlkoder), og eksisterende API-tests består mod PostgreSQL.
 
-## US-003 – Se belægningsgrad
-
-Som hoteladministrator ønsker jeg at se belægningsgrad pr. måned og for en valgt
-periode, så jeg kan planlægge kampagner i svage perioder.
-
-Acceptkriterier:
-
-- Formlen er dokumenteret: solgte værelsesnætter / (214 værelser × antal nætter).
-  Check-out er eksklusivt.
-- Bookingnætter uden for perioden klippes af, og annullerede bookinger tælles
-  ikke med.
-- `from` og `to` er påkrævede, eller en default er dokumenteret.
-- Nævner 0 giver 0 med en advarsel.
-- Beregningen er tilgængelig som dokumenteret GET-endpoint i OpenAPI/Swagger og
-  returnerer JSON med de samme tal som dashboardet.
-
-## US-004 – Analysér hotellets indtjening og gæster
-
-Som hoteladministrator ønsker jeg at se indtjening og gæsteoprindelse opdelt
-efter værelsestype, sæson og land, så jeg ved, hvilke værelser og markeder
-hotellet tjener mest på.
-
-Acceptkriterier:
-
-- Årets samlede indtjening og indtjening for en valgt periode vises.
-- Indtjening vises pr. værelsestype, pr. sæson og pr. land. Mest indbringende
-  type og land er tydeligt markeret.
-- Antal gæster pr. land vises.
-- Faktisk `price_total` bruges, annullerede filtreres fra, og bookinger på tværs
-  af sæsoner fordeles pr. nat efter den godkendte regel i Clarify.
-- Selvvalgt nøgletal: [VÆLGES] er defineret med formel og vises i API, frontend og
-  dashboard. (Åben beslutning, se Clarify.)
-- Tom periode giver tom respons, ikke fejl.
-- Beregningerne er tilgængelige som dokumenterede GET-endpoints i OpenAPI/Swagger
-  og returnerer JSON med de samme tal som dashboardet.
-
 ## US-005 – Analysér cocktailbaren
 
 Som hoteladministrator ønsker jeg at se Helene Christines salg i baren, så jeg
@@ -107,50 +80,18 @@ Acceptkriterier:
 - Beregningen er tilgængelig som dokumenteret GET-endpoint i OpenAPI/Swagger og
   returnerer JSON med de samme tal som dashboardet.
 
-## US-007 – Brug et interaktivt dashboard
-
-Som beslutningstager ønsker jeg at se alle nøgletal i et interaktivt Tableau-
-dashboard uden at skrive SQL, så jeg hurtigt kan træffe beslutninger.
-
-Acceptkriterier:
-
-- Dashboardet viser belægning, indtjening pr. type/sæson/land, årsindtjening,
-  gæster pr. land, selvvalgt nøgletal, barsalg (total, pr. drink,
-  procentfordeling) og kundetilfredshed.
-- Filtre på periode, land, værelsestype og sæson virker.
-- Tallene er afstemt mod API-endpoints (ikke direkte mod databasen), så API'et
-  er den ene sandhedskilde.
-- Datakilde og refresh-procedure er dokumenteret, og en ændring i en booking
-  kan vises efter refresh.
-
-## US-008 – Se nøgletal i frontend
-
-Som hoteladministrator ønsker jeg at se belægning, indtjening, gæster pr. land,
-barsalg og kundetilfredshed direkte i hotellets webapplikation, så jeg kan følge
-driften uden at åbne Tableau.
-
-Acceptkriterier:
-
-- Frontend viser alle analyser fra US-003 til US-006.
-- Alle tal hentes fra REST API'et. Frontend har ingen egen beregning og læser
-  ikke direkte fra databasen.
-- Valg af periode (og eventuelt land/værelsestype) opdaterer visningen.
-- Tomme data og fejl vises tydeligt (tom tilstand, ikke et blankt skærmbillede).
-- Efter en ny booking vises de opdaterede tal ved næste opdatering/indlæsning.
-
 ## Mapping fra tidligere stories
 
 | Tidligere id | Nyt id | Bemærkning |
 |---|---|---|
 | US-001–US-004 | US-001 | Booking-CRUD og browserflow samlet |
 | US-005 og US-010 | US-002 | Live-data og import samlet |
-| US-006 | US-003 | Belægningsanalyse |
-| US-007 | US-004 | Indtjening og gæster pr. land |
+| US-006 | — | Var US-003 (belægning); fjernet 2026-11-06 |
+| US-007 | — | Var US-004 (indtjening og gæster); fjernet 2026-11-06 |
 | US-008 | US-005 | Baranalyse |
 | US-011 | US-006 | Kundetilfredshed |
-| US-009 | US-007 | Tableau-dashboard |
+| US-009 | — | Var US-007 (Tableau); fjernet 2026-11-06 |
 | US-012 | — | Fjernet som brugerstory; Converge er projektleverance og spores i tasks/constitution |
-| — | US-008 | Ny story om analysevisninger i frontend |
 
 ## Kvalitetstjek (INVEST)
 
@@ -162,7 +103,5 @@ Acceptkriterier:
   beslutningstagerens mål; gruppen har endnu ikke reviewet tillægsopgave-udkastet.
 - **Estimerbare:** ikke vurderet; database- og endpointinventar er beskrevet i
   Plan, men arbejdsestimat mangler.
-- **Små:** ikke verificeret; US-002 samler dataflow og seed, og US-004 samler flere
-  rapporter.
-- **Testbare:** kriterier er observerbare. US-004 kan ikke markeres testbar for
-  hele omfanget, før det selvvalgte nøgletal er valgt og defineret.
+- **Små:** ikke verificeret; US-002 samler dataflow og seed.
+- **Testbare:** kriterier er observerbare.
