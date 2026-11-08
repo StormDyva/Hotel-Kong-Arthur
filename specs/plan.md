@@ -1,11 +1,11 @@
 # Teknisk plan — tillægsopgave uge 2
 
-Status 2026-11-03: PostgreSQL-runtime implementeret på migrationsbranchen; analysefrontend udestår.
-T-031/T-032-testbevis og konkrete valg: docs/postgres-migration.md.
-Nedenstående planpunkter bevares som planens baggrund.
-Nyere RevPAR- og CSV-demodatafunktioner fra main er med i denne branch, fortsat
-mod MySQL. Databasevalget PostgreSQL er afklaret i C-012.
-Specifikationen og åbne beslutninger findes i `spec.md` og `clarify.md`.
+Planen blev udarbejdet før implementeringen. Statuslinjer og fremtidsformuleringer
+nedenfor beskriver planlægningsgrundlaget pr. 2026-11-03 og er ikke aktuel
+implementeringsstatus. Løsningen og de resterende punkter er vurderet i den
+seneste Converge: [`converge-tillaeg-uge2.md`](converge-tillaeg-uge2.md).
+PostgreSQL-testbevis findes også i [`docs/postgres-migration.md`](../docs/postgres-migration.md).
+Databasevalget er afklaret i `clarify.md`.
 
 ## Analyse af eksisterende MySQL-specifikke konstruktioner
 
@@ -49,17 +49,15 @@ paths. Ny kontrakt for frontendens brug og eventuelle ændringer afklares i C-01
 | `GET /api/analytics/top-performers` | samme | top værelse, type og land | — (uden for scope) | Findes allerede |
 | `GET /api/analytics/bar-sales` | periode, `employee_name` | total, produkter og kategoriandele | US-005 | Findes allerede |
 | `GET /api/analytics/customer-satisfaction` | periode samt hotelkohortefiltre | rating, svarprocent, kohorte og fordeling | US-006 | Findes allerede |
-| `GET /api/analytics/revpar` | samme periode- og hotel-filtre | samlet RevPAR og månedlige rækker | — (uden for scope) | Findes allerede i main; om det er selvvalgt KPI er åbent |
-| `GET /api/analytics/dashboard` | samme som analysefilter | samlet analysepayload | US-005, US-006 | Findes allerede; Tableau-/frontendforbrug skal verificeres |
+| `GET /api/analytics/revpar` | samme periode- og hotel-filtre | samlet RevPAR og månedlige rækker | — (uden for scope) | Findes; det valgte selvstændige KPI er ALOS |
+| `GET /api/analytics/dashboard` | samme som analysefilter | samlet analysepayload | US-005, US-006 | Findes; frontend forbrug er vurderet i Converge |
 | `GET /analytics/revenue/by-room-type-season` | `year` eller `from`/`to` | flade 24 type/sæson-rækker | — (uden for scope) | Findes allerede; ældre Tableau-path uden `/api` bevares |
 | `GET /analytics/revenue/by-country` | `year` eller `from`/`to` | flade land/omsætning-rækker | — (uden for scope) | Findes allerede; ældre Tableau-path uden `/api` bevares |
-| Selvvalgt nøgletal, endnu ikke valgt | afventer C-013 | RevPAR findes som kandidat; andet valg kan kræve ny API-operation | — (uden for scope) | Implementering af valgte KPI-blokke afventer gruppens valg |
+| Selvvalgt nøgletal: ALOS | check-in-år eller periode | gennemsnitlig opholdslængde | — (uden for scope) | Implementeret i `/analytics/bookings/average-stay-length`; testet under T-047 |
 
-Der er således allerede endpoints for de navngivne analyseområder. Ingen
-grundlæggende analyse-GET er identificeret som manglende i API'et; den nye
-frontendvisning mangler, PostgreSQL-runtime mangler, og eventuelle KPI-specifikke
-API-ændringer afventer Clarify-review. Hvis gruppen vælger RevPAR, findes dens
-endpoint allerede i main; dette er ikke i sig selv beslutning om selvvalgt KPI.
+Planlægningsinventaret fandt de eksisterende analyse-endpoints. Implementerings-
+og verifikationsstatus for PostgreSQL, analysefrontend og KPI'er fremgår af den
+seneste Converge.
 
 ## PostgreSQL-skift
 
@@ -93,30 +91,27 @@ endpoint allerede i main; dette er ikke i sig selv beslutning om selvvalgt KPI.
 ## API-kontrakt og frontend
 
 API-/servicekontraktens endpoints, felter, status- og fejlkoder bevares gennem
-databaseskiftet. Nye endpoints er ikke besluttet; analyse-endpointernes
-parametre/fejl/warnings afventer C-014. Kontrakten skal først ændres i en senere
-implementering efter godkendelse og samtidig opdatering af OpenAPI.
+databaseskiftet. Afklaringerne i C-014 er gennemført; den gældende kontrakt er
+dokumenteret i OpenAPI.
 
-Frontendens aktuelle README beskriver bookingflowet. Planlagt analysevisning:
+Analysefrontendens dækkede visninger og status:
 
 | Visning | API-kald (nyttige eksisterende paths) | Story | Status |
 |---|---|---|---|
-| Belægning | `/api/analytics/occupancy` | — (uden for scope) | API findes; frontendvisning mangler |
-| Hotelindtjening, type/sæson/land og topresultater | `/api/analytics/revenue`, `/api/analytics/revenue-by-*`, `/api/analytics/top-performers` | — (uden for scope) | API findes; frontendvisning mangler |
-| Gæster pr. land | `/api/analytics/guests-by-country` | — (uden for scope) | API findes; frontendvisning mangler |
-| Barsalg | `/api/analytics/bar-sales` | US-005 | API findes; frontendvisning mangler |
-| Kundetilfredshed | `/api/analytics/customer-satisfaction` | US-006 | API findes; frontendvisning mangler |
-| Selvvalgt nøgletal | `/api/analytics/revpar` findes, hvis RevPAR vælges; ellers afventer C-013 | — (uden for scope) | RevPAR er kandidat; valg åbent |
+| Belægning | `/api/analytics/occupancy` | — (uden for scope) | Vist i analysefrontend; Converge dokumenterer test |
+| Hotelindtjening, type/sæson/land og topresultater | `/api/analytics/revenue`, `/api/analytics/revenue-by-*`, `/api/analytics/top-performers` | — (uden for scope) | Vist i analysefrontend; Converge dokumenterer test |
+| Gæster pr. land | `/api/analytics/guests-by-country` | — (uden for scope) | Vist i analysefrontend; Converge dokumenterer test |
+| Barsalg | `/api/analytics/bar-sales` | US-005 | Vist i analysefrontend; Converge dokumenterer test |
+| Kundetilfredshed | `/api/analytics/customer-satisfaction` | US-006 | Vist i analysefrontend; Converge dokumenterer test |
+| Selvvalgt nøgletal | `/api/analytics/bookings/average-stay-length` | — (uden for scope) | ALOS valgt og vist i analysefrontend |
 
 Frontend kalder kun REST API, implementerer ingen formler og har tydelige loading-,
-tom- og fejltilstande. Om kald foretages automatisk ved sidevisning eller via
-manuel opdatering afventer C-015.
+tom- og fejltilstande. Analysefanen henter friske værdier ved åbning; se C-015.
 
 ## Tableau
 
-Hvis Tableau fortsat er krævet (C-016), er det en ren API-forbruger. Det må ikke
-læse direkte fra PostgreSQL. Eksisterende flade revenue-exports og deres ældre
-paths dokumenteres; samlet workbook, filtre og refresh afstemmes mod API-tal.
+Tableau er en ren API-forbruger og læser ikke direkte fra PostgreSQL. C-016/C-018
+og den manuelle gruppedemonstration er beskrevet i den seneste Converge.
 
 ## Arkitektur
 
@@ -134,20 +129,19 @@ flowchart LR
 
 - RevPAR beregnes som omsætning / tilgængelige værelsesnætter. Månedsrækker
   klipper omsætning og kapacitet til valgt periode; periodens RevPAR beregnes ikke
-  som gennemsnit af afrundede månedsværdier. Det er endnu ikke afklaret, om RevPAR
-  er tillægsopgavens selvvalgte KPI.
+  som gennemsnit af afrundede månedsværdier. RevPAR er ikke det valgte
+  selvstændige KPI; gruppen valgte ALOS.
 - CSV-loaderen bevarer 1.000 kilderækker som JSON i `csv_source_rows`, med batch-
   hash, linjenummer og bookingrelation. Den genbruger anonymiserede kildebookinger,
   genererer 2026-datoer/værelser uden overlap og tilføjer særskilt 100 mock-
   bookinger. Genkørsel er idempotent; rå CSV/navne er ikke i Git.
 
-## Verifikation og kommende Converge
+## Verifikation og Converge
 
-PostgreSQL-implementationen skal verificere eksisterende API- og OpenAPI-tests,
-bookingconcurrency, import-idempotens, database-resetspærrer, frontendens rigtige
-API-flow, Swagger og Compose-health. Main indeholder aktuelt 29 MySQL-baserede
-API-tests; de er ikke PostgreSQL-testbevis. Historisk Converge fra 2026-10-28
-omskrives ikke.
+PostgreSQL-implementationen verificerer API-/OpenAPI-tests, bookingconcurrency,
+import-idempotens, database-resetspærrer, frontendens API-flow, Swagger og
+Compose-health. Resultaterne og begrænsningerne fremgår af seneste Converge;
+ældre Converge-filer bevares som historik.
 
 2026-11-03: Tableau-forbindelsen er REST API Connector. Portering af den historiske CSV/Hyper-bro er ikke del af PostgreSQL-migrationen.
 

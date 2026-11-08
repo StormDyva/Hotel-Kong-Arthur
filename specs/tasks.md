@@ -2,8 +2,9 @@
 
 ## Status
 
-Historiske tasks fra 2026-10-26/28 bevares som udført eller tidligere planlagt
-arbejde. T-031/T-032 er klar til review med PostgreSQL-testbevis; øvrige uge 2-tasks har separat status.
+Tasks bevares som sporbarhed for arbejdet. Statussen i den seneste Converge
+(`converge-tillaeg-uge2.md`, 2026-11-06) er den autoritative samlede vurdering,
+hvis en ældre status nedenfor ikke er opdateret.
 
 ## Dokumentation og beslutninger
 
@@ -309,7 +310,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-030 — Vælg og definér selvvalgt nøgletal
 
-- **Status:** Valgt og defineret af brugeren 2026-11-05: gennemsnitlig opholdslængde (ALOS). Implementeret under T-045; automatisk verifikation afventer.
+- **Status:** Valgt og defineret af brugeren 2026-11-05: gennemsnitlig opholdslængde (ALOS). Implementeret under T-045 og automatisk verificeret; se seneste Converge.
 - **Stories/accept:** Ingen (US-004/US-007/US-008 fjernet 2026-11-06, C-018).
 - **Formel/kohorte:** bekræftede bookinger valgt på check-in-dato; hele opholdets
   nætter / antal bookinger. Tom kohorte returnerer null-gennemsnit og nul counts.
@@ -338,7 +339,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-033 — Analysekontrakt og endpoint-dækning
 
-- **Status:** Analyseinventar udført; kontraktafklaring afventer C-014.
+- **Status:** Analyseinventar og kontraktafklaring gennemført; se C-014 og seneste Converge.
 - **Stories/accept:** US-005 og US-006.
 - **Afhængighed:** review af eksisterende paths i `plan.md`, derefter Clarify.
 - **Accept:** afgør om eksisterende analyser dækker kravene og eventuelle præcise
@@ -347,7 +348,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-034 — OpenAPI og Swagger for godkendte analysekontrakter
 
-- **Status:** Ikke startet.
+- **Status:** Implementeret/verificeret; OpenAPI er afstemt med runtime-koden under T-047.
 - **Stories/accept:** US-005 og US-006; dokumenter godkendte analyseparametre og
   responser uden utilsigtet kontraktændring.
 - **Afhængighed:** T-033 og T-030 for KPI-specifik kontrakt.
@@ -355,7 +356,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-035 — Analysevisninger i frontend
 
-- **Status:** Ikke startet; ny frontendfunktion.
+- **Status:** Implementeret; se T-046/T-047 og testbevis i seneste Converge.
 - **Stories/accept:** Ingen (US-008 fjernet 2026-11-06, C-018); vis analyser fra API med filtre,
   loading/tom-/fejltilstand og bookingopdatering.
 - **Afhængighed:** T-033; T-030 for valgt KPI; C-015 for opdateringsmåde.
@@ -363,7 +364,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-036 — Tableau kobles til API og afstemmes
 
-- **Status:** REST API Connector valgt af brugeren 2026-11-03; manuel dashboard-/refresh-verifikation udestår.
+- **Status:** REST API Connector valgt 2026-11-03. Gruppen har bygget Tableau-visninger; automatisk Tableau-verifikation findes ikke.
 - **Afgrænsning:** Ingen portering af legacy CSV/Hyper-eksport eller workbook-generator.
 - **Stories/accept:** Ingen (US-007 fjernet 2026-11-06, C-018); API som eneste beregningskilde, filtre, refresh og
   afstemning på kendt datasæt.
@@ -372,7 +373,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-037 — Regression- og PostgreSQL-testdækning
 
-- **Status:** Ikke startet.
+- **Status:** Gennemført; se testresultaterne i seneste Converge.
 - **Stories/accept:** US-001, US-002, US-005 og US-006; de nuværende 29 API-tests (inklusive de
   oprindelige 26) og bookingconcurrency skal bestå mod PostgreSQL.
 - **Afhængighed:** T-031–T-035.
@@ -382,7 +383,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 - **Dokumentationstilføjelse 2026-11-03:** docs/tableau-rest-endpoints.md giver URLs, JSONPath, felter og dataset-/paginationbegrænsninger. API-responsers paths kontrolleres; Tableau-UI er fortsat manuel verifikation.
 
-- **Status:** Ikke startet; ændret i tillægsopgave uge 2.
+- **Status:** Dokumentation er opdateret; testbeviser og resterende begrænsninger fremgår af seneste Converge.
 - **Stories/accept:** US-002 og projektleverance.
 - **Afhængighed:** T-031–T-036.
 - **Omfang:** README, guides, bidragsvejledninger, datagrundlag, API-testing,
@@ -391,19 +392,19 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 
 ### T-039 — Converge efter tillægsopgave uge 2
 
-- **Status:** Ikke startet; kommende leverance, ikke en brugerstory.
+- **Status:** Gennemført 2026-11-06; ikke en brugerstory.
 - **Afhængighed:** T-037 samt relevante dele af T-036/T-038.
 - **Accept:** vurder alle aktuelle sporbarhedsrækker med testbevis, ejere og gaps.
-  Historisk Converge fra 2026-10-28 må ikke omskrives.
-- **Verifikation:** ny Converge-fil og matrixreview.
+  Historiske Converge-filer bevares. Resultatet er `converge-tillaeg-uge2.md`.
+- **Verifikation:** testresultater og story-/kravmatrix er dokumenteret i Converge.
 
 ## Kvalitetstjek — tillægsopgave uge 2
 
-- Dækning: målrettet mod de otte nye stories; status er planlagt, ikke verificeret.
+- Dækning: fire aktive stories efter C-018; status er vurderet i Converge.
 - Afhængigheder: C-013 er afklaret som ALOS; C-014–C-016 afklarer kontrakt,
   frontendopdatering og Tableau-omfang.
-- Testbarhed: PostgreSQL-, API-, concurrency-, frontend- og manuel Tableau-
-  verifikation er planlagt, men ikke udført i specifikationsopgaven.
+- Testbarhed: PostgreSQL-, API-, concurrency- og frontend-verifikation er udført;
+  Tableau-dashboardet er manuelt udført af gruppen og ikke automatisk testet.
 
 ### T-040 — Komplet skole-demo ved første Compose-start
 
@@ -420,7 +421,7 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-041 — Kombineret hotel- og baromsætning til Tableau
 
 - **Story:** Ingen (US-007 fjernet 2026-11-06, C-018).
-- **Status:** API implementeret på `feature/T-041-combined-tableau-revenue`; 38 API-/kontrakttests består. Manuel Tableau-preview afventer.
+- **Status:** Implementeret; senere OpenAPI-/API-verifikation fremgår af T-047 og seneste Converge. Tableau-preview er manuel.
 - **Omfang:** `GET /analytics/revenue/combined` returnerer ét root-array med én
   række og numeriske `hotelRevenue`, `barRevenue` og `totalRevenue`. Backend
   bruger samme periode på begge datasæt; baromsætningen omfatter daterede salg
@@ -444,8 +445,8 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-043 — Daglig hotel/bar-sammenhæng til Tableau
 
 - **Story:** Understøtter US-005 (US-004/US-007 fjernet 2026-11-06).
-- **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
-  automatisk test og Tableau-preview afventer.
+- **Status:** Implementeret og automatisk testet; se T-047 og seneste Converge.
+  Tableau-preview er ikke automatisk verificeret.
 - **Omfang:** `GET /analytics/revenue/daily-combined` returnerer daglig hotel- og
   baromsætning, gæstenætter, værelsesnætter og belægning samt backendberegnede
   Pearson-korrelationer. Alle medarbejderes daterede barsalg medtages; kun
@@ -457,8 +458,8 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-044 — Kundetilfredshed pr. land og værelsestype
 
 - **Story:** US-006.
-- **Status:** Implementeret på `feat/tableau-bar-occupancy-correlation`;
-  automatisk test og Tableau-preview afventer.
+- **Status:** Implementeret og automatisk testet; se T-047 og seneste Converge.
+  Tableau-preview er ikke automatisk verificeret.
 - **Omfang:** `GET /analytics/customer-satisfaction/by-country-room-type` returnerer
   én numerisk række pr. land/værelsestype med gennemsnitsrating, svarprocent,
   kvalificerede/bedømte ophold og fordeling af rating 1–5.
@@ -470,8 +471,8 @@ overskrive arbejde. Nye uge 2 tasks starter derfor ved T-029.
 ### T-045 — Gennemsnitlig opholdslængde til Tableau
 
 - **Story:** Ingen (US-004/US-007/US-008 fjernet 2026-11-06, C-018).
-- **Status:** Endpoint implementeret på `feat/tableau-bar-occupancy-correlation`;
-  automatisk test og Tableau-preview afventer.
+- **Status:** Implementeret og automatisk testet; se T-047 og seneste Converge.
+  Tableau-preview er ikke automatisk verificeret.
 - **Kohorte/formel:** Bekræftede bookinger med check-in i perioden; samlet antal
   overnatninger divideret med antal bookinger. Hele opholdet tæller med, også
   når checkout ligger uden for perioden.

@@ -2,8 +2,9 @@
 
 ## Status
 
-Gældende projektprincipper. Tillægsopgave uge 2 er under specifikation og er endnu
-ikke implementeret. MySQL-udgaven er bevaret som v1 i tagget `v1-mysql-tableau`.
+Gældende projektprincipper for den afleverede løsning. Tillægsopgave uge 2 er
+implementeret og vurderet i `converge-tillaeg-uge2.md`. MySQL-udgaven er bevaret
+som v1 i tagget `v1-mysql-tableau`.
 
 ## Autoritativt grundlag
 
@@ -51,12 +52,13 @@ spørgsmål, Plan hvordan, og Tasks leverancer og verifikation.
   frontend-animationer er ikke MVP-krav.
 - Kundetilfredshed er aktiveret ved brugerbeslutning 2026-10-28: rating 1–5 pr.
   afsluttet booking, gennemsnit og svarprocent. Ingen opdigtede scores.
-- Tableau læser analyser fra API'et. Om dashboard fortsat er en obligatorisk
-  leverance efter tillægsopgaven står åbent i `clarify.md`.
-- Selvvalgt nøgletal er ikke valgt; beslutningen blokerer dets implementering.
+- Tableau-dashboardet er ikke en aktiv user story efter C-018. Hvis Tableau
+  bruges, læser det analyser fra API'et og ikke direkte fra databasen.
+- Selvvalgt nøgletal er valgt som gennemsnitlig opholdslængde (ALOS), jf. C-013.
+  Det beregnes i backend og vises i analysefrontend.
 
 ## Leverancekontrol
 
-Converge er en projektleverance, ikke en brugerstory. Den kommende Converge efter
-tillægsopgaven skal vurdere alle sporbarhedsrækker som implementeret, delvist
-implementeret eller mangler og dokumentere testbevis og resterende arbejde.
+Converge er en projektleverance, ikke en brugerstory. Den seneste vurdering er
+`converge-tillaeg-uge2.md` (2026-11-06); den beskriver implementering, testbevis
+og resterende arbejde.

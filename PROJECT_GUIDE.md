@@ -5,15 +5,17 @@
 Grundlag: E26 Tværfaglig Opgave Hotel Kong Arthur og Tillægsspørgsmål_swa.
 Tillægsopgave uge 2: trelags-backend, REST/JSON, OpenAPI/Swagger, PostgreSQL,
 Docker Compose, booking-CRUD, hotel-/baranalyser via API, booking- og
-analysefrontend samt dokumentation. Tableau-status afventer C-016.
+analysefrontend samt dokumentation. Tableau-dashboardet er udført manuelt af
+gruppen; se seneste Converge for status og begrænsninger.
 Brugeren har prioriteret API og valgt 1–5-rating pr. afsluttet booking.
 Brugeren har 2026-11-03 bestilt implementering på `feature/T-031-postgres-migration`. MySQL + Tableau-versionen fra før ændringen
 er bevaret i tagget `v1-mysql-tableau` på GitHub.
 
 Den kanoniske funktionelle specifikation er specs/spec.md. Arbejdsflow:
 Constitution → Specify → Clarify → Plan → Tasks → Implement → Converge.
-Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. PostgreSQL-
-Converge: specs/converge-postgres-2026-11-03.md; ældre rapporter er historik.
+Alle stories har acceptkriterier. Sporbarhed: specs/traceability.md. Seneste
+samlede Converge: specs/converge-tillaeg-uge2.md; migrations- og ældre rapporter
+er historiske testbeviser.
 
 ## Teknisk struktur
 
@@ -21,7 +23,7 @@ Converge: specs/converge-postgres-2026-11-03.md; ældre rapporter er historik.
 - services/: bookingregler, sæsonpriser, nøgletal og bedømmelser.
 - repositories/: parameteriseret SQL, persistence og låse; intet HTTP.
 - PostgreSQL: måldatabase; seed/import fra CSV/XLSX, ingen datamigrering fra v1.
-- PostgreSQL 17 er runtime på migrationsbranchen. Schema/seed ligger i
+- PostgreSQL 17 er runtime på main. Schema/seed ligger i
   database/postgres; MySQL-filer bevares som historiske v1-kilder.
 - Importerede skoleophold er anonymiserede, skrivebeskyttede `synthetic_import`-rækker.
 - Frontend: HTML/CSS/JavaScript; kalder API og skal vise API-beregnede analyser.

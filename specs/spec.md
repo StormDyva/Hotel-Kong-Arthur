@@ -1,9 +1,9 @@
 # Funktionel specifikation — Hotel Kong Arthur API
 
-Revision: tillægsopgave uge 2, specifikationsudkast. Kilder: E26 Tværfaglig
-Opgave Hotel Kong Arthur, Tillægsspørgsmål_swa og tillægsopgave uge 2. Dette
-kravudkast er delvist implementeret: PostgreSQL-runtime/import er reviewklar, mens analysefrontend og åbne afklaringer udestår. MySQL nævnes kun som den
-historiske v1, bevaret i tagget `v1-mysql-tableau`.
+Revision: tillægsopgave uge 2. Kilder: E26 Tværfaglig Opgave Hotel Kong Arthur,
+Tillægsspørgsmål_swa og tillægsopgave uge 2. Løsningen er implementeret og
+vurderet i `converge-tillaeg-uge2.md`; kendte begrænsninger står dér. MySQL
+nævnes kun som den historiske v1, bevaret i tagget `v1-mysql-tableau`.
 
 ## Principper og roller
 
@@ -114,8 +114,8 @@ land. Kohorten bestemmes af check-in i perioden; hver booking bidrager med hele
 opholdslængden, også hvis checkout ligger uden for perioden.
 
 Disse beregninger leveres af backend og er datakilde for frontendens
-analysevisninger og et eventuelt Tableau-dashboard. Endpoint- og warning-detaljer
-for nye/ændrede operationer kræver afklaring; eksisterende endpoints bevares.
+analysevisninger og Tableau-dashboard. De godkendte kontrakter er beskrevet i
+OpenAPI; eksisterende endpoints bevares.
 
 Filtre: enten year (1900–9998) eller from/to; de må ikke kombineres. Default er
 [2026-01-01,2027-01-01). Perioden er 1–3660 dage. Land (country_code), type
@@ -184,15 +184,16 @@ Frontend-analysevisninger og eventuel Tableau-rendering afstemmes mod API-tal.
 
 ## Frontendens analysevisninger
 
-Frontendprototypen skal vise belægning, hotelindtjening, gæster pr. land,
+Frontendens analysefane viser belægning, hotelindtjening, gæster pr. land,
 barsalg og kundetilfredshed med data hentet fra analyse-endpoints. Periodevalg og
 eventuelle godkendte land-/værelsesfiltre opdaterer API-kald. Tomme data og fejl
-vises tydeligt. Hentemåde ved sidevisning eller manuel opdatering afventer C-015.
+vises tydeligt. Analysefanen henter friske værdier, når brugeren åbner den; der
+er ikke periodisk opdatering eller push.
 
 ## Artefakter
 
 constitution.md → spec.md → clarify.md → plan.md → tasks.md → implementering →
-converge-api-2026-10-28.md. Stories/acceptkriterier: user-stories.md; sporbarhed:
+converge-tillaeg-uge2.md. Stories/acceptkriterier: user-stories.md; sporbarhed:
 traceability.md. specify.md er en henvisning til denne kanoniske specifikation.
 
 ## T-022 — færdige flade indtjeningsrækker til Tableau
@@ -272,9 +273,9 @@ MySQL. API-kontrakten er uændret og kontrolleres mod OpenAPI. Se
 
 ## Automatisk skole-datasæt — T-040
 
-`docker compose up --build -d --wait` skal alene oprette alle 1.000 kildebaserede
+`docker compose up --build -d --wait` opretter alle 1.000 kildebaserede
 ophold og 100 ekstra mockbookinger i 2026, plus fire basiseksempler. Kilderne er
 committede anonymiserede fixtures; rå CSV/XLSX må ikke være en startup-afhængighed.
-API-start afventer klargøringen. Genstart tilføjer ikke dubletter; eksisterende
+API starter efter klargøringen. Genstart tilføjer ikke dubletter; eksisterende
 operational-bookinger og allerede klargjorte 2026-ophold bevares. Gamle volumes
 opgraderes uden reset. Eksakte CSV-strenge/navne er fortsat en valgfri lokal import.

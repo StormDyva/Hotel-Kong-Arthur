@@ -2,11 +2,11 @@
 
 ## Aktuel status
 
-T-031/T-032: API, bookingfrontend og Swagger kører nu mod PostgreSQL 17.
-Schema, anonymiserede fixtures og CSV-loader er portet. T-040 klargør hele
-1.000 + 100-datasættet automatisk i Compose; ingen manuel import kræves. Eksisterende API-kontrakt
-bevares. Analysefrontend og de åbne C-013–C-016-punkter er ikke løst her.
-Se docs/postgres-migration.md for testbevis og verifikationsbevis.
+Løsningen kører mod PostgreSQL 17. Compose indlæser automatisk demoens
+1.000 + 100 datasæt, og analysefrontend samt ALOS er implementeret. Den seneste
+status, testbeviser og kendte begrænsninger findes i
+[`specs/converge-tillaeg-uge2.md`](specs/converge-tillaeg-uge2.md). PostgreSQL-
+migrationsbevis findes i `docs/postgres-migration.md`.
 
 Præsentationsversionen er sikret på GitHub som tag/branch
 `v1-mysql-tableau`. Se README.md for checkout og start.
@@ -15,8 +15,9 @@ Præsentationsversionen er sikret på GitHub som tag/branch
 2. Følg README.md for `docker compose up --build -d` og testkommandoer.
 3. Åbn http://localhost:8000/docs og brug docs/api-testing.md.
 4. Læs specs/constitution.md, spec.md, clarify.md, plan.md, tasks.md og user-stories.md.
-5. Aktuelt PostgreSQL-testbevis: specs/converge-postgres-2026-11-03.md.
-   specs/converge-api-2026-10-28.md er historisk MySQL-bevis.
+5. Læs den seneste samlede vurdering i `specs/converge-tillaeg-uge2.md`.
+   `specs/converge-postgres-2026-11-03.md` og `specs/converge-api-2026-10-28.md`
+   er historiske testbeviser.
 
 Kravgrundlag: de to udleverede PDF'er E26 Tværfaglig Opgave Hotel Kong Arthur og
 Tillægsspørgsmål_swa. De findes i den lokale hovedmappe uden for Git-repositoryet.
