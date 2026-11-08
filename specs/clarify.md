@@ -2,9 +2,9 @@
 
 ## Status
 
-Beslutningerne fra 2026-10-26/28 er den godkendte v1-baseline. Uge 2-tillægget
-tilføjer C-012–C-017; de åbne punkter dér skal afklares før deres afhængige
-implementering.
+Beslutningerne fra 2026-10-26/28 er den godkendte v1-baseline. Uge 2-beslutningerne
+C-012–C-018 er afklaret. C-016's manuelle Tableau-refresh er ikke automatisk
+verificeret; denne begrænsning beskrives i den seneste Converge.
 
 ### C-001 – Live data og opdateringsmekanisme (opdateret for uge 2)
 
@@ -106,9 +106,9 @@ ophævet. Se den daterede beslutning nedenfor.
 | Dobbeltbooking/kapacitet | Approved | Projektgruppen | 2026-10-26 |
 | PostgreSQL som måldatabase | Afklaret | Projektgruppen | Tillægsopgave uge 2 |
 | Selvvalgt nøgletal | Afklaret: gennemsnitlig opholdslængde (ALOS) | Brugeren | 2026-11-05 |
-| Analysekontrakt og warnings | Åben | Projektgruppen | Afventer |
-| Frontend-opdatering | Åben | Projektgruppen | Afventer |
-| Tableau som forbruger/leverance | Åben | Projektgruppen | Afventer |
+| Analysekontrakt og warnings | Afklaret | Projektgruppen | 2026-11-06 |
+| Frontend-opdatering | Afklaret: hent ved åbning af analysefanen | Projektgruppen | 2026-11-08 |
+| Tableau som forbruger/leverance | Afklaret: API-forbruger, ikke aktiv user story | Projektgruppen | 2026-11-06 |
 
 ## Kvalitetstjek — oprindelig v1-afklaring
 
@@ -145,10 +145,10 @@ december erstattes af lavsæson til og med 19/12 og højsæson 20/12–31/12. De
 præcise juledatoer er en implementeringsantagelse, ikke en oplysning fra hotellet.
 Eksisterende prislinjer bevares som historiske snapshots.
 
-## Tillægsopgave uge 2 — afklaringer
+## Tillægsopgave uge 2 — beslutninger
 
-Disse punkter er et kravudkast for den kommende implementering. De ændrer ikke
-testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
+Beslutningerne nedenfor blev afklaret under arbejdet med tillægsopgaven.
+Implementeringsstatus og testbevis fremgår af `converge-tillaeg-uge2.md`.
 
 ### C-012 — Databasetype
 
@@ -171,46 +171,28 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 - **Tomt datasæt:** `bookings=0`, `room_nights=0` og `average_stay_nights=null`.
 - **Opdeling:** samlet, check-in-måned, værelsestype og bookinggæstens land.
   Averages og ratios beregnes i backend og returneres numerisk.
-- **Nuværende implementation:** RevPAR findes stadig som eksisterende API-KPI,
-  men ALOS er gruppens valgte selvstændige nøgletal.
-- **RevPAR:** Omsætning / disponible værelsesnætter. Kræver omsætning og
-  disponible værelsesnætter for samme periode. Værelser, perioder, bookinger og
-  natpriser findes i den nuværende model; beregningen kan genbruge disse data,
-  men definitionen af omsætning i tælleren skal bekræftes.
-- **Gennemsnitlig opholdslængde:** Samlede opholdsnætter / antal bookinger i den
-  valgte kohorte. Kræver check-in, check-out og en afklaret kohorte/statusregel;
-  datoer og bookingstatus findes allerede.
-- **Annulleringsrate:** Annullerede bookinger / alle bookinger i en valgt
-  bookingkohorte × 100. Kræver kohorteperiode og entydig nævnerregel; status og
-  oprettelsestid findes i bookingdata, men valg af kohortens dato (oprettet,
-  check-in eller opholdsperiode) er ikke fastlagt.
-- **Datagrundlag:** Alle tre kandidater kan beregnes ud fra felter, der allerede
-  findes i v1-modellen; ingen kræver umiddelbart nye databasefelter. Gennemsnitlig
-  opholdslængde kræver færrest slags input (check-in, check-out og antal bookinger),
-  men kohorte/status skal stadig afklares. Dette er en vurdering af
-  datatilgængelighed, ikke en anbefaling af hvilket KPI gruppen skal vælge.
-- **Blokering:** Gruppen skal vælge KPI, kohorte, formel, periodefiltre og
-  nul-/tom-data-adfærd, før KPI-specifik API-, frontend- eller Tableau-arbejde
-  starter.
+- **Nuværende implementation:** RevPAR findes som eksisterende API-KPI.
+- **Afgrænsning:** ALOS er valgt, og dens kohorte, formel, periodefiltre og
+  tom-data-adfærd er defineret ovenfor. Tidligere kandidatovervejelser styrer
+  ikke den aktuelle løsning.
 
 ### C-014 — Analysekontrakt
 
-- **Status: ÅBEN.** Den konkrete endpoint-struktur, parameterkrav, responsform,
-  fejlkoder og warning-format for analysesider skal gennemgås og godkendes.
-- **Åben formelafstemning:** Den fjernede US-003 nævnte 214 værelser × alle periodens nætter,
-  mens tidligere C-005/T-020 bruger aktive værelser (og filtre på type/sæson) i
-  nævneren. Gruppen skal afklare, om 214 er fast eller alene det nuværende
-  referenceinventar, før kriterium/formel ændres eller implementeres.
-- **Eksisterende udgangspunkt:** Se endpointinventaret i `plan.md`. De eksisterende
-  analyse-endpoints bevares; nye eller ændrede endpoints beskrives først endeligt
-  efter gruppens kontraktreview.
+- **Status: AFKLARET 2026-11-06.** Eksisterende analyse-endpoints og OpenAPI-
+  schemas er den godkendte kontrakt; PostgreSQL-skiftet ændrede ikke kontrakten.
+  Detaljer og operationer står i `spec.md` og `openapi/openapi.yaml`.
+- **Belægningsnævner:** Aktive værelser i det valgte inventar × periodens
+  tilgængelige nætter; type- og sæsonfiltre ændrer nævneren. 214 er størrelsen på
+  det aktuelle syntetiske referenceinventar, ikke en fast API-konstant.
+- **Fejl og warnings:** Følger de eksisterende API-schemas og beskrivelser i
+  OpenAPI; KPI'er beregnes i backend.
 
 ### C-015 — Frontend-opdatering
 
-- **Status: ÅBEN.** Gruppen skal vælge, om analyser hentes automatisk ved
-  sidevisning, via manuel opdateringsknap eller begge dele. Opdatering efter
-  bookingmutation skal stadig ske ved næste GET/indlæsning; push er ikke besluttet
-  eller krævet.
+- **Status: AFKLARET 2026-11-08.** Analysefanen henter friske værdier, når
+  brugeren åbner fanen. Der er ingen periodisk opdatering eller push.
+- **Konsekvens:** Efter en booking skal brugeren åbne analysefanen for at hente
+  værdier fra næste API-request. Tableau opdateres ved connectorens refresh.
 
 ### C-016 — Tableau som leverance
 
@@ -228,8 +210,9 @@ testbeviset eller databasetilstanden beskrevet i Converge fra 2026-10-28.
 
 - **Status: AFKLARET.** Eksisterende data genskabes ved reproducerbar CSV/XLSX
   seed/import i PostgreSQL; der udføres ingen datamigrering fra MySQL.
-- **Åben detalje:** Mapping af kildefelter, `synthetic_import`-markering,
-  skrivebeskyttelse og dubletstrategi skal verificeres i den kommende importtask.
+- **Verificeret:** Mapping af kildefelter, `synthetic_import`-markering,
+  skrivebeskyttelse og idempotent import er implementeret; testbevis står i
+  `converge-tillaeg-uge2.md`.
 
 ### C-018 — Reduceret story-scope
 

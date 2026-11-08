@@ -2,9 +2,9 @@
 
 ## Status
 
-Udkast til tillægsopgave uge 2. Ikke implementeringsgodkendt. Hver story beskriver
-et brugerbehov og konkrete acceptkriterier; åbne beslutninger står i
-`clarify.md`.
+Godkendte user stories for tillægsopgave uge 2. Hver story beskriver et
+brugerbehov og konkrete acceptkriterier. Implementeringsstatus og testbevis står
+i `converge-tillaeg-uge2.md`.
 
 ## Scope
 
@@ -95,13 +95,11 @@ Acceptkriterier:
 
 ## Kvalitetstjek (INVEST)
 
-- **Uafhængige:** delvist vurderet; analyse- og databasedele har de afhængigheder,
-  der er beskrevet i Clarify og Tasks.
-- **Forhandlingsbare:** udkast; åbne valg og endpointdetaljer kræver gruppens
-  afklaring før implementering.
-- **Værdifulde:** formuleret ud fra receptionistens, administratorens og
-  beslutningstagerens mål; gruppen har endnu ikke reviewet tillægsopgave-udkastet.
-- **Estimerbare:** ikke vurderet; database- og endpointinventar er beskrevet i
-  Plan, men arbejdsestimat mangler.
-- **Små:** ikke verificeret; US-002 samler dataflow og seed.
+- **Uafhængige:** delvist; US-002 afhænger af seed/import, og analyse-stories
+  bruger den fælles backend og database.
+- **Forhandlingsbare:** beslutninger og endpointdetaljer er afklaret i
+  `clarify.md` og den godkendte OpenAPI-kontrakt.
+- **Værdifulde:** formuleret ud fra receptionistens og hoteladministratorens mål.
+- **Estimerbare:** opdelt i tasks; se `tasks.md`.
+- **Små:** US-002 er bredest, fordi den samler dataflow og seed.
 - **Testbare:** kriterier er observerbare.
